@@ -15,5 +15,12 @@ module.exports = {
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "setupFiles": [
+        "jest-plugin-context/setup"
+      ],
+      testPathIgnorePatterns: [
+        '/node_modules/',
+        'dist',
+    ],
 };

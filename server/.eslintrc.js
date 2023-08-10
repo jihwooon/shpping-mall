@@ -22,4 +22,14 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
   },
+  jest: {
+    globalAliases: {
+      describe: ['context'],
+      fdescribe: ['fcontext'],
+      xdescribe: ['xcontext'],
+    },
+  },
+  globals: {
+    context: 'readonly',
+  },
 };
