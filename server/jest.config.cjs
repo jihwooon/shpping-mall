@@ -6,6 +6,13 @@ module.exports = {
       "json",
       "ts"
     ],
+    "setupFiles": [
+      "jest-plugin-context/setup"
+    ],
+    testPathIgnorePatterns: [
+      '/node_modules/',
+      'dist',
+    ],
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
@@ -16,9 +23,6 @@ module.exports = {
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
-    "setupFiles": [
-        "jest-plugin-context/setup"
-      ],
       testPathIgnorePatterns: [
         '/node_modules/',
         'dist',
