@@ -1,5 +1,5 @@
 import Product from './product.entity'
-import { product } from '../fixture/productFixture'
+import { product } from '../../fixture/productFixture'
 
 describe('Product', () => {
   const products = new Product(product)
