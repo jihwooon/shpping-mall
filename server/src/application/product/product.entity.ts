@@ -49,15 +49,3 @@ export default class Product {
     this.imageUrl = imageUrl
   }
 }
-
-export interface ProductListItem {
-    productId?: number
-    categoryId?: number
-    productName?: string
-    size?: string
-    recentPrice?: number
-    buyPrice?: number
-    sellPrice?: number
-    productInfo?: string
-    imageUrl?: string
-}
