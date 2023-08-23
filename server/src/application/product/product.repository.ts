@@ -72,11 +72,14 @@ export default class productRepository {
     }))
   }
 
-  async update(product: Product): Promise<boolean> {
+  async update(
+    id: number,
+    product: Product,
+  ): Promise<boolean> {
     const [rows] = await doQuery((connect) =>
       connect.execute<ResultSetHeader>(
-        `UPDATE product SET productName = ?`,
-        [product.productName],
+        `UPDATE product SET productName = ? WHERE product = ?`,
+        [product.productName, product.imageUrl, id],
       ),
     )
 
