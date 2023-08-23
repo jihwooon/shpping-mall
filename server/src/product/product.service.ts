@@ -10,7 +10,9 @@ export class ProductService {
   ) {}
 
   async createProduct(product: Product): Promise<boolean> {
-    const products = await this.productRepository.save(product)
+    const products = await this.productRepository.save(
+      product,
+    )
     return products
   }
 

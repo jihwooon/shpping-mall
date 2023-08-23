@@ -32,9 +32,9 @@ export class ProductController {
     )
 
     if (!result) {
-      throw new InternalServerErrorException()  
+      throw new InternalServerErrorException()
     }
-    
+
     return {
       success: true,
       message: 'Product success',
