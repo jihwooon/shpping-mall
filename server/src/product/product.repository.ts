@@ -6,7 +6,7 @@ import {
 import Product from './product.entity'
 
 export default class productRepository {
-  async save(product: Product): Promise<void> {
+  async save(product: Product): Promise<boolean> {
     await doQuery((connection) =>
       connection.execute(
         `INSERT INTO product (productId, categoryId, productName, size,recentPrice, buyPrice, sellPrice, productInfo, imageUrl) VALUES (?,?,?,?,?,?,?,?,?)`,
@@ -22,6 +22,7 @@ export default class productRepository {
         ],
       ),
     )
+    return true
   }
 
   async findById(id: number): Promise<Product | null> {

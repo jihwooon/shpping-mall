@@ -9,12 +9,18 @@ export class ProductService {
     private readonly productRepository: ProductRepository,
   ) {}
 
-  async createProduct(product: Product): Promise<void> {
-    await this.productRepository.save(product)
+  async createProduct(product: Product): Promise<boolean> {
+    const products = await this.productRepository.save(product)
+    return products
   }
 
-  async getProduct(id: number) {
-    await this.productRepository.findById(id)
+  async getProduct(
+    id: number,
+  ): Promise<Product | undefined> {
+    const product = await this.productRepository.findById(
+      id,
+    )
+    return product
   }
 
   async getProducts(): Promise<Product[]> {
