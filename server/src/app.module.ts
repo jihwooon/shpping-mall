@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
-import { AppController } from './web/app.controller'
-import { AppService } from './application/app.service'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
 import { ConfigModule } from '@nestjs/config'
 
 @Module({

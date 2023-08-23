@@ -1,4 +1,4 @@
-import { doQuery } from '../../config/db.config'
+import { doQuery } from '../config/db.config'
 import {
   RowDataPacket,
   ResultSetHeader,

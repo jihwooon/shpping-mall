@@ -1,4 +1,4 @@
-import Product from '../application/product/product.entity'
+import Product from '../product/product.entity'
 
 export const product = new Product({
   productId: 28260,
