@@ -1,4 +1,5 @@
 import Product from './product.entity'
+import { CreateProductDTO } from './dto/createProduct.dto'
 import { ProductService } from './product.service'
 import {
   Controller,
@@ -26,15 +27,14 @@ export class ProductController {
   }
 
   @Post()
-  async createProductHandler(@Body() product: Product) {
-    const result = await this.productService.createProduct(
-      product,
+  async createProductHandler(
+    @Body() request: CreateProductDTO,
+  ) {
+    await this.productService.createProduct(
+      new Product({
+        categoryId: request.categoryId,
+      }),
     )
-
-    if (!result) {
-      throw new InternalServerErrorException()
-    }
-
     return {
       success: true,
       message: 'Product success',

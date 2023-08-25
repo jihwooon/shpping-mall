@@ -9,11 +9,8 @@ export class ProductService {
     private readonly productRepository: ProductRepository,
   ) {}
 
-  async createProduct(product: Product): Promise<boolean> {
-    const products = await this.productRepository.save(
-      product,
-    )
-    return products
+  async createProduct(product: Product): Promise<void> {
+    await this.productRepository.save(product)
   }
 
   async getProduct(
@@ -25,21 +22,21 @@ export class ProductService {
     return product
   }
 
-  async getProducts(): Promise<Product[]> {
-    const productList =
-      await this.productRepository.findAll()
-    return productList
-  }
+  // async getProducts(): Promise<Product[]> {
+  //   const productList =
+  //     await this.productRepository.findAll()
+  //   return productList
+  // }
 
-  async updateProduct(
-    id: number,
-    updateProduct: UpdateProductDTO,
-  ): Promise<boolean> {
-    const product = new Product({
-      productName: updateProduct.content,
-      imageUrl: updateProduct.imageURL,
-    })
+  // async updateProduct(
+  //   id: number,
+  //   updateProduct: UpdateProductDTO,
+  // ): Promise<boolean> {
+  //   const product = new Product({
+  //     productName: updateProduct.content,
+  //     imageUrl: updateProduct.imageURL,
+  //   })
 
-    return await this.productRepository.update(id, product)
-  }
+  //   return await this.productRepository.update(id, product)
+  // }
 }
