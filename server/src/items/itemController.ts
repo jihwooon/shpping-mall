@@ -12,11 +12,11 @@ export class ItemController {
     await this.itemService.registerItem(
       new Item({
         id: request.id,
-        itemName: request.name,
-        itemDetail: request.detail,
+        itemName: request.itemName,
+        itemDetail: request.itemDetail,
         price: request.price,
         stockNumber: request.stockNumber,
-        itemSellStatus: request.sellStatus,
+        sellStatus: request.sellStatus,
       }),
     )
   }

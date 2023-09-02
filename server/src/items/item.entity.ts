@@ -28,7 +28,7 @@ export class Item {
     modifiedBy = '',
     itemDetail = '',
     itemName = '',
-    itemSellStatus = ItemStatusEnum.SELL,
+    sellStatus = ItemStatusEnum.SELL,
     stockNumber = 0,
     price = 0,
   }: {
@@ -39,7 +39,7 @@ export class Item {
     modifiedBy?: string
     itemDetail?: string
     itemName?: string
-    itemSellStatus?: ItemStatusEnum
+    sellStatus?: ItemStatusEnum
     stockNumber?: number
     price?: number
   }) {
@@ -50,7 +50,7 @@ export class Item {
     this.modifiedBy = modifiedBy
     this.detail = itemDetail
     this.name = itemName
-    this.sellStatus = itemSellStatus
+    this.sellStatus = sellStatus
     this.stockNumber = stockNumber
     this.price = price
   }
