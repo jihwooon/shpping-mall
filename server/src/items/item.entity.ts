@@ -1,3 +1,4 @@
+import { ItemStatusEnum } from './item-status.enum'
 export class Item {
   id: number
 
@@ -13,7 +14,7 @@ export class Item {
 
   name: string
 
-  sellStatus: string
+  sellStatus: ItemStatusEnum
 
   stockNumber: number
 
@@ -27,7 +28,7 @@ export class Item {
     modifiedBy = '',
     itemDetail = '',
     itemName = '',
-    itemSellStatus = '',
+    itemSellStatus = ItemStatusEnum.SELL,
     stockNumber = 0,
     price = 0,
   }: {
@@ -38,7 +39,7 @@ export class Item {
     modifiedBy?: string
     itemDetail?: string
     itemName?: string
-    itemSellStatus?: string
+    itemSellStatus?: ItemStatusEnum
     stockNumber?: number
     price?: number
   }) {

@@ -11,11 +11,9 @@ export class ItemRepository implements Repository<Item, number> {
   ) {}
 
   async save(items: Item): Promise<void> {
-    await this.connection.execute(`INSERT INTO item (id, name, detail, price ) VALUES (?,?,?,?)`, [
-      items.id,
-      items.name,
-      items.detail,
-      items.price,
-    ])
+    await this.connection.execute(
+      `INSERT INTO item (id, name, detail, price, sellStatus, stockNumber,createTime) VALUES (?,?,?,?,?,?,?)`,
+      [items.id, items.name, items.detail, items.price, items.sellStatus, items.stockNumber, items.createTime],
+    )
   }
 }
