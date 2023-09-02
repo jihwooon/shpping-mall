@@ -13,7 +13,15 @@ export class ItemRepository implements Repository<Item, number> {
   async save(items: Item): Promise<void> {
     await this.connection.execute(
       `INSERT INTO item (id, name, detail, price, sellStatus, stockNumber,createTime) VALUES (?,?,?,?,?,?,?)`,
-      [items.id, items.name, items.detail, items.price, items.sellStatus, items.stockNumber, items.createTime],
+      [
+        items.id,
+        items.itemName,
+        items.itemDetail,
+        items.price,
+        items.itemSellStatus,
+        items.stockNumber,
+        items.createTime,
+      ],
     )
   }
 
@@ -31,10 +39,10 @@ export class ItemRepository implements Repository<Item, number> {
 
     return {
       id: row['id'],
-      name: row['name'],
-      detail: row['detail'],
+      itemName: row['name'],
+      itemDetail: row['detail'],
       price: row['price'],
-      sellStatus: row['sellStatus'],
+      itemSellStatus: row['sellStatus'],
       stockNumber: row['stockNumber'],
       createTime: row['createTime'],
       updateTime: row['updateTime'],

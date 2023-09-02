@@ -9,4 +9,10 @@ export class ItemService {
   async registerItem(items: Item): Promise<void> {
     await this.itemRepository.save(items)
   }
+
+  async getItem(id: number): Promise<Item> {
+    const item = await this.itemRepository.findById(id)
+
+    return item
+  }
 }
