@@ -16,4 +16,30 @@ export class ItemRepository implements Repository<Item, number> {
       [items.id, items.name, items.detail, items.price, items.sellStatus, items.stockNumber, items.createTime],
     )
   }
+
+  async findById(id: number): Promise<Item | undefined> {
+    const [rows] = await this.connection.execute(
+      `SELECT id, name, detail, price, sellStatus, stockNumber, createTime, updateTime, createBy, modifiedBy FROM item where id = ?`,
+      [id],
+    )
+
+    const row = rows ?? []
+
+    if (!row) {
+      return undefined
+    }
+
+    return {
+      id: row['id'],
+      name: row['name'],
+      detail: row['detail'],
+      price: row['price'],
+      sellStatus: row['sellStatus'],
+      stockNumber: row['stockNumber'],
+      createTime: row['createTime'],
+      updateTime: row['updateTime'],
+      createBy: row['createBy'],
+      modifiedBy: row['modifiedBy'],
+    }
+  }
 }
