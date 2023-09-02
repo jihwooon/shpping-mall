@@ -4,6 +4,7 @@ import { ItemService } from './item.service'
 import { ItemStatusEnum } from './item-status.enum'
 import { ItemRepository } from './item.repository'
 import { DatabaseModule } from '../config/database/database.module'
+import { ITEMS } from '../fixture/itemFixture'
 
 describe('ItemController', () => {
   let itemController: ItemController
@@ -28,13 +29,29 @@ describe('ItemController', () => {
     itemService = app.get<ItemService>(ItemService)
   })
 
-  describe('createItemHandler', () => {
-    it('should return "Hello World!"', async () => {
-      const spyFn = jest.spyOn(itemController, 'createItemHandler')
-      await itemController.createItemHandler(request)
+  describe('createItemHandler 메서드', () => {
+    context('멤버 객체가 주어지면', () => {
+      it('해당 메서드 호출한다', async () => {
+        const spyFn = jest.spyOn(itemController, 'createItemHandler')
+        await itemController.createItemHandler(request)
+        expect(spyFn).toHaveBeenCalled()
+        expect(spyFn).toBeCalledWith(request)
+      })
+    })
+  })
 
-      expect(spyFn).toHaveBeenCalled()
-      expect(spyFn).toBeCalledWith(request)
+  describe('getItemHandler 메서드', () => {
+    beforeEach(() => {
+      itemService.getItem = jest.fn().mockImplementation(() => ITEMS)
+    })
+
+    context('만약 id가 주어지면', () => {
+      const ID = 1
+      it('저장된 객체 정보를 리턴한다', async () => {
+        const item = await itemController.getItemHandler(ID)
+
+        expect(item).toEqual(ITEMS)
+      })
     })
   })
 })

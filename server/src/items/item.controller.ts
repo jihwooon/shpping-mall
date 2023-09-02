@@ -1,7 +1,7 @@
 import { Item } from './item.entity'
 import { ItemInfoDTO } from './dto/itemInfoDTO'
 import { ItemService } from './item.service'
-import { Body, Controller, Post } from '@nestjs/common'
+import { Body, Controller, Post, Get, Param } from '@nestjs/common'
 
 @Controller('items')
 export class ItemController {
@@ -19,5 +19,10 @@ export class ItemController {
         sellStatus: request.sellStatus,
       }),
     )
+  }
+
+  @Get(':id')
+  async getItemHandler(@Param('id') id: number): Promise<Item> {
+    return await this.itemService.getItem(id)
   }
 }

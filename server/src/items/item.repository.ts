@@ -1,4 +1,4 @@
-import { Connection } from 'mysql2/promise'
+import { Connection, RowDataPacket } from 'mysql2/promise'
 import { Item } from './item.entity'
 import { Inject } from '@nestjs/common'
 import { MYSQL_CONNECTION } from '../config/database/constants'
@@ -26,12 +26,12 @@ export class ItemRepository implements Repository<Item, number> {
   }
 
   async findById(id: number): Promise<Item | undefined> {
-    const [rows] = await this.connection.execute(
-      `SELECT id, name, detail, price, sellStatus, stockNumber, createTime, updateTime, createBy, modifiedBy FROM item where id = ?`,
+    const [rows] = await this.connection.execute<RowDataPacket[]>(
+      `SELECT id, name, detail, price, sellStatus, stockNumber, createTime, updateTime, createBy, modifiedBy FROM item WHERE id = ?`,
       [id],
     )
 
-    const row = rows ?? []
+    const [row] = rows ?? []
 
     if (!row) {
       return undefined
