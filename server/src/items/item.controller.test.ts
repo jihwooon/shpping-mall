@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { ItemController } from './itemController'
+import { ItemController } from './item.controller'
 import { ItemService } from './item.service'
 import { ItemStatusEnum } from './item-status.enum'
 import { ItemRepository } from './item.repository'
