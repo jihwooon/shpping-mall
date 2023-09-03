@@ -3,12 +3,8 @@ import { Item } from '../domain/item.entity'
 import { ItemRepository } from '../domain/item.repository'
 
 @Injectable()
-export class ItemService {
+export class ItemReader {
   constructor(private readonly itemRepository: ItemRepository) {}
-
-  async registerItem(items: Item): Promise<void> {
-    await this.itemRepository.save(items)
-  }
 
   async getItem(id: number): Promise<Item> {
     const item = await this.itemRepository.findById(id)

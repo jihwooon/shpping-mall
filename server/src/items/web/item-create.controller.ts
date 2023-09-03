@@ -1,13 +1,14 @@
 import { Item } from '../domain/item.entity'
 import { ItemInfoRequest } from '../dto/itemInfoRequest.dto'
-import { ItemService } from '../application/item.service'
-import { Body, Controller, Post } from '@nestjs/common'
+import { ItemCreater } from '../application/item.creater'
+import { Body, Controller, Post, HttpCode } from '@nestjs/common'
 
 @Controller('items')
 export class ItemCreateController {
-  constructor(private readonly itemService: ItemService) {}
+  constructor(private readonly itemService: ItemCreater) {}
 
   @Post()
+  @HttpCode(204)
   async createItemHandler(@Body() request: ItemInfoRequest): Promise<void> {
     await this.itemService.registerItem(
       new Item({

@@ -1,43 +1,22 @@
 import { NotFoundException } from '@nestjs/common'
 import { ItemRepository } from '../domain/item.repository'
 import { Test, TestingModule } from '@nestjs/testing'
-import { ItemService } from './item.service'
 import { ITEMS } from '../../fixture/itemFixture'
-import { Item } from '../domain/item.entity'
 import { DatabaseModule } from '../../config/database/database.module'
-import { DbHelper } from '../../config/helper/db.helper'
+import { ItemReader } from './item.reader'
 
-describe('ItemService', () => {
-  let itemService: ItemService
+describe('ItemReader', () => {
+  let itemReader: ItemReader
   let itemRepository: ItemRepository
-  let dbHelper: DbHelper
-  let items = new Item(ITEMS)
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [DatabaseModule],
-      providers: [ItemRepository, ItemService, DbHelper],
+      providers: [ItemRepository, ItemReader],
     }).compile()
 
-    itemService = module.get<ItemService>(ItemService)
+    itemReader = module.get<ItemReader>(ItemReader)
     itemRepository = module.get<ItemRepository>(ItemRepository)
-    dbHelper = module.get<DbHelper>(DbHelper)
-  })
-
-  beforeEach(async () => {
-    await dbHelper.clear()
-  })
-
-  describe('itemService 메서드', () => {
-    context('Item 객체가 주어지면', () => {
-      it('메서드 호출을 검증한다 ', async () => {
-        const spyFn = jest.spyOn(itemService, 'registerItem').mockImplementation()
-        await itemService.registerItem(items)
-
-        expect(spyFn).toHaveBeenCalled()
-        expect(spyFn).toBeCalledWith(items)
-      })
-    })
   })
 
   describe('findById 메서드', () => {
@@ -48,8 +27,8 @@ describe('ItemService', () => {
         itemRepository.findById = jest.fn().mockImplementation(() => ITEMS)
       })
 
-      it('item 정보를 반환한다', async () => {
-        const item = await itemService.getItem(ID)
+      it('item 객체를 리턴한다', async () => {
+        const item = await itemReader.getItem(ID)
 
         expect(item.id).toBe(1)
         expect(item.itemName).toBe('New Balance 530 Steel Grey')
@@ -69,7 +48,7 @@ describe('ItemService', () => {
       })
 
       it('NotFoundException을 던진다.', async () => {
-        expect(itemService.getItem(NOT_FOUND_ID)).rejects.toThrow(
+        expect(itemReader.getItem(NOT_FOUND_ID)).rejects.toThrow(
           new NotFoundException(`${NOT_FOUND_ID}에 해당하는 상품을 찾을 수 없습니다.`, {
             cause: new Error(),
             description: 'NOT_FOUND',

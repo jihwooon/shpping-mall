@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { ItemService } from '../application/item.service'
 import { ItemStatusEnum } from '../domain/item-status.enum'
 import { ItemRepository } from '../domain/item.repository'
 import { DatabaseModule } from '../../config/database/database.module'
 import { ITEMS } from '../../fixture/itemFixture'
 import { NotFoundException } from '@nestjs/common'
 import { ItemDetailController } from './item-detail.controller'
+import { ItemReader } from '../application/item.reader'
 
 describe('ItemController', () => {
   let itemController: ItemDetailController
-  let itemService: ItemService
+  let itemReader: ItemReader
 
   const RESPONSE = {
     id: 1,
@@ -24,11 +24,11 @@ describe('ItemController', () => {
     const app: TestingModule = await Test.createTestingModule({
       imports: [DatabaseModule],
       controllers: [ItemDetailController],
-      providers: [ItemService, ItemRepository],
+      providers: [ItemReader, ItemRepository],
     }).compile()
 
     itemController = app.get<ItemDetailController>(ItemDetailController)
-    itemService = app.get<ItemService>(ItemService)
+    itemReader = app.get<ItemReader>(ItemReader)
   })
 
   describe('getItemHandler 메서드', () => {
@@ -36,7 +36,7 @@ describe('ItemController', () => {
     const NOT_FOUND_ID = 9999
     context('id가 주어지면', () => {
       beforeEach(() => {
-        itemService.getItem = jest.fn().mockImplementation(() => ITEMS)
+        itemReader.getItem = jest.fn().mockImplementation(() => ITEMS)
       })
       it('저장된 객체 정보를 리턴한다', async () => {
         const item = await itemController.getItemHandler(ID)
@@ -47,7 +47,7 @@ describe('ItemController', () => {
 
     context('잘못된 id가 주어지면', () => {
       beforeEach(() => {
-        itemService.getItem = jest
+        itemReader.getItem = jest
           .fn()
           .mockRejectedValue(new NotFoundException(`${NOT_FOUND_ID}에 해당하는 상품을 찾을 수 없습니다.`))
       })

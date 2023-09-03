@@ -1,10 +1,10 @@
-import { ItemService } from '../application/item.service'
 import { Controller, Get, Param } from '@nestjs/common'
 import { ItemInfoResponse } from '../dto/itemInfoResponse.dto'
+import { ItemReader } from '../application/item.reader'
 
 @Controller('items')
 export class ItemDetailController {
-  constructor(private readonly itemService: ItemService) {}
+  constructor(private readonly itemService: ItemReader) {}
 
   @Get(':id')
   async getItemHandler(@Param('id') id: number): Promise<ItemInfoResponse> {
