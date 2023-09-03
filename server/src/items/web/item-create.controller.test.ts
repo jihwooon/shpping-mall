@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { ItemController } from './item.controller'
+import { ItemCreateController } from './item-create.controller'
 import { ItemService } from '../application/item.service'
 import { ItemStatusEnum } from '../domain/item-status.enum'
 import { ItemRepository } from '../domain/item.repository'
@@ -7,7 +7,7 @@ import { DatabaseModule } from '../../config/database/database.module'
 import { DbHelper } from '../../config/helper/db.helper'
 
 describe('ItemController', () => {
-  let itemController: ItemController
+  let itemController: ItemCreateController
   let itemService: ItemService
   let dbHelper: DbHelper
   const REQUEST = {
@@ -22,11 +22,11 @@ describe('ItemController', () => {
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       imports: [DatabaseModule],
-      controllers: [ItemController],
+      controllers: [ItemCreateController],
       providers: [ItemService, ItemRepository, DbHelper],
     }).compile()
 
-    itemController = app.get<ItemController>(ItemController)
+    itemController = app.get<ItemCreateController>(ItemCreateController)
     itemService = app.get<ItemService>(ItemService)
     dbHelper = app.get<DbHelper>(DbHelper)
   })

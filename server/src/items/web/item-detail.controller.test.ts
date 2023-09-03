@@ -1,23 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { ItemController } from './item.controller'
 import { ItemService } from '../application/item.service'
 import { ItemStatusEnum } from '../domain/item-status.enum'
 import { ItemRepository } from '../domain/item.repository'
 import { DatabaseModule } from '../../config/database/database.module'
 import { ITEMS } from '../../fixture/itemFixture'
 import { NotFoundException } from '@nestjs/common'
+import { ItemDetailController } from './item-detail.controller'
 
 describe('ItemController', () => {
-  let itemController: ItemController
+  let itemController: ItemDetailController
   let itemService: ItemService
-  const REQUEST = {
-    id: 1,
-    itemName: 'New Balance 530 Steel Grey',
-    itemDetail: 'M990WT6',
-    price: 130000,
-    stockNumber: 10,
-    sellStatus: ItemStatusEnum.SELL,
-  }
 
   const RESPONSE = {
     id: 1,
@@ -31,11 +23,11 @@ describe('ItemController', () => {
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       imports: [DatabaseModule],
-      controllers: [ItemController],
+      controllers: [ItemDetailController],
       providers: [ItemService, ItemRepository],
     }).compile()
 
-    itemController = app.get<ItemController>(ItemController)
+    itemController = app.get<ItemDetailController>(ItemDetailController)
     itemService = app.get<ItemService>(ItemService)
   })
 

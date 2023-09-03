@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common'
 import { ItemService } from './application/item.service'
-import { ItemController } from './web/item.controller'
+import { ItemCreateController } from './web/item-create.controller'
+import { ItemDetailController } from './web/item-detail.controller'
 import { ItemRepository } from './domain/item.repository'
 import { DatabaseModule } from '../config/database/database.module'
 
 @Module({
   imports: [DatabaseModule],
-  controllers: [ItemController],
+  controllers: [ItemCreateController, ItemDetailController],
   providers: [ItemService, ItemRepository],
   exports: [ItemService],
 })
