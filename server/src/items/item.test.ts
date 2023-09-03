@@ -2,7 +2,7 @@ import { Item } from './item.entity'
 import { ITEMS } from '../fixture/itemFixture'
 
 describe('Item', () => {
-  let items = new Item({})
+  let items: Item
 
   describe('item 값이 존재하면', () => {
     beforeEach(() => {
