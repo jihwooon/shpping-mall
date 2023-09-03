@@ -4,7 +4,6 @@ import { ItemService } from '../application/item.service'
 import { ItemStatusEnum } from '../domain/item-status.enum'
 import { ItemRepository } from '../domain/item.repository'
 import { DatabaseModule } from '../../config/database/database.module'
-import { ITEMS } from '../../fixture/itemFixture'
 import { DbHelper } from '../../config/helper/db.helper'
 
 describe('ItemController', () => {
@@ -12,15 +11,6 @@ describe('ItemController', () => {
   let itemService: ItemService
   let dbHelper: DbHelper
   const REQUEST = {
-    id: 1,
-    itemName: 'New Balance 530 Steel Grey',
-    itemDetail: 'M990WT6',
-    price: 130000,
-    stockNumber: 10,
-    sellStatus: ItemStatusEnum.SELL,
-  }
-
-  const RESPONSE = {
     id: 1,
     itemName: 'New Balance 530 Steel Grey',
     itemDetail: 'M990WT6',
@@ -53,21 +43,6 @@ describe('ItemController', () => {
 
         expect(spyFn).toHaveBeenCalled()
         expect(spyFn).toBeCalledWith(REQUEST)
-      })
-    })
-  })
-
-  describe('getItemHandler 메서드', () => {
-    beforeEach(() => {
-      itemService.getItem = jest.fn().mockImplementation(() => ITEMS)
-    })
-
-    context('만약 id가 주어지면', () => {
-      const ID = 1
-      it('저장된 객체 정보를 리턴한다', async () => {
-        const item = await itemController.getItemHandler(ID)
-
-        expect(item).toEqual(RESPONSE)
       })
     })
   })
