@@ -4,12 +4,12 @@ import { ITEMS } from '../../fixture/itemFixture'
 describe('Item', () => {
   let items: Item
 
-  describe('item 값이 존재하면', () => {
+  describe('객체가 주어지면', () => {
     beforeEach(() => {
       items = new Item(ITEMS)
     })
 
-    it('item 값을 리턴한다.', () => {
+    it('값을 리턴한다.', () => {
       expect(items.id).toEqual(1)
       expect(items.modifiedBy).toEqual('수정자')
       expect(items.createBy).toEqual('생성자')
@@ -22,12 +22,12 @@ describe('Item', () => {
     })
   })
 
-  describe('items 값이 빈 값이면', () => {
+  describe('객체가 빈 값이 주어지면', () => {
     beforeEach(() => {
       items = new Item({})
     })
 
-    it('item default 값을 리턴한다.', () => {
+    it('default 값을 리턴한다.', () => {
       expect(items.id).toEqual(0)
       expect(items.modifiedBy).toEqual('')
       expect(items.createBy).toEqual('')
