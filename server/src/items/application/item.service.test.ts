@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common'
 import { ItemRepository } from '../domain/item.repository'
 import { Test, TestingModule } from '@nestjs/testing'
 import { ItemService } from './item.service'
@@ -41,6 +42,7 @@ describe('ItemService', () => {
 
   describe('findById 메서드', () => {
     const ID = 1
+    const NOT_FOUND_ID = 99999
     context('id가 주어지면', () => {
       beforeEach(() => {
         itemRepository.findById = jest.fn().mockImplementation(() => ITEMS)
@@ -58,6 +60,21 @@ describe('ItemService', () => {
         expect(item.modifiedBy).toBe('수정자')
         expect(item.createTime).toStrictEqual(new Date('2023-09-01T23:10:00.009Z'))
         expect(item.updateTime).toStrictEqual(new Date('2023-09-01T23:10:00.009Z'))
+      })
+    })
+
+    context('잘못된 id가 주어지면', () => {
+      beforeEach(() => {
+        itemRepository.findById = jest.fn().mockResolvedValue(undefined)
+      })
+
+      it('NotFoundException을 던진다.', async () => {
+        expect(itemService.getItem(NOT_FOUND_ID)).rejects.toThrow(
+          new NotFoundException(`${NOT_FOUND_ID}에 해당하는 상품을 찾을 수 없습니다.`, {
+            cause: new Error(),
+            description: 'NOT_FOUND',
+          }),
+        )
       })
     })
   })
