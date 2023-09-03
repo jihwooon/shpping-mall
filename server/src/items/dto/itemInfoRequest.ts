@@ -1,6 +1,6 @@
 import { ItemStatusEnum } from '../item-status.enum'
 
-export class ItemInfoDTO {
+export class ItemInfoRequest {
   id: number
 
   itemName: string
