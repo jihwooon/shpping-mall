@@ -11,7 +11,16 @@ describe('ItemController', () => {
   let itemController: ItemController
   let itemService: ItemService
   let dbHelper: DbHelper
-  const item = {
+  const REQUEST = {
+    id: 1,
+    itemName: 'New Balance 530 Steel Grey',
+    itemDetail: 'M990WT6',
+    price: 130000,
+    stockNumber: 10,
+    sellStatus: ItemStatusEnum.SELL,
+  }
+
+  const RESPONSE = {
     id: 1,
     itemName: 'New Balance 530 Steel Grey',
     itemDetail: 'M990WT6',
@@ -40,10 +49,10 @@ describe('ItemController', () => {
     context('Item 객체가 주어지면', () => {
       it('해당 메서드 호출을 검증한다', async () => {
         const spyFn = jest.spyOn(itemController, 'createItemHandler').mockImplementation()
-        await itemController.createItemHandler(item)
+        await itemController.createItemHandler(REQUEST)
 
         expect(spyFn).toHaveBeenCalled()
-        expect(spyFn).toBeCalledWith(item)
+        expect(spyFn).toBeCalledWith(REQUEST)
       })
     })
   })
@@ -58,7 +67,7 @@ describe('ItemController', () => {
       it('저장된 객체 정보를 리턴한다', async () => {
         const item = await itemController.getItemHandler(ID)
 
-        expect(item).toEqual(ITEMS)
+        expect(item).toEqual(RESPONSE)
       })
     })
   })

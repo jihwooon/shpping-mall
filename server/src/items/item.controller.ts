@@ -1,5 +1,5 @@
 import { Item } from './item.entity'
-import { ItemInfoRequest } from './dto/itemInfoRequest'
+import { ItemInfoRequest } from './dto/itemInfoRequest.dto'
 import { ItemService } from './item.service'
 import { Body, Controller, Post, Get, Param } from '@nestjs/common'
 import { ItemInfoResponse } from './dto/itemInfoResponse.dto'
