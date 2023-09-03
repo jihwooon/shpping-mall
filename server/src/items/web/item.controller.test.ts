@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { ItemController } from './item.controller'
-import { ItemService } from './item.service'
-import { ItemStatusEnum } from './item-status.enum'
-import { ItemRepository } from './item.repository'
-import { DatabaseModule } from '../config/database/database.module'
-import { ITEMS } from '../fixture/itemFixture'
-import { DbHelper } from '../config/helper/db.helper'
+import { ItemService } from '../application/item.service'
+import { ItemStatusEnum } from '../domain/item-status.enum'
+import { ItemRepository } from '../domain/item.repository'
+import { DatabaseModule } from '../../config/database/database.module'
+import { ITEMS } from '../../fixture/itemFixture'
+import { DbHelper } from '../../config/helper/db.helper'
 
 describe('ItemController', () => {
   let itemController: ItemController

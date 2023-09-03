@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { Item } from './item.entity'
-import { ItemRepository } from './item.repository'
+import { Item } from '../domain/item.entity'
+import { ItemRepository } from '../domain/item.repository'
 
 @Injectable()
 export class ItemService {

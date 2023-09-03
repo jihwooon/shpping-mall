@@ -1,8 +1,8 @@
-import { Item } from './item.entity'
-import { ItemInfoRequest } from './dto/itemInfoRequest.dto'
-import { ItemService } from './item.service'
+import { Item } from '../domain/item.entity'
+import { ItemInfoRequest } from '../dto/itemInfoRequest.dto'
+import { ItemService } from '../application/item.service'
 import { Body, Controller, Post, Get, Param } from '@nestjs/common'
-import { ItemInfoResponse } from './dto/itemInfoResponse.dto'
+import { ItemInfoResponse } from '../dto/itemInfoResponse.dto'
 
 @Controller('items')
 export class ItemController {

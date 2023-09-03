@@ -1,10 +1,10 @@
-import { ItemRepository } from './item.repository'
+import { ItemRepository } from '../domain/item.repository'
 import { Test, TestingModule } from '@nestjs/testing'
 import { ItemService } from './item.service'
-import { ITEMS } from '../fixture/itemFixture'
-import { Item } from './item.entity'
-import { DatabaseModule } from '../config/database/database.module'
-import { DbHelper } from '../config/helper/db.helper'
+import { ITEMS } from '../../fixture/itemFixture'
+import { Item } from '../domain/item.entity'
+import { DatabaseModule } from '../../config/database/database.module'
+import { DbHelper } from '../../config/helper/db.helper'
 
 describe('ItemService', () => {
   let itemService: ItemService

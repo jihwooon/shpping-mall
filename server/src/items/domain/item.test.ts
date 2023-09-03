@@ -1,5 +1,5 @@
 import { Item } from './item.entity'
-import { ITEMS } from '../fixture/itemFixture'
+import { ITEMS } from '../../fixture/itemFixture'
 
 describe('Item', () => {
   let items: Item

@@ -1,4 +1,4 @@
-import { ItemStatusEnum } from '../item-status.enum'
+import { ItemStatusEnum } from '../domain/item-status.enum'
 
 export class ItemInfoRequest {
   id: number

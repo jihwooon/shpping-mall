@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
-import { ItemService } from './item.service'
-import { ItemController } from './item.controller'
-import { ItemRepository } from './item.repository'
+import { ItemService } from './application/item.service'
+import { ItemController } from './web/item.controller'
+import { ItemRepository } from './domain/item.repository'
 import { DatabaseModule } from '../config/database/database.module'
 
 @Module({

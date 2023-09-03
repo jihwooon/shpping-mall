@@ -1,4 +1,4 @@
-import { ItemStatusEnum } from '../items/item-status.enum'
+import { ItemStatusEnum } from '../items/domain/item-status.enum'
 export const ITEMS = {
   id: 1,
   createTime: new Date('2023-09-01T23:10:00.009Z'),

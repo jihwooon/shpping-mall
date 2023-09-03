@@ -1,7 +1,7 @@
 import { Connection, RowDataPacket } from 'mysql2/promise'
 import { Item } from './item.entity'
 import { Inject } from '@nestjs/common'
-import { MYSQL_CONNECTION } from '../config/database/constants'
+import { MYSQL_CONNECTION } from '../../config/database/constants'
 import { Repository } from 'src/config/database/repository'
 
 export class ItemRepository implements Repository<Item, number> {
