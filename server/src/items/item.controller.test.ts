@@ -32,14 +32,16 @@ describe('ItemController', () => {
     dbHelper = app.get<DbHelper>(DbHelper)
   })
 
+  beforeEach(async () => {
+    await dbHelper.clear()
+  })
+
   describe('createItemHandler 메서드', () => {
-    beforeEach(async () => {
-      await dbHelper.clear()
-    })
     context('Item 객체가 주어지면', () => {
       it('해당 메서드 호출을 검증한다', async () => {
-        const spyFn = jest.spyOn(itemController, 'createItemHandler')
+        const spyFn = jest.spyOn(itemController, 'createItemHandler').mockImplementation()
         await itemController.createItemHandler(item)
+
         expect(spyFn).toHaveBeenCalled()
         expect(spyFn).toBeCalledWith(item)
       })

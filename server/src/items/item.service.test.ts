@@ -4,28 +4,39 @@ import { ItemService } from './item.service'
 import { ITEMS } from '../fixture/itemFixture'
 import { Item } from './item.entity'
 import { DatabaseModule } from '../config/database/database.module'
+import { DbHelper } from '../config/helper/db.helper'
 
 describe('ItemService', () => {
   let itemService: ItemService
   let itemRepository: ItemRepository
+  let dbHelper: DbHelper
   let items = new Item(ITEMS)
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [DatabaseModule],
-      providers: [ItemRepository, ItemService],
+      providers: [ItemRepository, ItemService, DbHelper],
     }).compile()
 
     itemService = module.get<ItemService>(ItemService)
     itemRepository = module.get<ItemRepository>(ItemRepository)
+    dbHelper = module.get<DbHelper>(DbHelper)
   })
 
-  it('registerItem 함수을 호출한다 ', async () => {
-    const spyFn = jest.spyOn(itemService, 'registerItem')
-    await itemService.registerItem(items)
+  beforeEach(async () => {
+    await dbHelper.clear()
+  })
 
-    expect(spyFn).toHaveBeenCalled()
-    expect(spyFn).toBeCalledWith(items)
+  describe('itemService 메서드', () => {
+    context('Item 객체가 주어지면', () => {
+      it('메서드 호출을 검증한다 ', async () => {
+        const spyFn = jest.spyOn(itemService, 'registerItem').mockImplementation()
+        await itemService.registerItem(items)
+
+        expect(spyFn).toHaveBeenCalled()
+        expect(spyFn).toBeCalledWith(items)
+      })
+    })
   })
 
   describe('findById 메서드', () => {
