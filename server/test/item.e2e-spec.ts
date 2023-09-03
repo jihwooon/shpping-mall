@@ -1,26 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { INestApplication, NotFoundException } from '@nestjs/common'
+import { INestApplication, NotFoundException, ValidationPipe } from '@nestjs/common'
 import * as request from 'supertest'
 import { ItemModule } from '../src/items/item.module'
 import { ItemCreater } from '../src/items/application/item.creater'
-import { ItemStatusEnum } from '../src/items/domain/item-status.enum'
 import { ItemRepository } from '../src/items/domain/item.repository'
 import { DatabaseModule } from '../src/config/database/database.module'
 import { ItemReader } from '../src/items/application/item.reader'
-import { ITEMS } from '../src/fixture/itemFixture'
+import {
+  CREATE_NOT_DETAIL_REQUEST,
+  CREATE_NOT_NAME_REQUEST,
+  CREATE_NOT_PRICE_REQUEST,
+  CREATE_NOT_STOCK_REQUEST,
+  CREATE_REQUEST,
+  CREATE_RESPONSE,
+} from '../src/fixture/itemFixture'
 
 describe('ItemController (e2e)', () => {
   let app: INestApplication
   let itemCreater: ItemCreater
   let itemReader: ItemReader
-  const RESPONSE = {
-    id: 1,
-    itemName: 'New Balance 530 Steel Grey',
-    itemDetail: 'M990WT6',
-    price: 130000,
-    stockNumber: 10,
-    sellStatus: ItemStatusEnum.SELL,
-  }
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -32,18 +30,80 @@ describe('ItemController (e2e)', () => {
     itemReader = moduleFixture.get<ItemReader>(ItemReader)
     app = moduleFixture.createNestApplication()
 
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        transformOptions: { enableImplicitConversion: true },
+      }),
+    )
+
     await app.init()
   })
 
   describe('POST /items', () => {
-    context('Item 객체가 주어지면', () => {
-      beforeEach(() => {
-        itemCreater.registerItem = jest.fn().mockImplementation()
-      })
-      it('상태코드 204를 응답한다', async () => {
-        const response = await request(app.getHttpServer()).post('/items')
+    beforeEach(() => {
+      itemCreater.registerItem = jest.fn().mockResolvedValue(undefined)
+    })
 
-        expect(response.status).toEqual(204)
+    context('Item 객체가 주어지면', () => {
+      it('상태코드 204를 응답한다', async () => {
+        const { status, body } = await request(app.getHttpServer()).post('/items').send(CREATE_REQUEST)
+
+        expect(status).toEqual(204)
+        expect(body).toEqual({})
+      })
+    })
+
+    context('상풍명을 누락하면', () => {
+      it('상태코드 400를 응답한다', async () => {
+        const { status, body } = await request(app.getHttpServer()).post('/items').send(CREATE_NOT_NAME_REQUEST)
+
+        expect(status).toEqual(400)
+        expect(body).toEqual({
+          error: 'Bad Request',
+          message: ['상품명은 필수 입력 값입니다.'],
+          statusCode: 400,
+        })
+      })
+    })
+
+    context('상품 상세를 누락하면', () => {
+      it('상태코드 400를 응답한다', async () => {
+        const { status, body } = await request(app.getHttpServer()).post('/items').send(CREATE_NOT_DETAIL_REQUEST)
+
+        expect(status).toEqual(400)
+        expect(body).toEqual({
+          error: 'Bad Request',
+          message: ['상품 상세는 필수 입력 값입니다.'],
+          statusCode: 400,
+        })
+      })
+    })
+    context('가격를 누락하면', () => {
+      it('상태코드 400를 응답한다', async () => {
+        const { status, body } = await request(app.getHttpServer()).post('/items').send(CREATE_NOT_PRICE_REQUEST)
+
+        expect(status).toEqual(400)
+        expect(body).toEqual({
+          error: 'Bad Request',
+          message: ['price must be a number conforming to the specified constraints', '가격은 필수 입력 값입니다.'],
+          statusCode: 400,
+        })
+      })
+    })
+    context('재고를 누락하면', () => {
+      it('상태코드 400를 응답한다', async () => {
+        const { status, body } = await request(app.getHttpServer()).post('/items').send(CREATE_NOT_STOCK_REQUEST)
+
+        expect(status).toEqual(400)
+        expect(body).toEqual({
+          error: 'Bad Request',
+          message: [
+            'stockNumber must be a number conforming to the specified constraints',
+            '재고는 필수 입력 값입니다.',
+          ],
+          statusCode: 400,
+        })
       })
     })
   })
@@ -53,19 +113,21 @@ describe('ItemController (e2e)', () => {
     const NOT_FOUND_ID = 9999
     context('id 요청을 하면', () => {
       beforeEach(() => {
-        itemReader.getItem = jest.fn().mockImplementation(() => RESPONSE)
+        itemReader.getItem = jest.fn().mockImplementation(() => CREATE_RESPONSE)
       })
 
       it('상태코드 200을 응답한다', async () => {
-        const response = await request(app.getHttpServer()).get(`/items/${ID}`)
+        const { status, body } = await request(app.getHttpServer()).get(`/items/${ID}`)
 
-        expect(response.status).toEqual(200)
-        expect(response.body.id).toEqual(1)
-        expect(response.body.price).toEqual(130000)
-        expect(response.body.itemName).toEqual('New Balance 530 Steel Grey')
-        expect(response.body.itemDetail).toEqual('M990WT6')
-        expect(response.body.stockNumber).toEqual(10)
-        expect(response.body.sellStatus).toEqual('SELL')
+        expect(status).toEqual(200)
+        expect(body).toEqual({
+          id: 1,
+          itemDetail: 'M990WT6',
+          itemName: 'New Balance 530 Steel Grey',
+          price: 130000,
+          sellStatus: 'SELL',
+          stockNumber: 10,
+        })
       })
     })
 
@@ -76,9 +138,14 @@ describe('ItemController (e2e)', () => {
           .mockRejectedValue(new NotFoundException(`${NOT_FOUND_ID}에 해당하는 상품을 찾을 수 없습니다.`))
       })
       it('상태코드 404를 응답한다', async () => {
-        const response = await request(app.getHttpServer()).get(`/items/${NOT_FOUND_ID}`)
+        const { status, body } = await request(app.getHttpServer()).get(`/items/${NOT_FOUND_ID}`)
 
-        expect(response.status).toEqual(404)
+        expect(status).toEqual(404)
+        expect(body).toEqual({
+          error: 'Not Found',
+          message: '9999에 해당하는 상품을 찾을 수 없습니다.',
+          statusCode: 404,
+        })
       })
     })
   })
