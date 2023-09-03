@@ -5,11 +5,13 @@ import { ItemStatusEnum } from './item-status.enum'
 import { ItemRepository } from './item.repository'
 import { DatabaseModule } from '../config/database/database.module'
 import { ITEMS } from '../fixture/itemFixture'
+import { DbHelper } from '../config/helper/db.helper'
 
 describe('ItemController', () => {
   let itemController: ItemController
   let itemService: ItemService
-  const request = {
+  let dbHelper: DbHelper
+  const item = {
     id: 1,
     itemName: 'New Balance 530 Steel Grey',
     itemDetail: 'M990WT6',
@@ -22,20 +24,24 @@ describe('ItemController', () => {
     const app: TestingModule = await Test.createTestingModule({
       imports: [DatabaseModule],
       controllers: [ItemController],
-      providers: [ItemService, ItemRepository],
+      providers: [ItemService, ItemRepository, DbHelper],
     }).compile()
 
     itemController = app.get<ItemController>(ItemController)
     itemService = app.get<ItemService>(ItemService)
+    dbHelper = app.get<DbHelper>(DbHelper)
   })
 
   describe('createItemHandler 메서드', () => {
-    context('멤버 객체가 주어지면', () => {
-      it('해당 메서드 호출한다', async () => {
+    beforeEach(async () => {
+      await dbHelper.clear()
+    })
+    context('Item 객체가 주어지면', () => {
+      it('해당 메서드 호출을 검증한다', async () => {
         const spyFn = jest.spyOn(itemController, 'createItemHandler')
-        await itemController.createItemHandler(request)
+        await itemController.createItemHandler(item)
         expect(spyFn).toHaveBeenCalled()
-        expect(spyFn).toBeCalledWith(request)
+        expect(spyFn).toBeCalledWith(item)
       })
     })
   })
