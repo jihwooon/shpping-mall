@@ -1,14 +1,15 @@
 import { Item } from './item.entity'
-import { ItemInfoDTO } from './dto/itemInfoDTO'
+import { ItemInfoRequest } from './dto/itemInfoRequest'
 import { ItemService } from './item.service'
 import { Body, Controller, Post, Get, Param } from '@nestjs/common'
+import { ItemInfoResponse } from './dto/itemInfoResponse.dto'
 
 @Controller('items')
 export class ItemController {
   constructor(private readonly itemService: ItemService) {}
 
   @Post()
-  async createItemHandler(@Body() request: ItemInfoDTO): Promise<void> {
+  async createItemHandler(@Body() request: ItemInfoRequest): Promise<void> {
     await this.itemService.registerItem(
       new Item({
         id: request.id,
@@ -22,7 +23,16 @@ export class ItemController {
   }
 
   @Get(':id')
-  async getItemHandler(@Param('id') id: number): Promise<Item> {
-    return await this.itemService.getItem(id)
+  async getItemHandler(@Param('id') id: number): Promise<ItemInfoResponse> {
+    const response = await this.itemService.getItem(id)
+
+    return new ItemInfoResponse({
+      id: response.id,
+      itemName: response.itemName,
+      itemDetail: response.itemDetail,
+      price: response.price,
+      stockNumber: response.stockNumber,
+      sellStatus: response.itemSellStatus,
+    })
   }
 }
