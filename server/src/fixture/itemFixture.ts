@@ -71,3 +71,16 @@ export const GET_RESPONSE = {
   stockNumber: 10,
   sellStatus: ItemStatusEnum.SELL,
 }
+
+export const DB_RESPONSE = {
+  create_by: null,
+  create_time: new Date('2023-09-04T07:31:02'),
+  item_detail: 'M990WT6',
+  item_id: 1,
+  item_name: 'New Balance 530 Steel Grey',
+  item_price: 130000,
+  item_sell_status: 'SELL',
+  modified_by: null,
+  stock_number: 5,
+  update_time: null,
+}
