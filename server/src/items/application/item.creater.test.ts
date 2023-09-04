@@ -24,7 +24,7 @@ describe('ItemCreater class', () => {
   })
 
   beforeEach(async () => {
-    await dbHelper.clear()
+    await dbHelper.clear('item')
   })
 
   describe('registerItem method', () => {

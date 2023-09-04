@@ -14,11 +14,11 @@ export class ItemInfoResponse {
   sellStatus: ItemStatusEnum
 
   constructor({
-    id = 0,
-    itemName = '',
-    itemDetail = '',
-    price = 0,
-    stockNumber = 0,
+    id,
+    itemName,
+    itemDetail,
+    price,
+    stockNumber,
     sellStatus = ItemStatusEnum.SELL,
   }: {
     id: number

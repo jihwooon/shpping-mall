@@ -12,7 +12,7 @@ export class ItemRepository implements Repository<Item, number> {
 
   async save(items: Item): Promise<void> {
     await this.connection.execute(
-      `INSERT INTO item (id, name, detail, price, sellStatus, stockNumber,createTime) VALUES (?,?,?,?,?,?,?)`,
+      `INSERT INTO item (item_id, item_name, item_detail, item_price, item_sell_status, stock_number, create_time) VALUES (?,?,?,?,?,?,?)`,
       [
         items.id,
         items.itemName,
@@ -27,7 +27,7 @@ export class ItemRepository implements Repository<Item, number> {
 
   async findById(id: number): Promise<Item | undefined> {
     const [rows] = await this.connection.execute<RowDataPacket[]>(
-      `SELECT id, name, detail, price, sellStatus, stockNumber, createTime, updateTime, createBy, modifiedBy FROM item WHERE id = ?`,
+      `SELECT item_id, item_name, item_detail, item_price, item_sell_status, stock_number, create_time, update_time, create_by, modified_by FROM item WHERE item_id = ?`,
       [id],
     )
 
@@ -38,16 +38,16 @@ export class ItemRepository implements Repository<Item, number> {
     }
 
     return {
-      id: row['id'],
-      itemName: row['name'],
-      itemDetail: row['detail'],
+      id: row['item_id'],
+      itemName: row['item_name'],
+      itemDetail: row['item_detail'],
       price: row['price'],
-      itemSellStatus: row['sellStatus'],
-      stockNumber: row['stockNumber'],
-      createTime: row['createTime'],
-      updateTime: row['updateTime'],
-      createBy: row['createBy'],
-      modifiedBy: row['modifiedBy'],
+      itemSellStatus: row['item_sell_status'],
+      stockNumber: row['stock_number'],
+      createTime: row['create_time'],
+      updateTime: row['update_time'],
+      createBy: row['create_by'],
+      modifiedBy: row['modified_by'],
     }
   }
 }

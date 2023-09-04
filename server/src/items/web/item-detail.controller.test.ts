@@ -1,8 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { ItemStatusEnum } from '../domain/item-status.enum'
 import { ItemRepository } from '../domain/item.repository'
 import { DatabaseModule } from '../../config/database/database.module'
-import { ITEMS } from '../../fixture/itemFixture'
+import { GET_RESPONSE, ITEMS } from '../../fixture/itemFixture'
 import { NotFoundException } from '@nestjs/common'
 import { ItemDetailController } from './item-detail.controller'
 import { ItemReader } from '../application/item.reader'
@@ -10,15 +9,6 @@ import { ItemReader } from '../application/item.reader'
 describe('ItemController class', () => {
   let itemController: ItemDetailController
   let itemReader: ItemReader
-
-  const RESPONSE = {
-    id: 1,
-    itemName: 'New Balance 530 Steel Grey',
-    itemDetail: 'M990WT6',
-    price: 130000,
-    stockNumber: 10,
-    sellStatus: ItemStatusEnum.SELL,
-  }
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -41,7 +31,7 @@ describe('ItemController class', () => {
       it('저장된 객체 정보를 리턴해야 한다', async () => {
         const item = await itemController.getItemHandler(ID)
 
-        expect(item).toEqual(RESPONSE)
+        expect(item).toEqual(GET_RESPONSE)
       })
     })
 

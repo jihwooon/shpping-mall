@@ -62,3 +62,12 @@ export const CREATE_NOT_STOCK_REQUEST = {
   price: 130000,
   sellStatus: ItemStatusEnum.SELL,
 }
+
+export const GET_RESPONSE = {
+  id: 1,
+  itemName: 'New Balance 530 Steel Grey',
+  itemDetail: 'M990WT6',
+  price: 130000,
+  stockNumber: 10,
+  sellStatus: ItemStatusEnum.SELL,
+}
