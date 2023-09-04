@@ -8,7 +8,7 @@ export class DbHelper {
     private connection: Connection,
   ) {}
 
-  async clear(): Promise<void> {
-    await this.connection.execute('truncate table item')
+  async clear(table_name: string): Promise<void> {
+    await this.connection.execute(`truncate table ${table_name}`)
   }
 }

@@ -24,7 +24,7 @@ describe('ItemController class', () => {
   })
 
   beforeEach(async () => {
-    await dbHelper.clear()
+    await dbHelper.clear('item')
   })
 
   describe('createItemHandler method', () => {
