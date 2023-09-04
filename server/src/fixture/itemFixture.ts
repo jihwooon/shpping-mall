@@ -84,3 +84,11 @@ export const DB_RESPONSE = {
   stock_number: 5,
   update_time: null,
 }
+
+export const UPDATE_REQUEST = {
+  itemName: 'Nike React Infinity Run Flyknit 3 Black White',
+  itemDetail: 'DH5392-001',
+  price: 95000,
+  sellStatus: ItemStatusEnum.SOLD_OUT,
+  stockNumber: 10,
+}
