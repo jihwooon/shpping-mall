@@ -10,11 +10,11 @@ export class Item {
 
   modifiedBy: string
 
-  detail: string
+  itemDetail: string
 
-  name: string
+  itemName: string
 
-  sellStatus: ItemStatusEnum
+  itemSellStatus: ItemStatusEnum
 
   stockNumber: number
 
@@ -48,9 +48,9 @@ export class Item {
     this.updateTime = updateTime
     this.createBy = createBy
     this.modifiedBy = modifiedBy
-    this.detail = itemDetail
-    this.name = itemName
-    this.sellStatus = sellStatus
+    this.itemDetail = itemDetail
+    this.itemName = itemName
+    this.itemSellStatus = sellStatus
     this.stockNumber = stockNumber
     this.price = price
   }

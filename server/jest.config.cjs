@@ -13,8 +13,8 @@ module.exports = {
       '/node_modules/',
       'dist',
     ],
-    "rootDir": "src",
-    "testRegex": ".*\\.(test|spec)\\.ts$",
+    "rootDir": ".",
+    "testRegex": ".*\\.(e2e-spec|test|spec)\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
