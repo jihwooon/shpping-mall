@@ -47,7 +47,7 @@ describe('ItemReader class', () => {
         itemRepository.findById = jest.fn().mockResolvedValue(undefined)
       })
 
-      it('NotFoundException을 던져야한다', async () => {
+      it('NotFoundException을 던져야 한다', async () => {
         expect(itemReader.getItem(NOT_FOUND_ID)).rejects.toThrow(
           new NotFoundException(`${NOT_FOUND_ID}에 해당하는 상품을 찾을 수 없습니다.`, {
             cause: new Error(),
