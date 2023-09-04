@@ -12,7 +12,7 @@ export class ItemReader {
     if (!item) {
       throw new NotFoundException(`${id}에 해당하는 상품을 찾을 수 없습니다.`, {
         cause: new Error(),
-        description: 'NOT_FOUND',
+        description: '현재 요청 된 URL는 서버에서 찾을 수 없습니다.',
       })
     }
 
