@@ -1,4 +1,4 @@
-import { RowDataPacket, createConnection, Connection } from 'mysql2/promise'
+import { RowDataPacket, createConnection, Connection, ResultSetHeader } from 'mysql2/promise'
 import { DB_RESPONSE } from '../../fixture/itemFixture'
 import * as dotenv from 'dotenv'
 
@@ -6,6 +6,7 @@ dotenv.config()
 
 describe('ItemRepository class', () => {
   let connection: Connection
+  const ID = 1
 
   beforeEach(async () => {
     connection = await createConnection({
@@ -34,9 +35,8 @@ describe('ItemRepository class', () => {
   describe('findById method', () => {
     context('id가 주어지면', () => {
       it('select 쿼리가 작동해야 한다', async () => {
-        const id = 1
         const [rows] = await connection.execute<RowDataPacket[]>(
-          `SELECT item_id, item_name, item_detail, item_price, item_sell_status, stock_number, create_time, update_time, create_by, modified_by FROM item WHERE item_id = ${id}`,
+          `SELECT item_id, item_name, item_detail, item_price, item_sell_status, stock_number, create_time, update_time, create_by, modified_by FROM item WHERE item_id = ${ID}`,
         )
         const [row] = rows ?? []
 
@@ -45,8 +45,19 @@ describe('ItemRepository class', () => {
     })
   })
 
+  describe('update method', () => {
+    context('id와 수정 할 item 객체가 주어지면', () => {
+      it('update 쿼리가 작동해야 한다', async () => {
+        const [ok] = await connection.execute<ResultSetHeader>(
+          `UPDATE item SET item_name = "Nike React Infinity Run Flyknit 3 Black White", item_detail = "DH5392-001", item_price = 95000, item_sell_status = "SOLD_OUT", stock_number = 10, update_time = '2023-09-05 07:31:02', modified_by = '홍길동' WHERE item_id = ${ID}`,
+        )
+
+        expect(ok.affectedRows).toEqual(1)
+      })
+    })
+  })
+
   afterAll(async () => {
-    await connection.execute(`truncate table item`)
     await connection.end()
   })
 })
