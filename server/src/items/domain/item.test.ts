@@ -9,7 +9,7 @@ describe('Item', () => {
       items = new Item(ITEMS)
     })
 
-    it('값을 리턴한다.', () => {
+    it('값을 리턴해야 리턴해야 한다', () => {
       expect(items.id).toEqual(1)
       expect(items.modifiedBy).toEqual('수정자')
       expect(items.createBy).toEqual('생성자')
@@ -27,7 +27,7 @@ describe('Item', () => {
       items = new Item({})
     })
 
-    it('default 값을 리턴한다.', () => {
+    it('default 값을 리턴해야 한다', () => {
       expect(items.id).toEqual(0)
       expect(items.modifiedBy).toEqual('')
       expect(items.createBy).toEqual('')

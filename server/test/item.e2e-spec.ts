@@ -46,7 +46,7 @@ describe('ItemController (e2e)', () => {
     })
 
     context('Item 객체가 주어지면', () => {
-      it('상태코드 204를 응답한다', async () => {
+      it('상태코드 204를 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer()).post('/items').send(CREATE_REQUEST)
 
         expect(status).toEqual(204)
@@ -55,7 +55,7 @@ describe('ItemController (e2e)', () => {
     })
 
     context('상풍명을 누락하면', () => {
-      it('상태코드 400를 응답한다', async () => {
+      it('상태코드 400를 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer()).post('/items').send(CREATE_NOT_NAME_REQUEST)
 
         expect(status).toEqual(400)
@@ -68,7 +68,7 @@ describe('ItemController (e2e)', () => {
     })
 
     context('상품 상세를 누락하면', () => {
-      it('상태코드 400를 응답한다', async () => {
+      it('상태코드 400를 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer()).post('/items').send(CREATE_NOT_DETAIL_REQUEST)
 
         expect(status).toEqual(400)
@@ -80,7 +80,7 @@ describe('ItemController (e2e)', () => {
       })
     })
     context('가격를 누락하면', () => {
-      it('상태코드 400를 응답한다', async () => {
+      it('상태코드 400를 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer()).post('/items').send(CREATE_NOT_PRICE_REQUEST)
 
         expect(status).toEqual(400)
@@ -92,7 +92,7 @@ describe('ItemController (e2e)', () => {
       })
     })
     context('재고를 누락하면', () => {
-      it('상태코드 400를 응답한다', async () => {
+      it('상태코드 400를 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer()).post('/items').send(CREATE_NOT_STOCK_REQUEST)
 
         expect(status).toEqual(400)
@@ -116,7 +116,7 @@ describe('ItemController (e2e)', () => {
         itemReader.getItem = jest.fn().mockImplementation(() => CREATE_RESPONSE)
       })
 
-      it('상태코드 200을 응답한다', async () => {
+      it('상태코드 200을 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer()).get(`/items/${ID}`)
 
         expect(status).toEqual(200)
@@ -137,7 +137,7 @@ describe('ItemController (e2e)', () => {
           .fn()
           .mockRejectedValue(new NotFoundException(`${NOT_FOUND_ID}에 해당하는 상품을 찾을 수 없습니다.`))
       })
-      it('상태코드 404를 응답한다', async () => {
+      it('상태코드 404를 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer()).get(`/items/${NOT_FOUND_ID}`)
 
         expect(status).toEqual(404)

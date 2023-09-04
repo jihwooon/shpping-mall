@@ -7,7 +7,7 @@ import { NotFoundException } from '@nestjs/common'
 import { ItemDetailController } from './item-detail.controller'
 import { ItemReader } from '../application/item.reader'
 
-describe('ItemController', () => {
+describe('ItemController class', () => {
   let itemController: ItemDetailController
   let itemReader: ItemReader
 
@@ -31,14 +31,14 @@ describe('ItemController', () => {
     itemReader = app.get<ItemReader>(ItemReader)
   })
 
-  describe('getItemHandler 메서드', () => {
+  describe('getItemHandler method', () => {
     const ID = 1
     const NOT_FOUND_ID = 9999
     context('id가 주어지면', () => {
       beforeEach(() => {
         itemReader.getItem = jest.fn().mockImplementation(() => ITEMS)
       })
-      it('저장된 객체 정보를 리턴한다', async () => {
+      it('저장된 객체 정보를 리턴해야 한다', async () => {
         const item = await itemController.getItemHandler(ID)
 
         expect(item).toEqual(RESPONSE)
@@ -52,7 +52,7 @@ describe('ItemController', () => {
           .mockRejectedValue(new NotFoundException(`${NOT_FOUND_ID}에 해당하는 상품을 찾을 수 없습니다.`))
       })
 
-      it('NotFoundException을 던진다', async () => {
+      it('NotFoundException을 던져야 한다', async () => {
         expect(itemController.getItemHandler(NOT_FOUND_ID)).rejects.toThrow(
           new NotFoundException(`${NOT_FOUND_ID}에 해당하는 상품을 찾을 수 없습니다.`),
         )

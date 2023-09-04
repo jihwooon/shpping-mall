@@ -6,7 +6,7 @@ import { Item } from '../domain/item.entity'
 import { DatabaseModule } from '../../config/database/database.module'
 import { DbHelper } from '../../config/helper/db.helper'
 
-describe('ItemCreater', () => {
+describe('ItemCreater class', () => {
   let itemCreater: ItemCreater
   let itemRepository: ItemRepository
   let dbHelper: DbHelper
@@ -27,9 +27,9 @@ describe('ItemCreater', () => {
     await dbHelper.clear()
   })
 
-  describe('registerItem 메서드', () => {
+  describe('registerItem method', () => {
     context('Item 객체가 주어지면', () => {
-      it('메서드 호출을 검증한다 ', async () => {
+      it('메서드 호출을 검증해야 한다 ', async () => {
         const spyFn = jest.spyOn(itemCreater, 'registerItem').mockImplementation()
         await itemCreater.registerItem(items)
 

@@ -5,7 +5,7 @@ import { ITEMS } from '../../fixture/itemFixture'
 import { DatabaseModule } from '../../config/database/database.module'
 import { ItemReader } from './item.reader'
 
-describe('ItemReader', () => {
+describe('ItemReader class', () => {
   let itemReader: ItemReader
   let itemRepository: ItemRepository
 
@@ -19,7 +19,7 @@ describe('ItemReader', () => {
     itemRepository = module.get<ItemRepository>(ItemRepository)
   })
 
-  describe('findById 메서드', () => {
+  describe('findById method', () => {
     const ID = 1
     const NOT_FOUND_ID = 99999
     context('id가 주어지면', () => {
@@ -27,7 +27,7 @@ describe('ItemReader', () => {
         itemRepository.findById = jest.fn().mockImplementation(() => ITEMS)
       })
 
-      it('item 객체를 리턴한다', async () => {
+      it('item 객체를 리턴해야 한다', async () => {
         const item = await itemReader.getItem(ID)
 
         expect(item.id).toBe(1)
@@ -47,7 +47,7 @@ describe('ItemReader', () => {
         itemRepository.findById = jest.fn().mockResolvedValue(undefined)
       })
 
-      it('NotFoundException을 던진다.', async () => {
+      it('NotFoundException을 던져야한다', async () => {
         expect(itemReader.getItem(NOT_FOUND_ID)).rejects.toThrow(
           new NotFoundException(`${NOT_FOUND_ID}에 해당하는 상품을 찾을 수 없습니다.`, {
             cause: new Error(),
