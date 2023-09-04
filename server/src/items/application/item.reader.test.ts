@@ -30,15 +30,7 @@ describe('ItemReader class', () => {
       it('item 객체를 리턴해야 한다', async () => {
         const item = await itemReader.getItem(ID)
 
-        expect(item.id).toBe(1)
-        expect(item.itemName).toBe('New Balance 530 Steel Grey')
-        expect(item.itemDetail).toBe('M990WT6')
-        expect(item.stockNumber).toBe(10)
-        expect(item.itemSellStatus).toBe('SELL')
-        expect(item.createBy).toBe('생성자')
-        expect(item.modifiedBy).toBe('수정자')
-        expect(item.createTime).toStrictEqual(new Date('2023-09-01T23:10:00.009Z'))
-        expect(item.updateTime).toStrictEqual(new Date('2023-09-01T23:10:00.009Z'))
+        expect(item).toBe(ITEMS)
       })
     })
 
