@@ -2,17 +2,25 @@ import { NotFoundException } from '@nestjs/common'
 import { ItemRepository } from '../domain/item.repository'
 import { Test, TestingModule } from '@nestjs/testing'
 import { ITEMS } from '../../fixture/itemFixture'
-import { DatabaseModule } from '../../config/database/database.module'
 import { ItemReader } from './item.reader'
+import { MYSQL_CONNECTION } from '../../config/database/constants'
+import { Connection } from 'mysql2/promise'
 
 describe('ItemReader class', () => {
   let itemReader: ItemReader
   let itemRepository: ItemRepository
+  let connect: Connection
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [DatabaseModule],
-      providers: [ItemRepository, ItemReader],
+      providers: [
+        ItemRepository,
+        ItemReader,
+        {
+          provide: MYSQL_CONNECTION,
+          useValue: connect,
+        },
+      ],
     }).compile()
 
     itemReader = module.get<ItemReader>(ItemReader)

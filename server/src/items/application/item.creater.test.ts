@@ -3,28 +3,27 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { ItemCreater } from './item.creater'
 import { ITEMS } from '../../fixture/itemFixture'
 import { Item } from '../domain/item.entity'
-import { DatabaseModule } from '../../config/database/database.module'
-import { DbHelper } from '../../config/helper/db.helper'
+import { MYSQL_CONNECTION } from '../../config/database/constants'
+import { Connection } from 'mysql2/promise'
 
 describe('ItemCreater class', () => {
   let itemCreater: ItemCreater
-  let itemRepository: ItemRepository
-  let dbHelper: DbHelper
+  let connection: Connection
   let items = new Item(ITEMS)
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [DatabaseModule],
-      providers: [ItemRepository, ItemCreater, DbHelper],
+      providers: [
+        ItemRepository,
+        ItemCreater,
+        {
+          provide: MYSQL_CONNECTION,
+          useValue: connection,
+        },
+      ],
     }).compile()
 
     itemCreater = module.get<ItemCreater>(ItemCreater)
-    itemRepository = module.get<ItemRepository>(ItemRepository)
-    dbHelper = module.get<DbHelper>(DbHelper)
-  })
-
-  beforeEach(async () => {
-    await dbHelper.clear('item')
   })
 
   describe('registerItem method', () => {

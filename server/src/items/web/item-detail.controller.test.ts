@@ -1,20 +1,28 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { ItemRepository } from '../domain/item.repository'
-import { DatabaseModule } from '../../config/database/database.module'
 import { GET_RESPONSE, ITEMS } from '../../fixture/itemFixture'
 import { NotFoundException } from '@nestjs/common'
 import { ItemDetailController } from './item-detail.controller'
 import { ItemReader } from '../application/item.reader'
+import { MYSQL_CONNECTION } from '../../config/database/constants'
+import { Connection } from 'mysql2/promise'
 
 describe('ItemController class', () => {
   let itemController: ItemDetailController
   let itemReader: ItemReader
+  let connection: Connection
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
-      imports: [DatabaseModule],
       controllers: [ItemDetailController],
-      providers: [ItemReader, ItemRepository],
+      providers: [
+        ItemReader,
+        ItemRepository,
+        {
+          provide: MYSQL_CONNECTION,
+          useValue: connection,
+        },
+      ],
     }).compile()
 
     itemController = app.get<ItemDetailController>(ItemDetailController)
