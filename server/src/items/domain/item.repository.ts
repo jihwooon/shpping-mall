@@ -1,6 +1,6 @@
 import { Connection, RowDataPacket, ResultSetHeader } from 'mysql2/promise'
 import { Item } from './item.entity'
-import { Inject } from '@nestjs/common'
+import { Inject, InternalServerErrorException } from '@nestjs/common'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
 import { Repository } from 'src/config/database/repository'
 
@@ -41,7 +41,7 @@ export class ItemRepository implements Repository<Item, number> {
       id: row['item_id'],
       itemName: row['item_name'],
       itemDetail: row['item_detail'],
-      price: row['price'],
+      price: row['item_price'],
       itemSellStatus: row['item_sell_status'],
       stockNumber: row['stock_number'],
       createTime: row['create_time'],
