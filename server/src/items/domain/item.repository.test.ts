@@ -53,8 +53,4 @@ describe('ItemRepository class', () => {
       })
     })
   })
-
-  afterAll(async () => {
-    await connection.end()
-  })
 })
