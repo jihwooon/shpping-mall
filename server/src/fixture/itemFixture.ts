@@ -84,3 +84,41 @@ export const DB_RESPONSE = {
   stock_number: 5,
   update_time: null,
 }
+
+export const UPDATE_REQUEST = {
+  itemName: 'Nike React Infinity Run Flyknit 3 Black White',
+  itemDetail: 'DH5392-001',
+  price: 95000,
+  sellStatus: ItemStatusEnum.SOLD_OUT,
+  stockNumber: 10,
+}
+
+export const UPDATE_NOT_NAME_REQUEST = {
+  itemName: '',
+  itemDetail: 'DH5392-001',
+  price: 95000,
+  sellStatus: ItemStatusEnum.SOLD_OUT,
+  stockNumber: 10,
+}
+
+export const UPDATE_NOT_DETAIL_REQUEST = {
+  itemName: 'Nike React Infinity Run Flyknit 3 Black White',
+  itemDetail: '',
+  price: 95000,
+  sellStatus: ItemStatusEnum.SOLD_OUT,
+  stockNumber: 10,
+}
+
+export const UPDATE_NOT_PRICE_REQUEST = {
+  itemName: 'Nike React Infinity Run Flyknit 3 Black White',
+  itemDetail: 'DH5392-001',
+  sellStatus: ItemStatusEnum.SOLD_OUT,
+  stockNumber: 10,
+}
+
+export const UPDATE_NOT_STOCK_REQUEST = {
+  itemName: 'Nike React Infinity Run Flyknit 3 Black White',
+  itemDetail: 'DH5392-001',
+  price: 95000,
+  sellStatus: ItemStatusEnum.SOLD_OUT,
+}

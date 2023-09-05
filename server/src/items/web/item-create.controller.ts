@@ -1,5 +1,5 @@
 import { Item } from '../domain/item.entity'
-import { ItemInfoRequest } from '../dto/itemInfoRequest.dto'
+import { ItemInfoRequest } from '../dto/insert-item.dto'
 import { ItemCreater } from '../application/item.creater'
 import { Body, Controller, Post, HttpCode } from '@nestjs/common'
 

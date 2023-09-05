@@ -1,4 +1,4 @@
-import { Connection, RowDataPacket } from 'mysql2/promise'
+import { Connection, RowDataPacket, ResultSetHeader } from 'mysql2/promise'
 import { Item } from './item.entity'
 import { Inject } from '@nestjs/common'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
@@ -49,5 +49,23 @@ export class ItemRepository implements Repository<Item, number> {
       createBy: row['create_by'],
       modifiedBy: row['modified_by'],
     }
+  }
+
+  async update(id: number, items: Item): Promise<boolean> {
+    const [ok] = await this.connection.execute<ResultSetHeader>(
+      `UPDATE item SET item_name = ?, item_detail = ?, item_price = ?, item_sell_status = ?, stock_number = ?, update_time = ?, modified_by = ? WHERE item_id = ?`,
+      [
+        items.itemName,
+        items.itemDetail,
+        items.price,
+        items.itemSellStatus,
+        items.stockNumber,
+        items.updateTime,
+        items.modifiedBy,
+        id,
+      ],
+    )
+
+    return ok.affectedRows === 1
   }
 }
