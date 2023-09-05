@@ -2,14 +2,12 @@ import { ItemRepository } from '../domain/item.repository'
 import { Test, TestingModule } from '@nestjs/testing'
 import { ItemCreater } from './item.creater'
 import { ITEMS } from '../../fixture/itemFixture'
-import { Item } from '../domain/item.entity'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
 import { Connection } from 'mysql2/promise'
 
 describe('ItemCreater class', () => {
   let itemCreater: ItemCreater
   let connection: Connection
-  let items = new Item(ITEMS)
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,10 +28,10 @@ describe('ItemCreater class', () => {
     context('Item 객체가 주어지면', () => {
       it('메서드 호출을 검증해야 한다 ', async () => {
         const spyFn = jest.spyOn(itemCreater, 'registerItem').mockImplementation()
-        await itemCreater.registerItem(items)
+        await itemCreater.registerItem(ITEMS)
 
         expect(spyFn).toHaveBeenCalled()
-        expect(spyFn).toBeCalledWith(items)
+        expect(spyFn).toBeCalledWith(ITEMS)
       })
     })
   })
