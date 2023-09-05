@@ -45,11 +45,11 @@ describe('ItemRepository class', () => {
         connection.execute = jest.fn().mockResolvedValue([{ affectedRows: 1 }] as mysql.ResultSetHeader[])
       })
       it('update 쿼리가 작동해야 한다', async () => {
-        const [ok] = await connection.execute<mysql.ResultSetHeader>(
+        const [{ affectedRows }] = await connection.execute<mysql.ResultSetHeader>(
           `UPDATE item SET item_name = "Nike React Infinity Run Flyknit 3 Black White", item_detail = "DH5392-001", item_price = 95000, item_sell_status = "SOLD_OUT", stock_number = 10, update_time = '2023-09-05 07:31:02', modified_by = '홍길동' WHERE item_id = ${ID}`,
         )
 
-        expect(ok.affectedRows).toEqual(1)
+        expect(affectedRows).toEqual(1)
       })
     })
   })
