@@ -1,6 +1,6 @@
 import { Controller, Patch, Param, Body } from '@nestjs/common'
 import { ItemUpdater } from '../application/item.updater'
-import { UpdateItemInfoRequest } from '../dto/item-update.request.dto'
+import { UpdateItemInfoRequest } from '../dto/update-item.dto'
 import { Item } from '../domain/item.entity'
 
 @Controller('items')
