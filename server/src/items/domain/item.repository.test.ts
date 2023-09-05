@@ -1,24 +1,42 @@
 import * as mysql from 'mysql2/promise'
-import { DB_RESPONSE } from '../../fixture/itemFixture'
-
-jest.mock('mysql2/promise')
+import { Connection } from 'mysql2/promise'
+import { Test, TestingModule } from '@nestjs/testing'
+import { DB_RESPONSE, ITEMS } from '../../fixture/itemFixture'
+import { ItemRepository } from './item.repository'
+import { MYSQL_CONNECTION } from '../../config/database/constants'
 
 describe('ItemRepository class', () => {
-  let connection: mysql.Connection
+  let connection: Connection
+  let itemRepository: ItemRepository
   const ID = 1
+  const NOT_FOUND_ID = 9999
 
-  beforeEach(async () => {
-    connection = {
-      execute: jest.fn(),
-    } as unknown as mysql.Connection
+  connection = {
+    execute: jest.fn(),
+  } as unknown as mysql.Connection
+
+  beforeAll(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        ItemRepository,
+        {
+          provide: MYSQL_CONNECTION,
+          useValue: connection,
+        },
+      ],
+    }).compile()
+
+    itemRepository = module.get<ItemRepository>(ItemRepository)
   })
 
   describe('save method', () => {
     context('item 객체가 주어지면', () => {
-      it('insert 쿼리가 작동해야 한다', async () => {
-        await connection.execute(
-          `INSERT INTO item (item_id, item_name, item_detail, item_price, item_sell_status, stock_number, create_time) VALUES (1,"New Balance 530 Steel Grey","M990WT6",130000, "SELL", 5, '2023-09-04 07:31:02')`,
-        )
+      it('메서드 호출을 검즘해야 한다.', async () => {
+        const spyOn = jest.spyOn(itemRepository, 'save').mockResolvedValue()
+        await itemRepository.save(ITEMS)
+
+        expect(spyOn).toHaveBeenCalled()
+        expect(spyOn).toHaveBeenCalledWith(ITEMS)
       })
     })
   })
@@ -28,13 +46,31 @@ describe('ItemRepository class', () => {
       beforeEach(async () => {
         connection.execute = jest.fn().mockResolvedValue([[DB_RESPONSE] as mysql.RowDataPacket[], []])
       })
-      it('select 쿼리가 작동해야 한다', async () => {
-        const [rows] = await connection.execute<mysql.RowDataPacket[]>(
-          `SELECT item_id, item_name, item_detail, item_price, item_sell_status, stock_number, create_time, update_time, create_by, modified_by FROM item WHERE item_id = ${ID}`,
-        )
-        const [row] = rows ?? []
+      it('item 객체를 리턴해야 한다', async () => {
+        const items = await itemRepository.findById(ID)
 
-        expect(row).toEqual(DB_RESPONSE)
+        expect(items).toEqual({
+          id: 1,
+          itemName: 'New Balance 530 Steel Grey',
+          itemDetail: 'M990WT6',
+          price: 130000,
+          itemSellStatus: 'SELL',
+          stockNumber: 5,
+          createTime: new Date('2023-09-03T22:31:02.000Z'),
+          updateTime: null,
+          createBy: null,
+          modifiedBy: null,
+        })
+      })
+    })
+
+    context('잘못된 id가 주어지면', () => {
+      beforeEach(async () => {
+        connection.execute = jest.fn().mockResolvedValue([[undefined] as mysql.RowDataPacket[], []])
+      })
+      it('undefined를 리턴해야 한다', async () => {
+        const item = await itemRepository.findById(NOT_FOUND_ID)
+        expect(item).toEqual(undefined)
       })
     })
   })
@@ -44,12 +80,20 @@ describe('ItemRepository class', () => {
       beforeEach(async () => {
         connection.execute = jest.fn().mockResolvedValue([{ affectedRows: 1 }] as mysql.ResultSetHeader[])
       })
-      it('update 쿼리가 작동해야 한다', async () => {
-        const [{ affectedRows }] = await connection.execute<mysql.ResultSetHeader>(
-          `UPDATE item SET item_name = "Nike React Infinity Run Flyknit 3 Black White", item_detail = "DH5392-001", item_price = 95000, item_sell_status = "SOLD_OUT", stock_number = 10, update_time = '2023-09-05 07:31:02', modified_by = '홍길동' WHERE item_id = ${ID}`,
-        )
+      it('true를 리턴해야 한다', async () => {
+        const items = await itemRepository.update(ID, ITEMS)
 
-        expect(affectedRows).toEqual(1)
+        expect(items).toEqual(true)
+      })
+    })
+    context('잘못된 id와 수정 할 item 객체가 주어지면', () => {
+      beforeEach(async () => {
+        connection.execute = jest.fn().mockResolvedValue([{ affectedRows: 0 }] as mysql.ResultSetHeader[])
+      })
+      it('false를 리턴해야 한다', async () => {
+        const items = await itemRepository.update(ID, ITEMS)
+
+        expect(items).toEqual(false)
       })
     })
   })
