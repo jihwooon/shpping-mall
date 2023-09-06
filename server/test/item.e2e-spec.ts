@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { INestApplication, NotFoundException, ValidationPipe } from '@nestjs/common'
 import * as request from 'supertest'
-import { ItemModule } from '../src/items/item.module'
 import { ItemCreater } from '../src/items/application/item.creater'
 import { ItemReader } from '../src/items/application/item.reader'
 import { ItemUpdater } from '../src/items/application/item.updater'
@@ -12,27 +11,45 @@ import {
   CREATE_NOT_STOCK_REQUEST,
   CREATE_REQUEST,
   CREATE_RESPONSE,
-  UPDATE_REQUEST,
-  UPDATE_NOT_NAME_REQUEST,
   UPDATE_NOT_DETAIL_REQUEST,
+  UPDATE_NOT_NAME_REQUEST,
   UPDATE_NOT_PRICE_REQUEST,
   UPDATE_NOT_STOCK_REQUEST,
+  UPDATE_REQUEST,
 } from '../src/fixture/itemFixture'
+import { ItemUpdateController } from '../src/items/web/item-update.controller'
+import { ItemDetailController } from '../src/items/web/item-detail.controller'
+import { ItemCreateController } from '../src/items/web/item-create.controller'
+import { ItemRepository } from '../src/items/domain/item.repository'
+import { MYSQL_CONNECTION } from '../src/config/database/constants'
+import { Connection } from 'mysql2/promise'
 
 describe('ItemController (e2e)', () => {
   let app: INestApplication
+  let connection: Connection
   let itemCreater: ItemCreater
   let itemReader: ItemReader
   let itemUpdater: ItemUpdater
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [ItemModule],
+      controllers: [ItemCreateController, ItemDetailController, ItemUpdateController],
+      providers: [
+        ItemRepository,
+        ItemCreater,
+        ItemReader,
+        ItemUpdater,
+        {
+          provide: MYSQL_CONNECTION,
+          useValue: connection,
+        },
+      ],
     }).compile()
 
     itemCreater = moduleFixture.get<ItemCreater>(ItemCreater)
     itemReader = moduleFixture.get<ItemReader>(ItemReader)
     itemUpdater = moduleFixture.get<ItemUpdater>(ItemUpdater)
+
     app = moduleFixture.createNestApplication()
 
     app.useGlobalPipes(
