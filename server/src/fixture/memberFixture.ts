@@ -1,5 +1,5 @@
-import { Role } from '../users/domain/member-role.enum'
-import { MemberType } from '../users/domain/member-type.enum'
+import { Role } from '../members/domain/member-role.enum'
+import { MemberType } from '../members/domain/member-type.enum'
 
 export const MEMBER = {
   memberId: 1,
