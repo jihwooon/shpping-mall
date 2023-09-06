@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { Connection, RowDataPacket } from 'mysql2/promise'
+import { Connection, RowDataPacket, ResultSetHeader } from 'mysql2/promise'
 import { MemberRepository } from './member.repository'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
 import { DB_MEMBER_RESPONSE } from '../../fixture/memberFixture'
@@ -10,6 +10,7 @@ describe('MemberRepository class', () => {
   let connection: Connection
   let memberRepository: MemberRepository
   const REGISTERED_EMAIL = 'abc@email.com'
+  const UNSUBSCRIBED_EMAIL = 'xxxx@email.com'
 
   connection = {
     execute: jest.fn(),
@@ -62,6 +63,30 @@ describe('MemberRepository class', () => {
         const member = await memberRepository.findByEmail(REGISTERED_EMAIL)
 
         expect(member).toEqual(undefined)
+      })
+    })
+  })
+
+  describe('existsByEmail method', () => {
+    context('이미 가입 된 email이 주어지면', () => {
+      beforeEach(async () => {
+        connection.execute = jest.fn().mockResolvedValue([{ fieldCount: 0 }] as ResultSetHeader[])
+      })
+      it('true를 리턴해야 한다', async () => {
+        const exitedEmail = await memberRepository.existsByEmail(REGISTERED_EMAIL)
+
+        expect(exitedEmail).toEqual(true)
+      })
+    })
+
+    context('email이 가입 되어 있지 않으면', () => {
+      beforeEach(async () => {
+        connection.execute = jest.fn().mockResolvedValue([{ fieldCount: 1 }] as ResultSetHeader[])
+      })
+      it('false를 리턴해야 한다', async () => {
+        const exitedEmail = await memberRepository.existsByEmail(UNSUBSCRIBED_EMAIL)
+
+        expect(exitedEmail).toEqual(false)
       })
     })
   })

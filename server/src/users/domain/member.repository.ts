@@ -1,4 +1,4 @@
-import { Connection, RowDataPacket } from 'mysql2/promise'
+import { Connection, RowDataPacket, ResultSetHeader } from 'mysql2/promise'
 import { Inject } from '@nestjs/common'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
 import { Member } from './member.entity'
@@ -33,5 +33,18 @@ export class MemberRepository {
       createBy: row['create_by'],
       modifiedBy: row['modified_by'],
     }
+  }
+
+  async existsByEmail(email: string): Promise<boolean> {
+    const [{ fieldCount }] = await this.connection.execute<ResultSetHeader>(
+      'SELECT COUNT(email) FROM member WHERE email = ?',
+      [email],
+    )
+
+    if (fieldCount >= 1) {
+      return false
+    }
+
+    return true
   }
 }
