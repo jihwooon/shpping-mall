@@ -16,17 +16,6 @@ export const MEMBER = {
   modifiedBy: '김철수',
 }
 
-export const DB_MEMBER_RESPONSE = {
-  member_id: 1,
+export const DB_MEMBER_EMAIL_RESPONSE = {
   email: 'abc@email.com',
-  member_name: '홍길동',
-  member_type: MemberType.GENERAL,
-  password: '12345678',
-  refresh_token: 'eyJhbGciOiJI',
-  token_expiration_time: new Date('2023-09-01T23:10:00.009Z'),
-  role: Role.USER,
-  create_time: new Date('2023-09-01T23:10:00.009Z'),
-  update_time: new Date('2023-09-01T23:10:00.009Z'),
-  create_by: '홍길동',
-  modified_by: '김철수',
 }
