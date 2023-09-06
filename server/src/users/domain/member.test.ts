@@ -9,6 +9,7 @@ describe('Member', () => {
   context('Member 객체가 주어지면', () => {
     it('Member 값을 리턴해야 한다', () => {
       member = new Member(MEMBER)
+
       expect(member).toEqual({
         memberId: 1,
         email: 'abc@email.com',
