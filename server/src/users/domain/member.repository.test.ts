@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { Connection, RowDataPacket, ResultSetHeader } from 'mysql2/promise'
 import { MemberRepository } from './member.repository'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
-import { DB_MEMBER_RESPONSE } from '../../fixture/memberFixture'
+import { DB_MEMBER_RESPONSE, MEMBER } from '../../fixture/memberFixture'
 import { MemberType } from './member-type.enum'
 import { Role } from './member-role.enum'
 
@@ -28,6 +28,30 @@ describe('MemberRepository class', () => {
     }).compile()
 
     memberRepository = module.get<MemberRepository>(MemberRepository)
+  })
+
+  describe('save method', () => {
+    context('member 정보가 저장에 성공하면', () => {
+      beforeEach(async () => {
+        connection.execute = jest.fn().mockResolvedValue([{ insertId: 1 }] as ResultSetHeader[])
+      })
+      it('생성 된 insertId를 리턴해야 한다', async () => {
+        const insertId = await memberRepository.save(MEMBER)
+
+        expect(insertId).toEqual(1)
+      })
+    })
+
+    context('member 정보가 저장에 실패하면', () => {
+      beforeEach(async () => {
+        connection.execute = jest.fn().mockResolvedValue([{ insertId: 0 }] as ResultSetHeader[])
+      })
+      it('undefined를 리턴해야 한다', async () => {
+        const insertId = await memberRepository.save(MEMBER)
+
+        expect(insertId).toEqual(undefined)
+      })
+    })
   })
 
   describe('findByEmail method', () => {

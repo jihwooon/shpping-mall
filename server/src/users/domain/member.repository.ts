@@ -9,6 +9,32 @@ export class MemberRepository {
     private connection: Connection,
   ) {}
 
+  async save(member: Member): Promise<number | undefined> {
+    const [{ insertId }] = await this.connection.execute<ResultSetHeader>(
+      'INSERT INTO member (member_id, member_name, email, member_type, role, refresh_token, token_expiration_time, password, create_time, update_time, create_by, modified_by) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',
+      [
+        member.memberId,
+        member.memberName,
+        member.email,
+        member.memberType,
+        member.role,
+        member.refreshToken,
+        member.tokenExpirationTime,
+        member.password,
+        member.createTime,
+        member.updateTime,
+        member.createBy,
+        member.modifiedBy,
+      ],
+    )
+
+    if (insertId === 0) {
+      return undefined
+    }
+
+    return insertId
+  }
+
   async findByEmail(email: string): Promise<Member | undefined> {
     const [[row]] = await this.connection.execute<RowDataPacket[]>(
       'SELECT member_id, email, member_name, member_type, paswword, refresh_token, token_expiration_time, role, create_time,update_time, create_by, modified_by FROM member WHERE email = ?',
