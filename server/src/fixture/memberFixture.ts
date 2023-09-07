@@ -19,3 +19,9 @@ export const MEMBER = {
 export const DB_MEMBER_EMAIL_RESPONSE = {
   email: 'abc@email.com',
 }
+
+export const CREATE_MEMBER_REQUEST = {
+  email: 'abc@email.com',
+  memberName: '홍길동',
+  password: '12345678123456',
+}
