@@ -19,3 +19,69 @@ export const MEMBER = {
 export const DB_MEMBER_EMAIL_RESPONSE = {
   email: 'abc@email.com',
 }
+
+export const CREATE_MEMBER_REQUEST = {
+  email: 'abc@email.com',
+  memberName: '홍길동',
+  password: '12345678123456',
+}
+
+export const REQUEST_BODY = {
+  email: 'abc@email.com',
+  memberName: '홍길동',
+  password: '12345678123456',
+}
+
+export const CREATE_NOT_EMAIL_REQUEST = {
+  memberName: '홍길동',
+  password: '12345678123456',
+}
+
+export const CREATE_NOT_ERROR_REQUEST = {
+  email: 'abcd.email.com',
+  memberName: '홍길동',
+  password: '12345678123456',
+}
+
+export const CREATE_LONG_EMAIL_REQUEST = {
+  email:
+    'abcdefghijklmnopqrabcdefghijklmnopqrabcdefghijklmnopqrabcdefghijklmnopqrabcdefghijklmnopqrabcdefghijklmnopqr@email.com',
+  memberName: '홍길동',
+  password: '12345678123456',
+}
+
+export const CREATE_NOT_STRING_EMAIL_REQUEST = {
+  email: 123456,
+  memberName: '홍길동',
+  password: '12345678123456',
+}
+
+export const CREATE_NOT_EMPTY_PASSWORD_REQUEST = {
+  email: 'abcd@email.com',
+  memberName: '홍길동',
+  password: '',
+}
+
+export const CREATE_UNDER_8_LENGTH_PASSWORD_REQUEST = {
+  email: 'abcd@email.com',
+  memberName: '홍길동',
+  password: '12345',
+}
+
+export const CREATE_UP_16_LENGTH_PASSWORD_REQUEST = {
+  email: 'abcd@email.com',
+  memberName: '홍길동',
+  password: '1234567890123456789012345678901234567890',
+}
+
+export const CREATE_NOT_STRING_PASSWORD_REQUEST = {
+  email: 'abcd@email.com',
+  memberName: '홍길동',
+  password: 123456,
+}
+
+export const CREATE_EMPTY_NAME_REQUEST = {
+  email: 'abcd@email.com',
+  memberName: '',
+  password: '12345678123456',
+}
