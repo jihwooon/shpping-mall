@@ -79,9 +79,9 @@ describe('MemberRepository class', () => {
   })
 
   describe('existsByEmail method', () => {
-    context('이미 가입 된 email이 주어지면', () => {
+    context('가입 된 email이 존재하면', () => {
       beforeEach(async () => {
-        connection.execute = jest.fn().mockResolvedValue([{ fieldCount: 0 }] as ResultSetHeader[])
+        connection.execute = jest.fn().mockResolvedValue([[{ email: 1 }] as RowDataPacket[], []])
       })
       it('true를 리턴해야 한다', async () => {
         const exitedEmail = await memberRepository.existsByEmail(REGISTERED_EMAIL)
@@ -90,9 +90,9 @@ describe('MemberRepository class', () => {
       })
     })
 
-    context('email이 가입 되어 있지 않으면', () => {
+    context('가입 된 email이 존재하지 않으면', () => {
       beforeEach(async () => {
-        connection.execute = jest.fn().mockResolvedValue([{ fieldCount: 1 }] as ResultSetHeader[])
+        connection.execute = jest.fn().mockResolvedValue([[{ email: 0 }] as RowDataPacket[], []])
       })
       it('false를 리턴해야 한다', async () => {
         const exitedEmail = await memberRepository.existsByEmail(UNSUBSCRIBED_EMAIL)
