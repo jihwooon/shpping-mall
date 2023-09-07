@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common'
 import { EmailChecker } from './application/email.checker'
+import { MemberRepository } from './domain/member.repository'
+import { DatabaseModule } from '../config/database/database.module'
 
 @Module({
-  providers: [EmailChecker],
-  exports: [EmailChecker],
+  imports: [DatabaseModule],
+  providers: [EmailChecker, MemberRepository],
+  exports: [EmailChecker, MemberRepository],
 })
 export class MemberModule {}
