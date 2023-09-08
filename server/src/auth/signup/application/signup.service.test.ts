@@ -4,6 +4,7 @@ import { MemberRepository } from '../../../members/domain/member.repository'
 import { EmailChecker } from '../../../members/application/email.checker'
 import { MYSQL_CONNECTION } from '../../../config/database/constants'
 import { SignupService } from './signup.service'
+import { PasswordProvider } from '../../../members/application/password.provider'
 
 describe('Signup class', () => {
   let connect: Connection
@@ -21,6 +22,7 @@ describe('Signup class', () => {
         MemberRepository,
         SignupService,
         EmailChecker,
+        PasswordProvider,
         {
           provide: MYSQL_CONNECTION,
           useValue: connect,
