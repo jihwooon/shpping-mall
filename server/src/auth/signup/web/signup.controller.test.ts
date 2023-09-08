@@ -7,6 +7,7 @@ import { EmailChecker } from '../../../members/application/email.checker'
 import { MYSQL_CONNECTION } from '../../../config/database/constants'
 import { CREATE_MEMBER_REQUEST } from '../../../fixture/memberFixture'
 import { SignupService } from '../application/signup.service'
+import { PasswordProvider } from '../../../members/application/password.provider'
 
 describe('SignupController class', () => {
   let signupController: SignupController
@@ -20,6 +21,7 @@ describe('SignupController class', () => {
         SignupService,
         EmailChecker,
         MemberRepository,
+        PasswordProvider,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,

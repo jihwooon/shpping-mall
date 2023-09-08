@@ -19,6 +19,7 @@ import {
   CREATE_UP_16_LENGTH_PASSWORD_REQUEST,
   REQUEST_BODY,
 } from '../src/fixture/memberFixture'
+import { PasswordProvider } from '../src/members/application/password.provider'
 
 describe('SignupController (e2e)', () => {
   let app: INestApplication
@@ -33,6 +34,7 @@ describe('SignupController (e2e)', () => {
         SignupService,
         EmailChecker,
         MemberRepository,
+        PasswordProvider,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,
