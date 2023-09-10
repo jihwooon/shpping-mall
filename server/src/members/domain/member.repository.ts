@@ -35,8 +35,11 @@ export class MemberRepository {
     return insertId
   }
 
-  async findByEmail(email: string): Promise<Pick<Member, 'email'> | undefined> {
-    const [[row]] = await this.connection.execute<RowDataPacket[]>('SELECT email FROM member WHERE email = ?', [email])
+  async findByEmail(email: string): Promise<Pick<Member, 'email' | 'memberId'> | undefined> {
+    const [[row]] = await this.connection.execute<RowDataPacket[]>(
+      'SELECT email, memberId FROM member WHERE email = ?',
+      [email],
+    )
 
     if (!row) {
       return undefined
@@ -44,6 +47,7 @@ export class MemberRepository {
 
     return {
       email: row['email'],
+      memberId: row['memberId'],
     }
   }
 

@@ -62,6 +62,7 @@ describe('MemberRepository class', () => {
 
         expect(member).toEqual({
           email: 'abc@email.com',
+          memberId: 1,
         })
       })
     })

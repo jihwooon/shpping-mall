@@ -18,6 +18,7 @@ export const MEMBER = {
 
 export const DB_MEMBER_EMAIL_RESPONSE = {
   email: 'abc@email.com',
+  memberId: 1,
 }
 
 export const CREATE_MEMBER_REQUEST = {
