@@ -5,11 +5,13 @@ import { MYSQL_CONNECTION } from '../../../config/database/constants'
 import { JwtProvider } from '../../../jwt/jwt.provider'
 import { SigninService } from './signin.service'
 import { NotFoundException } from '@nestjs/common'
+import { PasswordProvider } from '../../../members/application/password.provider'
 
 describe('Signup class', () => {
   let connect: Connection
   let memberRepository: MemberRepository
   let signinService: SigninService
+  let passwordProvider: PasswordProvider
 
   const EMAIL = 'abc@email.com'
   const NOT_EXISTED_EMAIL = 'notfound@email.com'
@@ -23,6 +25,7 @@ describe('Signup class', () => {
         MemberRepository,
         SigninService,
         JwtProvider,
+        PasswordProvider,
         {
           provide: MYSQL_CONNECTION,
           useValue: connect,
@@ -32,6 +35,7 @@ describe('Signup class', () => {
 
     memberRepository = module.get<MemberRepository>(MemberRepository)
     signinService = module.get<SigninService>(SigninService)
+    passwordProvider = module.get<PasswordProvider>(PasswordProvider)
   })
 
   describe('login method', () => {
@@ -40,6 +44,7 @@ describe('Signup class', () => {
         email: EMAIL,
         memberId: 1,
       })
+      passwordProvider.comparePassword = jest.fn().mockResolvedValue(true)
     })
     context('가입된 회원 정보를 확인하면', () => {
       it('인증을 성공하고, accessToken을 리턴 해야 한다', async () => {
@@ -64,6 +69,18 @@ describe('Signup class', () => {
     context('찾을 수 없는 이메일이 null이면', () => {
       beforeEach(async () => {
         memberRepository.findByEmail = jest.fn().mockResolvedValue(null)
+      })
+      it('NotFoundException을 던져야 한다', async () => {
+        expect(signinService.login(NOT_EXISTED_EMAIL, PASSWORD)).rejects.toThrow(
+          new NotFoundException('회원 정보를 찾을 수 없습니다'),
+        )
+      })
+    })
+
+    context('찾을 수 없는 패스워드가 주어지면', () => {
+      beforeEach(async () => {
+        memberRepository.findByEmail = jest.fn().mockResolvedValue(undefined)
+        passwordProvider.comparePassword = jest.fn().mockResolvedValue(false)
       })
       it('NotFoundException을 던져야 한다', async () => {
         expect(signinService.login(NOT_EXISTED_EMAIL, PASSWORD)).rejects.toThrow(
