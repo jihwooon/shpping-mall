@@ -2,7 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { Connection, ResultSetHeader, RowDataPacket } from 'mysql2/promise'
 import { MemberRepository } from './member.repository'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
-import { DB_MEMBER_EMAIL_RESPONSE, MEMBER } from '../../fixture/memberFixture'
+import { MEMBER } from '../../fixture/memberFixture'
+import { MemberType } from './member-type.enum'
+import { Role } from './member-role.enum'
 
 describe('MemberRepository class', () => {
   let connection: Connection
@@ -55,14 +57,24 @@ describe('MemberRepository class', () => {
   describe('findByEmail method', () => {
     context('찾을 수 있는 email이 주어지면', () => {
       beforeEach(async () => {
-        connection.execute = jest.fn().mockResolvedValue([[DB_MEMBER_EMAIL_RESPONSE] as RowDataPacket[], []])
+        connection.execute = jest.fn().mockResolvedValue([[MEMBER] as RowDataPacket[], []])
       })
       it('member 정보를 리턴해야 한다', async () => {
         const member = await memberRepository.findByEmail(REGISTERED_EMAIL)
 
         expect(member).toEqual({
-          email: 'abc@email.com',
           memberId: 1,
+          email: 'abc@email.com',
+          memberName: '홍길동',
+          memberType: MemberType.GENERAL,
+          password: '$2b$10$nEU5CvDwcTwsMfZeiRv6UeYxh.Zp796RXh170vrRVPP.w0en8696K',
+          refreshToken: 'eyJhbGciOiJI',
+          tokenExpirationTime: new Date('2023-09-01T23:10:00.009Z'),
+          role: Role.USER,
+          createTime: new Date('2023-09-01T23:10:00.009Z'),
+          updateTime: new Date('2023-09-01T23:10:00.009Z'),
+          createBy: '홍길동',
+          modifiedBy: '김철수',
         })
       })
     })

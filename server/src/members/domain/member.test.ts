@@ -15,7 +15,7 @@ describe('Member', () => {
         email: 'abc@email.com',
         memberName: '홍길동',
         memberType: MemberType.GENERAL,
-        password: '12345678',
+        password: '$2b$10$nEU5CvDwcTwsMfZeiRv6UeYxh.Zp796RXh170vrRVPP.w0en8696K',
         refreshToken: 'eyJhbGciOiJI',
         tokenExpirationTime: new Date('2023-09-01T23:10:00.009Z'),
         role: Role.USER,
