@@ -50,7 +50,6 @@ describe('Signup class', () => {
     context('회원가입 정보 저장이 되면', () => {
       it('accessToken을 리턴 해야 한다', async () => {
         const authentication = await signupService.signup(EMAIL, PASSWORD, NAME)
-        console.log(authentication)
 
         expect(authentication).not.toEqual({
           accessToken: ACCESS_TOKEN,
