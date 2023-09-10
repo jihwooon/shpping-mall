@@ -4,7 +4,7 @@ import { EmailChecker } from '../../../members/application/email.checker'
 import { Member } from '../../../members/domain/member.entity'
 import { PasswordProvider } from '../../../members/application/password.provider'
 import { JwtProvider } from '../../../jwt/jwt.provider'
-import { Authentication } from '../dto/authentication'
+import { Authentication } from '../../../jwt/dto/authentication'
 
 @Injectable()
 export class SignupService {
