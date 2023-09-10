@@ -20,12 +20,16 @@ import {
   REQUEST_BODY,
 } from '../src/fixture/memberFixture'
 import { PasswordProvider } from '../src/members/application/password.provider'
+import { JwtProvider } from '../src/jwt/jwt.provider'
 
 describe('SignupController (e2e)', () => {
   let app: INestApplication
   let connection: Connection
   let signupController: SignupController
   let signupService: SignupService
+
+  const ACCESS_TOKEN =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjk0MzI3MTcwLCJleHAiOjE2OTQ0MTM1NzB9.6UXhpwHPB9W1ZtFZJQfiMANMinEt3WUULdwLSJKQ_z0'
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -35,6 +39,7 @@ describe('SignupController (e2e)', () => {
         EmailChecker,
         MemberRepository,
         PasswordProvider,
+        JwtProvider,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,
@@ -58,21 +63,24 @@ describe('SignupController (e2e)', () => {
   })
 
   describe('POST /auth/signup', () => {
-    context('회원가입 정보가 주어지면', () => {
-      beforeEach(() => {
-        signupService.signup = jest.fn().mockImplementation(() => 1)
+    beforeEach(() => {
+      signupService.signup = jest.fn().mockResolvedValue({
+        accessToken: ACCESS_TOKEN,
       })
+    })
+
+    context('회원가입 정보가 주어지면', () => {
       it('상태코드 201를 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer()).post('/auth/signup').send(REQUEST_BODY)
 
         expect(status).toEqual(201)
+        expect(body).toEqual({
+          accessToken: ACCESS_TOKEN,
+        })
       })
     })
 
     context('이메일을 누락하면', () => {
-      beforeEach(() => {
-        signupService.signup = jest.fn().mockImplementation(() => 1)
-      })
       it('상태코드 400를 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer()).post('/auth/signup').send(CREATE_NOT_EMAIL_REQUEST)
 
@@ -91,9 +99,6 @@ describe('SignupController (e2e)', () => {
     })
 
     context('이메일 형식이 맞지 않으면', () => {
-      beforeEach(() => {
-        signupService.signup = jest.fn().mockImplementation(() => 1)
-      })
       it('상태코드 400를 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer()).post('/auth/signup').send(CREATE_NOT_ERROR_REQUEST)
 
