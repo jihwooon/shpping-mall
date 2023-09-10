@@ -1,6 +1,7 @@
 import { SignupService } from '../application/signup.service'
 import { CreateMemberDto } from '../../../members/dto/create-member.dto'
-import { Controller, Post, HttpCode, Body } from '@nestjs/common'
+import { Body, Controller, HttpCode, Post } from '@nestjs/common'
+import { SignupResponseDto } from '../dto/signup-response.dto'
 
 @Controller('auth')
 export class SignupController {
@@ -8,7 +9,10 @@ export class SignupController {
 
   @Post('signup')
   @HttpCode(201)
-  async signupHandler(@Body() request: CreateMemberDto): Promise<number> {
-    return await this.signupService.signup(request.email, request.password, request.memberName)
+  async signupHandler(@Body() request: CreateMemberDto): Promise<SignupResponseDto> {
+    const response = await this.signupService.signup(request.email, request.password, request.memberName)
+    return {
+      accessToken: response.accessToken,
+    }
   }
 }
