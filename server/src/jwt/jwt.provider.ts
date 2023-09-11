@@ -20,7 +20,7 @@ export class JwtProvider {
     try {
       const { payload } = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload
 
-      return payload.memberId
+      return payload
     } catch (e) {
       throw new UnauthorizedException('인증 할 수 없는 token 입니다')
     }

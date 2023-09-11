@@ -6,11 +6,9 @@ import { BadRequestException, UnauthorizedException } from '@nestjs/common'
 describe('JwtProvider class', () => {
   let jwtProvider: JwtProvider
 
-  let ACCESS_TOKEN =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7Im1lbWJlcklkIjoxLCJlbWFpbCI6ImFiY0BlbWFpbC5jb20iLCJtZW1iZXJOYW1lIjoi7ZmN6ri464-ZIiwibWVtYmVyVHlwZSI6IkdFTkVSQUwiLCJwYXNzd29yZCI6IjEyMzQ1Njc4IiwicmVmcmVzaFRva2VuIjoiZXlKaGJHY2lPaUpJIiwidG9rZW5FeHBpcmF0aW9uVGltZSI6IjIwMjMtMDktMDFUMjM6MTA6MDAuMDA5WiIsInJvbGUiOiJVU0VSIiwiY3JlYXRlVGltZSI6IjIwMjMtMDktMDFUMjM6MTA6MDAuMDA5WiIsInVwZGF0ZVRpbWUiOiIyMDIzLTA5LTAxVDIzOjEwOjAwLjAwOVoiLCJjcmVhdGVCeSI6Iu2Zjeq4uOuPmSIsIm1vZGlmaWVkQnkiOiLquYDssqDsiJgifSwiaWF0IjoxNjk0MzEzOTIyLCJleHAiOjE2OTQ0MDAzMjJ9.F5gN5mkLFk6nET2pJ78_sTdb_YIStT7u8ei7rfK1I7c'
-
   let INVALID_ACCESS_TOKEN =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7Im1lbWJlcklkIjoxLCJlbWFpbCI6ImFiY0BlbWFpbC5jb20iLCJtZW1iZXJOYW1lIjoi7ZmN6ri464-ZIiwibWVtYmVyVHlwZSI6IkdFTkVSQUwiLCJwYXNzd29yZCI6IjEyMzQ1Njc4IiwicmVmcmVzaFRva2VuIjoiZXlKaGJHY2lPaUpJIiwidG9rZW5FeHBpcmF0aW9uVGltZSI6IjIwMjMtMDktMDFUMjM6MTA6MDAuMDA5WiIsInJvbGUiOiJVU0VSIiwiY3JlYXRlVGltZSI6IjIwMjMtMDktMDFUMjM6MTA6MDAuMDA5WiIsInVwZGF0ZVRpbWUiOiIyMDIzLTA5LTAxVDIzOjEwOjAwLjAwOVoiLCJjcmVhdGVCeSI6Iu2Zjeq4uOuPmSIsIm1vZGlmaWVkQnkiOiLquYDssqDsiJgifSwiaWF0IjoxNjk0MzEzOTIyLCJleHAiOjE2OTQ0MDAzMjJ9.F5gN5mkLFk6nET2pJ78_sTdb_YIStT7u8ei7rfK1I123'
+  const Id = 1
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -22,7 +20,6 @@ describe('JwtProvider class', () => {
 
   describe('generateAccessToken method', () => {
     context('사용자 정보가 주어 질 때', () => {
-      const Id = 1
       it('accessToken을 리턴 해야 한다', () => {
         const accessToken = jwtProvider.generateAccessToken(Id)
 
@@ -34,13 +31,13 @@ describe('JwtProvider class', () => {
 
     context('accessToken이 검증을 성공하면', () => {
       it('id를 리턴 해야 한다.', () => {
-        const decoded = jwtProvider.validateToken(ACCESS_TOKEN)
+        const payload = jwtProvider.validateToken(jwtProvider.generateAccessToken(Id))
 
-        expect(decoded).toEqual(1)
+        expect(payload).toEqual(1)
       })
     })
     context('accessToken이 검증을 실패하면', () => {
-      it('JsonWebTokenError을 던져야 한다', () => {
+      it('UnauthorizedException을 던져야 한다', () => {
         try {
           jwtProvider.validateToken(INVALID_ACCESS_TOKEN)
         } catch (e) {
