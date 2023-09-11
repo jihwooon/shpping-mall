@@ -46,18 +46,18 @@ export class MemberRepository {
     }
 
     return {
-      memberId: row['memberId'],
+      memberId: row['member_id'],
       email: row['email'],
-      memberName: row['memberName'],
-      memberType: row['memberType'],
+      memberName: row['member_name'],
+      memberType: row['member_type'],
       password: row['password'],
-      refreshToken: row['refreshToken'],
-      tokenExpirationTime: row['tokenExpirationTime'],
+      refreshToken: row['refresh_token'],
+      tokenExpirationTime: row['token_expiration_time'],
       role: row['role'],
-      createTime: row['createTime'],
-      updateTime: row['updateTime'],
-      createBy: row['createBy'],
-      modifiedBy: row['modifiedBy'],
+      createTime: row['create_time'],
+      updateTime: row['update_time'],
+      createBy: row['create_by'],
+      modifiedBy: row['modified_by'],
     }
   }
 

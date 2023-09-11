@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { Connection, ResultSetHeader, RowDataPacket } from 'mysql2/promise'
 import { MemberRepository } from './member.repository'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
-import { MEMBER } from '../../fixture/memberFixture'
+import { FIND_BY_EMAIL, MEMBER } from '../../fixture/memberFixture'
 import { MemberType } from './member-type.enum'
 import { Role } from './member-role.enum'
 
@@ -57,7 +57,7 @@ describe('MemberRepository class', () => {
   describe('findByEmail method', () => {
     context('찾을 수 있는 email이 주어지면', () => {
       beforeEach(async () => {
-        connection.execute = jest.fn().mockResolvedValue([[MEMBER] as RowDataPacket[], []])
+        connection.execute = jest.fn().mockResolvedValue([[FIND_BY_EMAIL] as RowDataPacket[], []])
       })
       it('member 정보를 리턴해야 한다', async () => {
         const member = await memberRepository.findByEmail(REGISTERED_EMAIL)
