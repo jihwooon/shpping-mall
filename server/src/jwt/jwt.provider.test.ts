@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { JwtProvider } from './jwt.provider'
-import * as jwt from 'jsonwebtoken'
 import { BadRequestException, UnauthorizedException } from '@nestjs/common'
 
 describe('JwtProvider class', () => {
@@ -28,7 +27,29 @@ describe('JwtProvider class', () => {
         )
       })
     })
+    context('id가 null이 주어지면', () => {
+      it('BadRequestException를 던져야 한다', () => {
+        try {
+          jwtProvider.generateAccessToken(null)
+        } catch (e) {
+          expect(e).toBeInstanceOf(BadRequestException)
+          expect(e.message).toEqual('id는 null이 될 수 없습니다')
+        }
+      })
+    })
+    context('id가 undefined이 주어지면', () => {
+      it('BadRequestException를 던져야 한다', () => {
+        try {
+          jwtProvider.generateAccessToken(undefined)
+        } catch (e) {
+          expect(e).toBeInstanceOf(BadRequestException)
+          expect(e.message).toEqual('id는 undefined이 될 수 없습니다')
+        }
+      })
+    })
+  })
 
+  describe('validateToken method', () => {
     context('accessToken이 검증을 성공하면', () => {
       it('id를 리턴 해야 한다.', () => {
         const payload = jwtProvider.validateToken(jwtProvider.generateAccessToken(Id))
