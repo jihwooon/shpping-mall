@@ -7,6 +7,10 @@ dotenv.config()
 @Injectable()
 export class JwtProvider {
   generateAccessToken(id: number) {
+    if (id == undefined || id == null) {
+      throw new BadRequestException(`id는 ${id}이 될 수 없습니다`)
+    }
+
     return jwt.sign({ payload: id }, process.env.JWT_SECRET, {
       expiresIn: '1d',
     })
