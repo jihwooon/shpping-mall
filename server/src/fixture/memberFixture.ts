@@ -6,7 +6,7 @@ export const MEMBER = {
   email: 'abc@email.com',
   memberName: '홍길동',
   memberType: MemberType.GENERAL,
-  password: '12345678',
+  password: '$2b$10$nEU5CvDwcTwsMfZeiRv6UeYxh.Zp796RXh170vrRVPP.w0en8696K',
   refreshToken: 'eyJhbGciOiJI',
   tokenExpirationTime: new Date('2023-09-01T23:10:00.009Z'),
   role: Role.USER,
@@ -14,10 +14,6 @@ export const MEMBER = {
   updateTime: new Date('2023-09-01T23:10:00.009Z'),
   createBy: '홍길동',
   modifiedBy: '김철수',
-}
-
-export const DB_MEMBER_EMAIL_RESPONSE = {
-  email: 'abc@email.com',
 }
 
 export const CREATE_MEMBER_REQUEST = {
