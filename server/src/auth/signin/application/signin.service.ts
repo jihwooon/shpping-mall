@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common'
 import { MemberRepository } from '../../../members/domain/member.repository'
 import { JwtProvider } from '../../../jwt/jwt.provider'
 import { Authentication } from '../../../jwt/dto/authentication'
@@ -18,9 +18,9 @@ export class SigninService {
       throw new NotFoundException('회원 정보를 찾을 수 없습니다')
     }
 
-    const isPasswordMatch = this.passwordProvider.comparePassword(password, member)
+    const isPasswordMatch = await this.passwordProvider.comparePassword(password, member)
     if (!isPasswordMatch) {
-      throw new NotFoundException('회원 정보를 찾을 수 없습니다')
+      throw new BadRequestException('패스워드가 일치 하지 않습니다')
     }
 
     return {
