@@ -1,6 +1,7 @@
-import { Controller, HttpCode, Post, Req } from '@nestjs/common'
+import { Controller, HttpCode, Post, Body } from '@nestjs/common'
 import { SigninService } from '../application/signin.service'
 import { SigninResponseDto } from '../dto/signin-response.dto'
+import { LoginMemberDto } from '../../../members/dto/login-member.dto'
 
 @Controller('auth')
 export class SigninController {
@@ -8,10 +9,8 @@ export class SigninController {
 
   @Post('signin')
   @HttpCode(200)
-  async signinHandler(@Req() req: any): Promise<SigninResponseDto> {
-    const { email, password } = req.body
-
-    const response = await this.signinService.login(email, password)
+  async signinHandler(@Body() request: LoginMemberDto): Promise<SigninResponseDto> {
+    const response = await this.signinService.login(request.email, request.password)
 
     return {
       accessToken: response.accessToken,
