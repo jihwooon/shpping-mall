@@ -49,6 +49,38 @@ describe('JwtProvider class', () => {
     })
   })
 
+  describe('generateRefreshToken method', () => {
+    context('사용자 정보가 주어 질 때', () => {
+      it('refreshToken을 리턴 해야 한다', () => {
+        const refreshToken = jwtProvider.generateRefreshToken(Id)
+
+        expect(refreshToken).not.toEqual(
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7Im1lbWJlcklkIjoxLCJlbWFpbCI6ImFiY0BlbWFpbC5jb20iLCJtZW1iZXJOYW1lIjoi7ZmN6ri464-ZIiwibWVtYmVyVHlwZSI6IkdFTkVSQUwiLCJwYXNzd29yZCI6IjEyMzQ1Njc4IiwicmVmcmVzaFRva2VuIjoiZXlKaGJHY2lPaUpJIiwidG9rZW5FeHBpcmF0aW9uVGltZSI6IjIwMjMtMDktMDFUMjM6MTA6MDAuMDA5WiIsInJvbGUiOiJVU0VSIiwiY3JlYXRlVGltZSI6IjIwMjMtMDktMDFUMjM6MTA6MDAuMDA5WiIsInVwZGF0ZVRpbWUiOiIyMDIzLTA5LTAxVDIzOjEwOjAwLjAwOVoiLCJjcmVhdGVCeSI6Iu2Zjeq4uOuPmSIsIm1vZGlmaWVkQnkiOiLquYDssqDsiJgifSwiaWF0IjoxNjk0MzEzOTIyLCJleHAiOjE2OTQ0MDAzMjJ9.F5gN5mkLFk6nET2pJ78_sTdb_YIStT7u8ei7rfK1I7c',
+        )
+      })
+    })
+    context('id가 null이 주어지면', () => {
+      it('BadRequestException를 던져야 한다', () => {
+        try {
+          jwtProvider.generateRefreshToken(null)
+        } catch (e) {
+          expect(e).toBeInstanceOf(BadRequestException)
+          expect(e.message).toEqual('id는 null이 될 수 없습니다')
+        }
+      })
+    })
+    context('id가 undefined이 주어지면', () => {
+      it('BadRequestException를 던져야 한다', () => {
+        try {
+          jwtProvider.generateRefreshToken(undefined)
+        } catch (e) {
+          expect(e).toBeInstanceOf(BadRequestException)
+          expect(e.message).toEqual('id는 undefined이 될 수 없습니다')
+        }
+      })
+    })
+  })
+
   describe('validateToken method', () => {
     context('accessToken이 검증을 성공하면', () => {
       it('id를 리턴 해야 한다.', () => {

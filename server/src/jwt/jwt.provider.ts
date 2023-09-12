@@ -12,7 +12,19 @@ export class JwtProvider {
     }
 
     return jwt.sign({ payload: id }, process.env.JWT_SECRET, {
+      subject: 'ACCESS',
       expiresIn: '1d',
+    })
+  }
+
+  generateRefreshToken(id: number) {
+    if (id == undefined || id == null) {
+      throw new BadRequestException(`id는 ${id}이 될 수 없습니다`)
+    }
+
+    return jwt.sign({ payload: id }, process.env.REFRESH_JWT_SECRET, {
+      subject: 'REFRESH',
+      expiresIn: '2w',
     })
   }
 
