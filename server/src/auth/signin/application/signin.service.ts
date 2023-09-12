@@ -18,7 +18,7 @@ export class SigninService {
       throw new NotFoundException('회원 정보를 찾을 수 없습니다')
     }
 
-    const isPasswordMatch = this.passwordProvider.comparePassword(password, member)
+    const isPasswordMatch = await this.passwordProvider.comparePassword(password, member)
     if (!isPasswordMatch) {
       throw new NotFoundException('회원 정보를 찾을 수 없습니다')
     }
