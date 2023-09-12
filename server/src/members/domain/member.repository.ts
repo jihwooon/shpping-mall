@@ -62,13 +62,14 @@ export class MemberRepository {
   }
 
   async existsByEmail(email: string): Promise<boolean> {
-    const [rows] = await this.connection.execute<RowDataPacket[]>('SELECT COUNT(email) FROM member WHERE email = ?', [
-      email,
-    ])
+    const [rows] = await this.connection.execute<RowDataPacket[]>(
+      'SELECT COUNT(email) as emailCount FROM member WHERE email = ?',
+      [email],
+    )
 
     const row = rows ?? []
 
-    if (row[0].email >= 1) {
+    if (row[0].emailCount >= 1) {
       return true
     }
 
