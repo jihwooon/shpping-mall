@@ -18,6 +18,8 @@ describe('Signup class', () => {
   const PASSWORD = '123456'
   const ACCESS_TOKEN =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoxLCJpYXQiOjE2OTQzNDA2MDQsImV4cCI6MTY5NDQyNzAwNH0.CeU8XsvPM1SWtHVzonZWR-WatmOEVRIXYXpezsyAYfg'
+  const REFRESH_TOKEN =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoxLCJpYXQiOjE2OTQ1MjI0NzUsImV4cCI6MTY5NTczMjA3NSwic3ViIjoiUkVGUkVTSCJ9.A2PfZdj91q6MIapXrvTB6bUd7blhqrrDY2yh0eYdGPY'
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -47,11 +49,12 @@ describe('Signup class', () => {
       passwordProvider.comparePassword = jest.fn().mockResolvedValue(true)
     })
     context('가입된 회원 정보를 확인하면', () => {
-      it('인증을 성공하고, accessToken을 리턴 해야 한다', async () => {
+      it('인증을 성공하고, accessToken과 refreshToken을 리턴 해야 한다', async () => {
         const authentication = await signinService.login(EMAIL, PASSWORD)
 
         expect(authentication).not.toEqual({
           accessToken: ACCESS_TOKEN,
+          refreshToken: REFRESH_TOKEN,
         })
       })
     })

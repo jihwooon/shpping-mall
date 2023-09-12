@@ -19,6 +19,8 @@ describe('Signup class', () => {
   const NAME = '홍길동'
   const ACCESS_TOKEN =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoxLCJpYXQiOjE2OTQzNDA2MDQsImV4cCI6MTY5NDQyNzAwNH0.CeU8XsvPM1SWtHVzonZWR-WatmOEVRIXYXpezsyAYfg'
+  const REFRESH_TOKEN =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoxLCJpYXQiOjE2OTQ1MjI1NzcsImV4cCI6MTY5NTczMjE3Nywic3ViIjoiUkVGUkVTSCJ9.Inx2q66-WHa1Q79kYdTAaII_-0dFUETKFkLdzwpBOHs'
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -48,11 +50,12 @@ describe('Signup class', () => {
     })
 
     context('회원가입 정보 저장이 되면', () => {
-      it('accessToken을 리턴 해야 한다', async () => {
+      it('accessToken과 refreshToken을 리턴 해야 한다', async () => {
         const authentication = await signupService.signup(EMAIL, PASSWORD, NAME)
 
         expect(authentication).not.toEqual({
           accessToken: ACCESS_TOKEN,
+          refreshToken: REFRESH_TOKEN,
         })
       })
     })

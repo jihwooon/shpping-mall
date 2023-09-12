@@ -30,6 +30,8 @@ describe('SignupController (e2e)', () => {
 
   const ACCESS_TOKEN =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjk0MzI3MTcwLCJleHAiOjE2OTQ0MTM1NzB9.6UXhpwHPB9W1ZtFZJQfiMANMinEt3WUULdwLSJKQ_z0'
+  const REFRESH_TOKEN =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjo0NSwiaWF0IjoxNjk0NTIyODc2LCJleHAiOjE2OTU3MzI0NzYsInN1YiI6IlJFRlJFU0gifQ.HQc7pLeiMFtL-phEICVtulH8qraSA23toTfcehYvy4Y'
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -66,6 +68,7 @@ describe('SignupController (e2e)', () => {
     beforeEach(() => {
       signupService.signup = jest.fn().mockResolvedValue({
         accessToken: ACCESS_TOKEN,
+        refreshToken: REFRESH_TOKEN,
       })
     })
 
@@ -76,6 +79,7 @@ describe('SignupController (e2e)', () => {
         expect(status).toEqual(201)
         expect(body).toEqual({
           accessToken: ACCESS_TOKEN,
+          refreshToken: REFRESH_TOKEN,
         })
       })
     })

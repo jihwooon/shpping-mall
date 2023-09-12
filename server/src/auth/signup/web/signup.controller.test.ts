@@ -17,8 +17,10 @@ describe('SignupController class', () => {
   let connection: Connection
   let signupResponse: SignupResponseDto
 
-  let ACCESS_TOKEN =
+  const ACCESS_TOKEN =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjk0MzI3MTcwLCJleHAiOjE2OTQ0MTM1NzB9.6UXhpwHPB9W1ZtFZJQfiMANMinEt3WUULdwLSJKQ_z0'
+  const REFRESH_TOKEN =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjo0NSwiaWF0IjoxNjk0NTIyODc2LCJleHAiOjE2OTU3MzI0NzYsInN1YiI6IlJFRlJFU0gifQ.HQc7pLeiMFtL-phEICVtulH8qraSA23toTfcehYvy4Y'
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -44,14 +46,16 @@ describe('SignupController class', () => {
     beforeEach(() => {
       signupService.signup = jest.fn().mockResolvedValue({
         accessToken: ACCESS_TOKEN,
+        refreshToken: REFRESH_TOKEN,
       })
     })
     context('회원가입 정보 요청이 주어지고, 회원가입 정보 저장 후', () => {
-      it('accessToken를 리턴해야 한다', async () => {
+      it('accessToken과 refreshToken를 리턴해야 한다', async () => {
         const signedMember = await signupController.signupHandler(CREATE_MEMBER_REQUEST)
 
         expect(signedMember).toEqual({
           accessToken: ACCESS_TOKEN,
+          refreshToken: REFRESH_TOKEN,
         })
       })
     })

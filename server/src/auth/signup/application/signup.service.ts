@@ -24,6 +24,7 @@ export class SignupService {
 
     return {
       accessToken: this.jwtProvider.generateAccessToken(id),
+      refreshToken: this.jwtProvider.generateRefreshToken(id),
     }
   }
 }
