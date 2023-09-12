@@ -25,6 +25,7 @@ export class SigninService {
 
     return {
       accessToken: this.jwtProvider.generateAccessToken(member.memberId),
+      refreshToken: this.jwtProvider.generateRefreshToken(member.memberId),
     }
   }
 }

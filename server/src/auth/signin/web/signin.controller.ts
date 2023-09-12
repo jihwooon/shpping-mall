@@ -14,6 +14,7 @@ export class SigninController {
 
     return {
       accessToken: response.accessToken,
+      refreshToken: response.refreshToken,
     }
   }
 }
