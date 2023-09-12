@@ -13,6 +13,7 @@ export class SignupController {
     const response = await this.signupService.signup(request.email, request.password, request.memberName)
     return {
       accessToken: response.accessToken,
+      refreshToken: response.refreshToken,
     }
   }
 }
