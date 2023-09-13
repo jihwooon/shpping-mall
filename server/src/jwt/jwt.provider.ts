@@ -11,7 +11,7 @@ export class JwtProvider {
       throw new BadRequestException(`id는 ${id}이 될 수 없습니다`)
     }
 
-    return jwt.sign({ payload: id }, process.env.ACCESS_JWT_SECRET, {
+    return jwt.sign({ payload: id }, process.env.JWT_SECRET, {
       subject: 'ACCESS',
       expiresIn: expireTime.getMilliseconds(),
     })
@@ -22,7 +22,7 @@ export class JwtProvider {
       throw new BadRequestException(`id는 ${id}이 될 수 없습니다`)
     }
 
-    return jwt.sign({ payload: id }, process.env.REFRESH_JWT_SECRET, {
+    return jwt.sign({ payload: id }, process.env.JWT_SECRET, {
       subject: 'REFRESH',
       expiresIn: expireTime.getMilliseconds(),
     })
@@ -34,7 +34,7 @@ export class JwtProvider {
     }
 
     try {
-      const { payload } = jwt.verify(token, process.env.ACCESS_JWT_SECRET) as jwt.JwtPayload
+      const { payload } = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload
 
       return payload
     } catch (e) {
