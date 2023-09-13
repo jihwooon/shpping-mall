@@ -24,12 +24,26 @@ jobs:
           cache: "npm"
           cache-dependency-path: ./package-lock.json
       
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: server/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./package-lock.json') }}
       - name : .env setting
         run : |
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
 
       - name: install
         run: npm install
+
+      - name: ci
+        if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+        run: npm ci
 
       - name: test
         run: npm test
