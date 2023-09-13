@@ -1,0 +1,38 @@
+name: server
+
+on:
+    push:
+      branches: [ main ]
+    pull_request:
+      branches: [ main ]
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.12.0
+          cache: "npm"
+          cache-dependency-path: ./package-lock.json
+      
+      - name : .env setting
+        run : |
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
+
+      - name: install
+        run: npm install
+
+      - name: test
+        run: npm test
+
+      - name: build
+        run: npm run build
