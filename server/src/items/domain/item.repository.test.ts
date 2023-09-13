@@ -55,7 +55,7 @@ describe('ItemRepository class', () => {
           price: 130000,
           itemSellStatus: 'SELL',
           stockNumber: 5,
-          createTime: new Date('2023-09-03T22:31:02.000Z'),
+          createTime: new Date('2023-09-04T07:31:02'),
           updateTime: null,
           createBy: null,
           modifiedBy: null,
