@@ -1,0 +1,56 @@
+name: server
+
+on:
+    push:
+      branches: [ main ]
+    pull_request:
+      branches: [ main ]
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Setup node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.12.0
+          cache: "npm"
+          cache-dependency-path: ./package-lock.json
+      
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: server/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./package-lock.json') }}
+      
+      - name : Setting .ENV
+        run : |
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
+
+      - name: Install
+        run: npm install
+
+      - name: Install Dependencies
+        if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+        run: npm ci
+
+      - name: Run Test
+        run: npm test
+
+      - name: Run Build
+        run: npm run build
