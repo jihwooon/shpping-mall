@@ -13,13 +13,16 @@ describe('SigninController (e2e)', () => {
   let app: INestApplication
   let connection: Connection
   let signinService: SigninService
+  let signinController: SigninController
 
   const ACCESS_TOKEN =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjk0MzI3MTcwLCJleHAiOjE2OTQ0MTM1NzB9.6UXhpwHPB9W1ZtFZJQfiMANMinEt3WUULdwLSJKQ_z0'
   const REFRESH_TOKEN =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjo0NSwiaWF0IjoxNjk0NTIyODc2LCJleHAiOjE2OTU3MzI0NzYsInN1YiI6IlJFRlJFU0gifQ.HQc7pLeiMFtL-phEICVtulH8qraSA23toTfcehYvy4Y'
+  const ACCESS_TOKEN_EXPIRE = new Date(Date.now() + 86400000).toISOString()
+  const REFRESH_TOKEN_EXPIRE = new Date(Date.now() + 1210500000).toISOString()
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [SigninController],
       providers: [
@@ -34,6 +37,7 @@ describe('SigninController (e2e)', () => {
       ],
     }).compile()
 
+    signinController = moduleFixture.get<SigninController>(SigninController)
     signinService = moduleFixture.get<SigninService>(SigninService)
 
     app = moduleFixture.createNestApplication()
@@ -53,6 +57,8 @@ describe('SigninController (e2e)', () => {
       signinService.login = jest.fn().mockResolvedValue({
         accessToken: ACCESS_TOKEN,
         refreshToken: REFRESH_TOKEN,
+        accessTokenExpireTime: ACCESS_TOKEN_EXPIRE,
+        refreshTokenExpireTime: REFRESH_TOKEN_EXPIRE,
       })
     })
 
@@ -67,6 +73,8 @@ describe('SigninController (e2e)', () => {
         expect(body).toEqual({
           accessToken: ACCESS_TOKEN,
           refreshToken: REFRESH_TOKEN,
+          accessTokenExpireTime: ACCESS_TOKEN_EXPIRE,
+          refreshTokenExpireTime: REFRESH_TOKEN_EXPIRE,
         })
       })
     })
