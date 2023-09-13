@@ -14,6 +14,8 @@ export class SignupController {
     return {
       accessToken: response.accessToken,
       refreshToken: response.refreshToken,
+      accessTokenExpireTime: response.accessTokenExpireTime,
+      refreshTokenExpireTime: response.refreshTokenExpireTime,
     }
   }
 }

@@ -6,25 +6,25 @@ dotenv.config()
 
 @Injectable()
 export class JwtProvider {
-  generateAccessToken(id: number) {
+  generateAccessToken(id: number, expireTime: Date) {
     if (id == undefined || id == null) {
       throw new BadRequestException(`id는 ${id}이 될 수 없습니다`)
     }
 
     return jwt.sign({ payload: id }, process.env.JWT_SECRET, {
       subject: 'ACCESS',
-      expiresIn: '1d',
+      expiresIn: expireTime.getMilliseconds(),
     })
   }
 
-  generateRefreshToken(id: number) {
+  generateRefreshToken(id: number, expireTime: Date) {
     if (id == undefined || id == null) {
       throw new BadRequestException(`id는 ${id}이 될 수 없습니다`)
     }
 
-    return jwt.sign({ payload: id }, process.env.REFRESH_JWT_SECRET, {
+    return jwt.sign({ payload: id }, process.env.JWT_SECRET, {
       subject: 'REFRESH',
-      expiresIn: '2w',
+      expiresIn: expireTime.getMilliseconds(),
     })
   }
 
@@ -40,5 +40,13 @@ export class JwtProvider {
     } catch (e) {
       throw new UnauthorizedException('인증 할 수 없는 token 입니다')
     }
+  }
+
+  createAccessTokenExpireTime() {
+    return new Date(Date.now() + 86400000)
+  }
+
+  createRefreshTokenExpireTime() {
+    return new Date(Date.now() + 1210500000)
   }
 }

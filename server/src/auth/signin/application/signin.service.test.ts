@@ -12,6 +12,7 @@ describe('Signup class', () => {
   let memberRepository: MemberRepository
   let signinService: SigninService
   let passwordProvider: PasswordProvider
+  let jwtProvider: JwtProvider
 
   const EMAIL = 'abc@email.com'
   const NOT_EXISTED_EMAIL = 'notfound@email.com'
@@ -38,6 +39,7 @@ describe('Signup class', () => {
     memberRepository = module.get<MemberRepository>(MemberRepository)
     signinService = module.get<SigninService>(SigninService)
     passwordProvider = module.get<PasswordProvider>(PasswordProvider)
+    jwtProvider = module.get<JwtProvider>(JwtProvider)
   })
 
   describe('login method', () => {
@@ -57,7 +59,14 @@ describe('Signup class', () => {
           refreshToken: REFRESH_TOKEN,
         })
       })
+      it('인증을 성공하고, accessTokenExpire과 refreshTokenExpire을 리턴 해야 한다', async () => {
+        const authentication = await signinService.login(EMAIL, PASSWORD)
+
+        expect(authentication.accessTokenExpireTime).toBeTruthy()
+        expect(authentication.refreshTokenExpireTime).toBeTruthy()
+      })
     })
+
     context('찾을 수 없는 이메일이 undefined이면', () => {
       beforeEach(async () => {
         memberRepository.findByEmail = jest.fn().mockResolvedValue(undefined)

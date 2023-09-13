@@ -58,6 +58,12 @@ describe('Signup class', () => {
           refreshToken: REFRESH_TOKEN,
         })
       })
+      it('accessTokenExpire과 refreshTokenExpire을 리턴 해야 한다', async () => {
+        const authentication = await signupService.signup(EMAIL, PASSWORD, NAME)
+
+        expect(authentication.accessTokenExpireTime).toBeTruthy()
+        expect(authentication.refreshTokenExpireTime).toBeTruthy()
+      })
     })
   })
 })
