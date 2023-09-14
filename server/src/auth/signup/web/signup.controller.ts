@@ -10,12 +10,10 @@ export class SignupController {
   @Post('signup')
   @HttpCode(201)
   async signupHandler(@Body() request: CreateMemberDto): Promise<SignupResponseDto> {
-    const response = await this.signupService.signup(request.email, request.password, request.memberName)
+    const id = await this.signupService.signup(request.email, request.password, request.memberName)
+
     return {
-      accessToken: response.accessToken,
-      refreshToken: response.refreshToken,
-      accessTokenExpireTime: response.accessTokenExpireTime,
-      refreshTokenExpireTime: response.refreshTokenExpireTime,
+      id: id,
     }
   }
 }
