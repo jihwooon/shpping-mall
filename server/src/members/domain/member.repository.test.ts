@@ -9,8 +9,12 @@ import { Role } from './member-role.enum'
 describe('MemberRepository class', () => {
   let connection: Connection
   let memberRepository: MemberRepository
+
   const REGISTERED_EMAIL = 'abc@email.com'
   const UNSUBSCRIBED_EMAIL = 'xxxx@email.com'
+  const REFRESH_TOKEN =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoxLCJpYXQiOjE2OTQ1MjI0NzUsImV4cCI6MTY5NTczMjA3NSwic3ViIjoiUkVGUkVTSCJ9.A2PfZdj91q6MIapXrvTB6bUd7blhqrrDY2yh0eYdGPY'
+  const REFRESH_EXPIRE_TIME = new Date('2023-09-28T14:45:55.144Z')
 
   connection = {
     execute: jest.fn(),
@@ -111,6 +115,22 @@ describe('MemberRepository class', () => {
         const exitedEmail = await memberRepository.existsByEmail(UNSUBSCRIBED_EMAIL)
 
         expect(exitedEmail).toEqual(false)
+      })
+    })
+  })
+
+  describe('updateMemberByRefreshTokenAndExpirationTime method', () => {
+    context('refreshToken과 사용자 email이 주어지면', () => {
+      it('메서드를 호출해야 한다', async () => {
+        const spyOn = jest.spyOn(memberRepository, 'updateMemberByRefreshTokenAndExpirationTime').mockResolvedValue()
+        await memberRepository.updateMemberByRefreshTokenAndExpirationTime(
+          REFRESH_TOKEN,
+          REFRESH_EXPIRE_TIME,
+          REGISTERED_EMAIL,
+        )
+
+        expect(spyOn).toHaveBeenCalled()
+        expect(spyOn).toHaveBeenCalledWith(REFRESH_TOKEN, REFRESH_EXPIRE_TIME, REGISTERED_EMAIL)
       })
     })
   })

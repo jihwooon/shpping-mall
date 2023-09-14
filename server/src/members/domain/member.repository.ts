@@ -75,4 +75,15 @@ export class MemberRepository {
 
     return false
   }
+
+  async updateMemberByRefreshTokenAndExpirationTime(
+    refreshToken: string,
+    expireTime: Date,
+    email: string,
+  ): Promise<void> {
+    await this.connection.execute<ResultSetHeader>(
+      `UPDATE member SET refresh_token = ?, token_expiration_time = ? WHERE email = ?`,
+      [refreshToken, expireTime, email],
+    )
+  }
 }

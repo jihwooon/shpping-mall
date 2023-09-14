@@ -3,6 +3,7 @@ import { MemberRepository } from '../../../members/domain/member.repository'
 import { JwtProvider } from '../../../jwt/jwt.provider'
 import { Authentication } from '../../../jwt/dto/authentication'
 import { PasswordProvider } from '../../../members/application/password.provider'
+import { Member } from '../../../members/domain/member.entity'
 
 @Injectable()
 export class SigninService {
@@ -24,6 +25,7 @@ export class SigninService {
     }
 
     const generateToken = this.jwtProvider.createTokenDTO(member.email)
+    await this.updateRefreshTokenAndExpirationTime(generateToken, member)
 
     return {
       accessToken: generateToken.accessToken,
@@ -31,5 +33,13 @@ export class SigninService {
       refreshToken: generateToken.refreshToken,
       refreshTokenExpireTime: generateToken.refreshTokenExpireTime,
     }
+  }
+
+  async updateRefreshTokenAndExpirationTime(generateToken: any, member: Member) {
+    await this.memberRepository.updateMemberByRefreshTokenAndExpirationTime(
+      generateToken.refreshToken,
+      generateToken.refreshTokenExpireTime,
+      member.email,
+    )
   }
 }
