@@ -22,14 +22,14 @@ export class SignupService {
       new Member({ email: email, password: hashedPassword, memberName: memberName }),
     )
 
-    const accessTokenExpireTime = this.jwtProvider.createAccessTokenExpireTime()
-    const refreshTokenExpireTime = this.jwtProvider.createRefreshTokenExpireTime()
+    const generateAccessToken = this.jwtProvider.generateAccessToken(id)
+    const generateRefreshToken = this.jwtProvider.generateRefreshToken(id)
 
     return {
-      accessToken: this.jwtProvider.generateAccessToken(id, accessTokenExpireTime),
-      refreshToken: this.jwtProvider.generateRefreshToken(id, refreshTokenExpireTime),
-      accessTokenExpireTime: accessTokenExpireTime,
-      refreshTokenExpireTime: refreshTokenExpireTime,
+      accessToken: generateAccessToken.accessToken,
+      accessTokenExpireTime: generateAccessToken.accessTokenExpireTime,
+      refreshToken: generateRefreshToken.refreshToken,
+      refreshTokenExpireTime: generateRefreshToken.refreshTokenExpireTime,
     }
   }
 }

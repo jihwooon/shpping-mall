@@ -1,29 +1,39 @@
 import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common'
 import * as jwt from 'jsonwebtoken'
 import * as dotenv from 'dotenv'
+import { TokenType } from './token-type.enum'
 
 dotenv.config()
 
 @Injectable()
 export class JwtProvider {
-  generateAccessToken(id: number, expireTime: Date) {
-    if (id == undefined || id == null) {
-      throw new BadRequestException(`id는 ${id}이 될 수 없습니다`)
-    }
+  generateAccessToken(id: number) {
+    const accessTokenExpireTime = this.createAccessTokenExpireTime()
+    const accessToken = this.generateToken(id, accessTokenExpireTime, TokenType.ACCESS)
 
-    return jwt.sign({ payload: id }, process.env.JWT_SECRET, {
-      subject: 'ACCESS',
-      expiresIn: expireTime.getMilliseconds(),
-    })
+    return {
+      accessToken: accessToken,
+      accessTokenExpireTime: accessTokenExpireTime,
+    }
   }
 
-  generateRefreshToken(id: number, expireTime: Date) {
+  generateRefreshToken(id: number) {
+    const refreshTokenExpireTime = this.createRefreshTokenExpireTime()
+    const refreshToken = this.generateToken(id, refreshTokenExpireTime, TokenType.REFRESH)
+
+    return {
+      refreshToken: refreshToken,
+      refreshTokenExpireTime: refreshTokenExpireTime,
+    }
+  }
+
+  generateToken(id: number, expireTime: Date, tokenType: string) {
     if (id == undefined || id == null) {
       throw new BadRequestException(`id는 ${id}이 될 수 없습니다`)
     }
 
     return jwt.sign({ payload: id }, process.env.JWT_SECRET, {
-      subject: 'REFRESH',
+      subject: tokenType,
       expiresIn: expireTime.getMilliseconds(),
     })
   }
