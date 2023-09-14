@@ -25,15 +25,7 @@ import { JwtProvider } from '../src/jwt/jwt.provider'
 describe('SignupController (e2e)', () => {
   let app: INestApplication
   let connection: Connection
-  let signupController: SignupController
   let signupService: SignupService
-
-  const ACCESS_TOKEN =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjk0MzI3MTcwLCJleHAiOjE2OTQ0MTM1NzB9.6UXhpwHPB9W1ZtFZJQfiMANMinEt3WUULdwLSJKQ_z0'
-  const REFRESH_TOKEN =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjo0NSwiaWF0IjoxNjk0NTIyODc2LCJleHAiOjE2OTU3MzI0NzYsInN1YiI6IlJFRlJFU0gifQ.HQc7pLeiMFtL-phEICVtulH8qraSA23toTfcehYvy4Y'
-  const ACCESS_TOKEN_EXPIRE = new Date(Date.now() + 86400000).toISOString()
-  const REFRESH_TOKEN_EXPIRE = new Date(Date.now() + 1210500000).toISOString()
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -51,7 +43,6 @@ describe('SignupController (e2e)', () => {
       ],
     }).compile()
 
-    signupController = moduleFixture.get<SignupController>(SignupController)
     signupService = moduleFixture.get<SignupService>(SignupService)
 
     app = moduleFixture.createNestApplication()
@@ -68,25 +59,20 @@ describe('SignupController (e2e)', () => {
 
   describe('POST /auth/signup', () => {
     beforeEach(() => {
-      signupService.signup = jest.fn().mockResolvedValue({
-        accessToken: ACCESS_TOKEN,
-        refreshToken: REFRESH_TOKEN,
-        accessTokenExpireTime: ACCESS_TOKEN_EXPIRE,
-        refreshTokenExpireTime: REFRESH_TOKEN_EXPIRE,
-      })
+      signupService.signup = jest.fn().mockImplementation(() => 1)
     })
 
     context('회원가입 정보가 주어지면', () => {
       it('상태코드 201를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer()).post('/auth/signup').send(REQUEST_BODY)
+        const {
+          status,
+          body: { id },
+        } = await request(app.getHttpServer())
+          .post('/auth/signup')
+          .send({ email: 'abc@email.com', memberName: '홍길동', password: '12345678123456' })
 
         expect(status).toEqual(201)
-        expect(body).toEqual({
-          accessToken: ACCESS_TOKEN,
-          refreshToken: REFRESH_TOKEN,
-          accessTokenExpireTime: ACCESS_TOKEN_EXPIRE,
-          refreshTokenExpireTime: REFRESH_TOKEN_EXPIRE,
-        })
+        expect(id).toEqual(1)
       })
     })
 
