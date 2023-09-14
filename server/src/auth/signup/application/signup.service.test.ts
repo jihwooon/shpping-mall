@@ -10,17 +10,8 @@ import { JwtProvider } from '../../../jwt/jwt.provider'
 describe('Signup class', () => {
   let connect: Connection
   let memberRepository: MemberRepository
-  let emailChecker: EmailChecker
   let signupService: SignupService
-  let jwtProvider: JwtProvider
-
-  const EMAIL = 'abc@email.com'
-  const PASSWORD = '123456'
-  const NAME = '홍길동'
-  const ACCESS_TOKEN =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoxLCJpYXQiOjE2OTQzNDA2MDQsImV4cCI6MTY5NDQyNzAwNH0.CeU8XsvPM1SWtHVzonZWR-WatmOEVRIXYXpezsyAYfg'
-  const REFRESH_TOKEN =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoxLCJpYXQiOjE2OTQ1MjI1NzcsImV4cCI6MTY5NTczMjE3Nywic3ViIjoiUkVGUkVTSCJ9.Inx2q66-WHa1Q79kYdTAaII_-0dFUETKFkLdzwpBOHs'
+  let emailChecker: EmailChecker
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -40,7 +31,6 @@ describe('Signup class', () => {
     memberRepository = module.get<MemberRepository>(MemberRepository)
     emailChecker = module.get<EmailChecker>(EmailChecker)
     signupService = module.get<SignupService>(SignupService)
-    jwtProvider = module.get<JwtProvider>(JwtProvider)
   })
 
   describe('sinup method', () => {
@@ -50,19 +40,10 @@ describe('Signup class', () => {
     })
 
     context('회원가입 정보 저장이 되면', () => {
-      it('accessToken과 refreshToken을 리턴 해야 한다', async () => {
-        const authentication = await signupService.signup(EMAIL, PASSWORD, NAME)
+      it('저장 된 id 값을 리턴해야 한다', async () => {
+        const id = await signupService.signup('abc@email.com', '123456', '홍길동')
 
-        expect(authentication).not.toEqual({
-          accessToken: ACCESS_TOKEN,
-          refreshToken: REFRESH_TOKEN,
-        })
-      })
-      it('accessTokenExpire과 refreshTokenExpire을 리턴 해야 한다', async () => {
-        const authentication = await signupService.signup(EMAIL, PASSWORD, NAME)
-
-        expect(authentication.accessTokenExpireTime).toBeTruthy()
-        expect(authentication.refreshTokenExpireTime).toBeTruthy()
+        expect(id).toEqual(1)
       })
     })
   })
