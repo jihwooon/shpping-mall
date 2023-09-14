@@ -7,9 +7,20 @@ dotenv.config()
 
 @Injectable()
 export class JwtProvider {
-  generateAccessToken(id: number) {
+  createTokenDTO(email: string) {
+    const generateAccessToken = this.generateAccessToken(email)
+    const generateRefreshToken = this.generateRefreshToken(email)
+
+    return {
+      accessToken: generateAccessToken.accessToken,
+      accessTokenExpireTime: generateAccessToken.accessTokenExpireTime,
+      refreshToken: generateRefreshToken.refreshToken,
+      refreshTokenExpireTime: generateRefreshToken.refreshTokenExpireTime,
+    }
+  }
+  generateAccessToken(email: string) {
     const accessTokenExpireTime = this.createAccessTokenExpireTime()
-    const accessToken = this.generateToken(id, accessTokenExpireTime, TokenType.ACCESS)
+    const accessToken = this.generateToken(email, accessTokenExpireTime, TokenType.ACCESS)
 
     return {
       accessToken: accessToken,
@@ -17,9 +28,9 @@ export class JwtProvider {
     }
   }
 
-  generateRefreshToken(id: number) {
+  generateRefreshToken(email: string) {
     const refreshTokenExpireTime = this.createRefreshTokenExpireTime()
-    const refreshToken = this.generateToken(id, refreshTokenExpireTime, TokenType.REFRESH)
+    const refreshToken = this.generateToken(email, refreshTokenExpireTime, TokenType.REFRESH)
 
     return {
       refreshToken: refreshToken,
@@ -27,12 +38,12 @@ export class JwtProvider {
     }
   }
 
-  generateToken(id: number, expireTime: Date, tokenType: string) {
-    if (id == undefined || id == null) {
-      throw new BadRequestException(`id는 ${id}이 될 수 없습니다`)
+  generateToken(email: string, expireTime: Date, tokenType: string) {
+    if (email == undefined || email == null || email == '') {
+      throw new BadRequestException(`id는 ${email}이 될 수 없습니다`)
     }
 
-    return jwt.sign({ payload: id }, process.env.JWT_SECRET, {
+    return jwt.sign({ payload: email }, process.env.JWT_SECRET, {
       subject: tokenType,
       expiresIn: expireTime.getMilliseconds(),
     })
