@@ -6,6 +6,7 @@ import { JwtProvider } from '../../../jwt/jwt.provider'
 import { SigninService } from './signin.service'
 import { NotFoundException } from '@nestjs/common'
 import { PasswordProvider } from '../../../members/application/password.provider'
+import { MEMBER } from '../../../fixture/memberFixture'
 
 describe('Signup class', () => {
   let connect: Connection
@@ -49,6 +50,7 @@ describe('Signup class', () => {
         memberId: 1,
       })
       passwordProvider.comparePassword = jest.fn().mockResolvedValue(true)
+      memberRepository.updateMemberByRefreshTokenAndExpirationTime = jest.fn().mockImplementation()
     })
     context('가입된 회원 정보를 확인하면', () => {
       it('인증을 성공하고, accessToken과 refreshToken을 리턴 해야 한다', async () => {
@@ -97,6 +99,30 @@ describe('Signup class', () => {
       it('NotFoundException을 던져야 한다', async () => {
         expect(signinService.login(NOT_EXISTED_EMAIL, PASSWORD)).rejects.toThrow(
           new NotFoundException('회원 정보를 찾을 수 없습니다'),
+        )
+      })
+    })
+  })
+
+  describe('updateRefreshTokenAndExpirationTime method', () => {
+    context('refreshToken과 사용자 정보가 주어지면', () => {
+      it('메서드를 호출해야 한다 ', async () => {
+        const spyOn = jest.spyOn(signinService, 'updateRefreshTokenAndExpirationTime').mockResolvedValue()
+        await signinService.updateRefreshTokenAndExpirationTime(
+          {
+            refreshToken: REFRESH_TOKEN,
+            refreshTokenExpireTime: new Date('2023-09-28T14:45:55.144Z'),
+          },
+          MEMBER,
+        )
+
+        expect(spyOn).toHaveBeenCalled()
+        expect(spyOn).toHaveBeenCalledWith(
+          {
+            refreshToken: REFRESH_TOKEN,
+            refreshTokenExpireTime: new Date('2023-09-28T14:45:55.144Z'),
+          },
+          MEMBER,
         )
       })
     })
