@@ -49,8 +49,8 @@ jobs:
         if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
         run: npm ci
 
-      - name: Run Test
-        run: npm test
+      - name: Run Test(only Changed)
+        run: npm run test:only-changed
 
       - name: Run Build
         run: npm run build
