@@ -4,7 +4,6 @@ import { EmailChecker } from '../../../members/application/email.checker'
 import { Member } from '../../../members/domain/member.entity'
 import { PasswordProvider } from '../../../members/application/password.provider'
 import { JwtProvider } from '../../../jwt/jwt.provider'
-import { Authentication } from '../../../jwt/dto/authentication'
 
 @Injectable()
 export class SignupService {
@@ -15,21 +14,19 @@ export class SignupService {
     private readonly jwtProvider: JwtProvider,
   ) {}
 
-  async signup(email: string, password: string, memberName: string): Promise<Authentication> {
+  async signup(email: string, password: string, memberName: string): Promise<number> {
     await this.emailChecker.checkDuplicatedEmail(email)
     const hashedPassword = await this.passwordProvider.hashPassword(password)
-    const id = await this.memberRepository.save(
-      new Member({ email: email, password: hashedPassword, memberName: memberName }),
+    const generateToken = this.jwtProvider.createTokenDTO(email)
+
+    return await this.memberRepository.save(
+      new Member({
+        email: email,
+        password: hashedPassword,
+        memberName: memberName,
+        refreshToken: generateToken.refreshToken,
+        tokenExpirationTime: generateToken.refreshTokenExpireTime,
+      }),
     )
-
-    const generateAccessToken = this.jwtProvider.generateAccessToken(id)
-    const generateRefreshToken = this.jwtProvider.generateRefreshToken(id)
-
-    return {
-      accessToken: generateAccessToken.accessToken,
-      accessTokenExpireTime: generateAccessToken.accessTokenExpireTime,
-      refreshToken: generateRefreshToken.refreshToken,
-      refreshTokenExpireTime: generateRefreshToken.refreshTokenExpireTime,
-    }
   }
 }

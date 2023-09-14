@@ -9,20 +9,11 @@ import { CREATE_MEMBER_REQUEST } from '../../../fixture/memberFixture'
 import { SignupService } from '../application/signup.service'
 import { PasswordProvider } from '../../../members/application/password.provider'
 import { JwtProvider } from '../../../jwt/jwt.provider'
-import { SignupResponseDto } from '../dto/signup-response.dto'
 
 describe('SignupController class', () => {
   let signupController: SignupController
-  let signupService: SignupService
   let connection: Connection
-  let signupResponse: SignupResponseDto
-
-  const ACCESS_TOKEN =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjk0MzI3MTcwLCJleHAiOjE2OTQ0MTM1NzB9.6UXhpwHPB9W1ZtFZJQfiMANMinEt3WUULdwLSJKQ_z0'
-  const REFRESH_TOKEN =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjo0NSwiaWF0IjoxNjk0NTIyODc2LCJleHAiOjE2OTU3MzI0NzYsInN1YiI6IlJFRlJFU0gifQ.HQc7pLeiMFtL-phEICVtulH8qraSA23toTfcehYvy4Y'
-  const ACCESS_TOKEN_EXPIRE = Date.now() + 86400000
-  const REFRESH_TOKEN_EXPIRE = Date.now() + 1210500000
+  let signupService: SignupService
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -46,23 +37,13 @@ describe('SignupController class', () => {
 
   describe('signupHandler method', () => {
     beforeEach(() => {
-      signupService.signup = jest.fn().mockResolvedValue({
-        accessToken: ACCESS_TOKEN,
-        refreshToken: REFRESH_TOKEN,
-        accessTokenExpireTime: ACCESS_TOKEN_EXPIRE,
-        refreshTokenExpireTime: REFRESH_TOKEN_EXPIRE,
-      })
+      signupService.signup = jest.fn().mockResolvedValue(1)
     })
     context('회원가입 정보 요청이 주어지고, 회원가입 정보 저장 후', () => {
-      it('accessToken과 refreshToken를 리턴해야 한다', async () => {
-        const signedMember = await signupController.signupHandler(CREATE_MEMBER_REQUEST)
+      it('저장 된 id 값을 리턴 해야 한다', async () => {
+        const id = await signupController.signupHandler(CREATE_MEMBER_REQUEST)
 
-        expect(signedMember).toEqual({
-          accessToken: ACCESS_TOKEN,
-          refreshToken: REFRESH_TOKEN,
-          accessTokenExpireTime: ACCESS_TOKEN_EXPIRE,
-          refreshTokenExpireTime: REFRESH_TOKEN_EXPIRE,
-        })
+        expect(id).toEqual({ id: 1 })
       })
     })
   })
