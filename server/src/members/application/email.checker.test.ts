@@ -3,7 +3,7 @@ import { Connection } from 'mysql2/promise'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
 import { MemberRepository } from '../domain/member.repository'
 import { EmailChecker } from './email.checker'
-import { BadRequestException } from '@nestjs/common'
+import { AlreadyExistedEmailException } from './error/already-existed-email.exception'
 
 describe('EmailChecker class', () => {
   let connect: Connection
@@ -35,10 +35,7 @@ describe('EmailChecker class', () => {
 
       it('BadRequestException를 던져야 한다.', async () => {
         expect(emailChecker.checkDuplicatedEmail(SUBSCRIBED_EMAIL)).rejects.toThrow(
-          new BadRequestException('동일한 이메일이 이미 존재합니다.', {
-            cause: new Error(),
-            description: 'Bad Request',
-          }),
+          new AlreadyExistedEmailException('동일한 이메일이 이미 존재합니다'),
         )
       })
     })
