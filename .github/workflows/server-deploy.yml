@@ -51,6 +51,9 @@ jobs:
 
       - name: Run Test(only Changed)
         run: npm run test:only-changed
+      
+      - name: Run Lint(only Changed)
+        run : npm run format:diff
 
       - name: Run Build
         run: npm run build
