@@ -86,4 +86,30 @@ export class MemberRepository {
       [refreshToken, expireTime, email],
     )
   }
+
+  async findMemberByRefreshToken(refreshToken: string): Promise<Member> {
+    const [[row]] = await this.connection.execute<RowDataPacket[]>(
+      'SELECT member_id, member_name, email, member_type, role, refresh_token, token_expiration_time, password, create_time, update_time, create_by, modified_by FROM member WHERE refresh_token = ?',
+      [refreshToken],
+    )
+
+    if (!row) {
+      return undefined
+    }
+
+    return {
+      memberId: row['member_id'],
+      email: row['email'],
+      memberName: row['member_name'],
+      memberType: row['member_type'],
+      password: row['password'],
+      refreshToken: row['refresh_token'],
+      tokenExpirationTime: row['token_expiration_time'],
+      role: row['role'],
+      createTime: row['create_time'],
+      updateTime: row['update_time'],
+      createBy: row['create_by'],
+      modifiedBy: row['modified_by'],
+    }
+  }
 }
