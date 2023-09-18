@@ -82,7 +82,7 @@ export const CREATE_EMPTY_NAME_REQUEST = {
   password: '12345678123456',
 }
 
-export const FIND_BY_EMAIL = {
+export const RESPONSE_MEMBER = {
   member_id: 1,
   email: 'abc@email.com',
   member_name: '홍길동',
