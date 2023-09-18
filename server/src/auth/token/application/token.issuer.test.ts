@@ -12,6 +12,7 @@ describe('TokenIssuer class', () => {
   let connect: Connection
   let tokenIssuer: TokenIssuer
   let memberRepository: MemberRepository
+  let jwtProvider: JwtProvider
 
   const REFRESH_TOKEN =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoxLCJpYXQiOjE2OTQ1MjI0NzUsImV4cCI6MTY5NTczMjA3NSwic3ViIjoiUkVGUkVTSCJ9.A2PfZdj91q6MIapXrvTB6bUd7blhqrrDY2yh0eYdGPY'
@@ -33,12 +34,14 @@ describe('TokenIssuer class', () => {
 
     tokenIssuer = module.get<TokenIssuer>(TokenIssuer)
     memberRepository = module.get<MemberRepository>(MemberRepository)
+    jwtProvider = module.get<JwtProvider>(JwtProvider)
   })
 
   describe('createAccessTokenByRefreshToken method', () => {
     context('refreshToken이 주어지면', () => {
       beforeEach(() => {
         memberRepository.findMemberByRefreshToken = jest.fn().mockResolvedValue(MEMBER)
+        jwtProvider.validateToken = jest.fn().mockResolvedValue('abc@gmail.com')
       })
       it('accessToken과 accessTokenExpireTime을 갱신해야 한다', async () => {
         const member = await tokenIssuer.createAccessTokenByRefreshToken(REFRESH_TOKEN, NOW)
@@ -54,6 +57,7 @@ describe('TokenIssuer class', () => {
     context('refreshToken이 찾을 수 없거나 올바르지 않으면', () => {
       beforeEach(() => {
         memberRepository.findMemberByRefreshToken = jest.fn().mockResolvedValue(undefined)
+        jwtProvider.validateToken = jest.fn().mockResolvedValue('abc@gmail.com')
       })
       it('MemberNotFoundException를 던져야 한다', async () => {
         expect(tokenIssuer.createAccessTokenByRefreshToken(REFRESH_TOKEN, NOW)).rejects.toThrow(
@@ -65,6 +69,7 @@ describe('TokenIssuer class', () => {
     context('refreshToken의 유효기간이 만료 되면', () => {
       beforeEach(() => {
         memberRepository.findMemberByRefreshToken = jest.fn().mockResolvedValue(MEMBER)
+        jwtProvider.validateToken = jest.fn().mockResolvedValue('abc@gmail.com')
       })
       it('TokenExpiredException를 던져야 한다', async () => {
         expect(tokenIssuer.createAccessTokenByRefreshToken(REFRESH_TOKEN, EXPIRED_TIME)).rejects.toThrow(

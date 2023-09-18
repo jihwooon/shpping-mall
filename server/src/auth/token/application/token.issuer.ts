@@ -10,6 +10,7 @@ export class TokenIssuer {
   constructor(private readonly memberRepository: MemberRepository, private readonly jwtProvider: JwtProvider) {}
 
   async createAccessTokenByRefreshToken(refreshToken: string, now: Date): Promise<AccessTokenDto> {
+    this.jwtProvider.validateToken(refreshToken)
     const member = await this.memberRepository.findMemberByRefreshToken(refreshToken)
 
     if (!member) {
