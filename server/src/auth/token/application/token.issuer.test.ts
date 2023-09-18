@@ -1,11 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { Connection } from 'mysql2/promise'
 import { TokenIssuer } from './token.issuer'
-import { MemberRepository } from '../domain/member.repository'
-import { MYSQL_CONNECTION } from '../../config/database/constants'
-import { RefreshTokenNotFoundException } from './error/refresh-token-not-found.exception'
-import { RESPONSE_MEMBER } from '../../fixture/memberFixture'
-import { JwtProvider } from '../../jwt/jwt.provider'
+import { MemberRepository } from '../../../members/domain/member.repository'
+import { MYSQL_CONNECTION } from '../../../config/database/constants'
+import { MemberNotFoundException } from '../../../members/application/error/member-not-found.exception'
+import { MEMBER } from '../../../fixture/memberFixture'
+import { JwtProvider } from '../../../jwt/jwt.provider'
+import { TokenExpiredException } from '../error/token_expired.exception'
 
 describe('TokenIssuer class', () => {
   let connect: Connection
@@ -14,7 +15,8 @@ describe('TokenIssuer class', () => {
 
   const REFRESH_TOKEN =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoxLCJpYXQiOjE2OTQ1MjI0NzUsImV4cCI6MTY5NTczMjA3NSwic3ViIjoiUkVGUkVTSCJ9.A2PfZdj91q6MIapXrvTB6bUd7blhqrrDY2yh0eYdGPY'
-  const NOW = new Date('2023-09-19T04:48:42.487Z')
+  const NOW = new Date('2023-08-19T04:48:42.487Z')
+  const EXPIRED_TIME = new Date('2023-12-01T04:48:42.487Z')
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -36,26 +38,37 @@ describe('TokenIssuer class', () => {
   describe('createAccessTokenByRefreshToken method', () => {
     context('refreshToken이 주어지면', () => {
       beforeEach(() => {
-        memberRepository.findMemberByRefreshToken = jest.fn().mockResolvedValue(RESPONSE_MEMBER)
+        memberRepository.findMemberByRefreshToken = jest.fn().mockResolvedValue(MEMBER)
       })
-      it('accessToken과 accessToken ExpireTime을 리턴해야 한다', async () => {
+      it('accessToken과 accessTokenExpireTime을 갱신해야 한다', async () => {
         const member = await tokenIssuer.createAccessTokenByRefreshToken(REFRESH_TOKEN, NOW)
 
         expect(member).not.toEqual({
           accessToken:
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiYWJjQGVtYWlsLmNvbSIsImlhdCI6MTY5NTAxMjUyMiwiZXhwIjoxNjk1MDEzMDA5LCJzdWIiOiJBQ0NFU1MifQ.L7Z1BBLh914jOVJ2fyDh0KSeCU61Q6b-_qnrTPglq7U',
-          accessTokenExpireTime: NOW,
+          accessTokenExpireTime: new Date('2023-08-19T04:48:42.487Z'),
         })
       })
     })
 
-    context('refreshToken이 존재하지 않으면', () => {
+    context('refreshToken이 찾을 수 없거나 올바르지 않으면', () => {
       beforeEach(() => {
         memberRepository.findMemberByRefreshToken = jest.fn().mockResolvedValue(undefined)
       })
-      it('RefreshTokenNotFoundException를 던져야 한다', async () => {
+      it('MemberNotFoundException를 던져야 한다', async () => {
         expect(tokenIssuer.createAccessTokenByRefreshToken(REFRESH_TOKEN, NOW)).rejects.toThrow(
-          new RefreshTokenNotFoundException('Refresh Token 정보를 찾을 수 없습니다'),
+          new MemberNotFoundException('회원 정보를 찾을 수 없습니다'),
+        )
+      })
+    })
+
+    context('refreshToken의 유효기간이 만료 되면', () => {
+      beforeEach(() => {
+        memberRepository.findMemberByRefreshToken = jest.fn().mockResolvedValue(MEMBER)
+      })
+      it('TokenExpiredException를 던져야 한다', async () => {
+        expect(tokenIssuer.createAccessTokenByRefreshToken(REFRESH_TOKEN, EXPIRED_TIME)).rejects.toThrow(
+          new TokenExpiredException('Refresh Token의 유효기간이 만료되었습니다'),
         )
       })
     })
