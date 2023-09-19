@@ -85,15 +85,21 @@ describe('JwtProvider class', () => {
   })
 
   describe('validateToken method', () => {
-    context('accessToken이 검증을 성공하면', () => {
-      it('id를 리턴 해야 한다.', () => {
+    context('token 검증 성공하면', () => {
+      it('token 정보를 리턴해야 한다.', () => {
         const generateAccessToken = jwtProvider.generateAccessToken(EMAIL)
-        const payload = jwtProvider.validateToken(generateAccessToken.accessToken)
+        const { payload, expirationTime, subject, audience } = jwtProvider.validateToken(
+          generateAccessToken.accessToken,
+        )
 
         expect(payload).toEqual('abc@gmail.com')
+        expect(expirationTime).toBeTruthy()
+        expect(subject).toEqual('ACCESS')
+        expect(audience).toEqual('abc@gmail.com')
       })
     })
-    context('accessToken이 검증을 실패하면', () => {
+
+    context('token 검증 실패하면', () => {
       it('UnauthorizedException을 던져야 한다', () => {
         try {
           jwtProvider.validateToken(INVALID_ACCESS_TOKEN)
@@ -103,7 +109,8 @@ describe('JwtProvider class', () => {
         }
       })
     })
-    context('accessToken이 null 이면', () => {
+
+    context('token이 null 이면', () => {
       it('BadRequestException을 던져야 한다', () => {
         try {
           jwtProvider.validateToken(null)
@@ -113,7 +120,7 @@ describe('JwtProvider class', () => {
         }
       })
     })
-    context('accessToken이 undefined 이면', () => {
+    context('token이 undefined 이면', () => {
       it('BadRequestException을 던져야 한다', () => {
         try {
           jwtProvider.validateToken(undefined)
@@ -123,7 +130,7 @@ describe('JwtProvider class', () => {
         }
       })
     })
-    context('accessToken이 공백 이면', () => {
+    context('token이 공백 이면', () => {
       it('BadRequestException을 던져야 한다', () => {
         try {
           jwtProvider.validateToken('')
@@ -182,6 +189,52 @@ describe('JwtProvider class', () => {
         const tokenDTO = jwtProvider.createTokenDTO(EMAIL)
 
         expect(tokenDTO).toBeTruthy()
+      })
+    })
+  })
+
+  describe('expiredRefreshToken method', () => {
+    context('email과 만료시간이 주어지면', () => {
+      it('refreshToken과 refreshToken 만료시간을 리턴해야 한다', () => {
+        const expiredRefreshToken = jwtProvider.expiredRefreshToken(EMAIL, new Date())
+
+        expect(expiredRefreshToken.refreshToken).not.toEqual(
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiYWJjQGdtYWlsLmNvbSIsImlhdCI6MTY5NTEzNzk5NCwiZXhwIjoxNjk1MTM2MTAzMjYxLCJhdWQiOiJhYmNAZ21haWwuY29tIiwic3ViIjoiUkVGUkVTSCJ9.16pzHwI-EDti2o2MVqnrgQhfVa_tcpVgTJtLdNydoQo',
+        )
+        expect(expiredRefreshToken.refreshTokenExpireTime).toBeTruthy()
+      })
+    })
+
+    context('email에 null이 주어지면', () => {
+      it('BadRequestException를 던져야 한다', () => {
+        try {
+          jwtProvider.expiredRefreshToken(null, new Date())
+        } catch (e) {
+          expect(e).toBeInstanceOf(BadRequestException)
+          expect(e.message).toEqual('email은 null이 될 수 없습니다')
+        }
+      })
+    })
+
+    context('email에 undefined이 주어지면', () => {
+      it('BadRequestException를 던져야 한다', () => {
+        try {
+          jwtProvider.expiredRefreshToken(undefined, new Date())
+        } catch (e) {
+          expect(e).toBeInstanceOf(BadRequestException)
+          expect(e.message).toEqual('email은 undefined이 될 수 없습니다')
+        }
+      })
+    })
+
+    context('email에 공백이 주어지면', () => {
+      it('BadRequestException를 던져야 한다', () => {
+        try {
+          jwtProvider.expiredRefreshToken('', new Date())
+        } catch (e) {
+          expect(e).toBeInstanceOf(BadRequestException)
+          expect(e.message).toEqual('email은 이 될 수 없습니다')
+        }
       })
     })
   })

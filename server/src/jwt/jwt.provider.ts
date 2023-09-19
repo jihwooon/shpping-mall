@@ -45,21 +45,40 @@ export class JwtProvider {
 
     return jwt.sign({ payload: email }, process.env.JWT_SECRET, {
       subject: tokenType,
-      expiresIn: expireTime.getMilliseconds(),
+      expiresIn: expireTime.getTime() - 1728000000 + 30970630,
+      audience: email,
     })
   }
 
-  validateToken(token: string): number {
+  validateToken(token: string) {
     if (token == null || token == undefined || token == '') {
       throw new BadRequestException(`token는 ${token}이 될 수 없습니다`)
     }
 
     try {
-      const { payload } = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload
+      const { payload, sub, exp, aud } = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload
 
-      return payload
+      return {
+        payload: payload,
+        expirationTime: exp,
+        subject: sub,
+        audience: aud,
+      }
     } catch (e) {
       throw new UnauthorizedException('인증 할 수 없는 token 입니다')
+    }
+  }
+
+  expiredRefreshToken(email: string, now: Date) {
+    if (email == undefined || email == null || email == '') {
+      throw new BadRequestException(`email은 ${email}이 될 수 없습니다`)
+    }
+
+    const refreshToken = this.generateToken(email, now, TokenType.REFRESH)
+
+    return {
+      refreshToken: refreshToken,
+      refreshTokenExpireTime: now,
     }
   }
 
