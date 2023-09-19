@@ -122,17 +122,33 @@ describe('MemberRepository class', () => {
   })
 
   describe('updateMemberByRefreshTokenAndExpirationTime method', () => {
-    context('refreshToken과 사용자 email이 주어지면', () => {
-      it('메서드를 호출해야 한다', async () => {
-        const spyOn = jest.spyOn(memberRepository, 'updateMemberByRefreshTokenAndExpirationTime').mockResolvedValue()
-        await memberRepository.updateMemberByRefreshTokenAndExpirationTime(
+    context('email과 refreshToken이 주어지고 변경이 성공하면', () => {
+      beforeEach(async () => {
+        connection.execute = jest.fn().mockResolvedValue([{ affectedRows: 1 }] as ResultSetHeader[])
+      })
+      it('true를 리턴해야 한다', async () => {
+        const updatedToken = await memberRepository.updateMemberByRefreshTokenAndExpirationTime(
           REFRESH_TOKEN,
           REFRESH_EXPIRE_TIME,
           REGISTERED_EMAIL,
         )
 
-        expect(spyOn).toHaveBeenCalled()
-        expect(spyOn).toHaveBeenCalledWith(REFRESH_TOKEN, REFRESH_EXPIRE_TIME, REGISTERED_EMAIL)
+        expect(updatedToken).toEqual(true)
+      })
+    })
+
+    context('email과 refreshToken이 주어지고 변경이 실패하면', () => {
+      beforeEach(async () => {
+        connection.execute = jest.fn().mockResolvedValue([{ affectedRows: 0 }] as ResultSetHeader[])
+      })
+      it('false를 리턴해야 한다', async () => {
+        const memberId = await memberRepository.updateMemberByRefreshTokenAndExpirationTime(
+          REFRESH_TOKEN,
+          REFRESH_EXPIRE_TIME,
+          REGISTERED_EMAIL,
+        )
+
+        expect(memberId).toEqual(false)
       })
     })
   })
@@ -161,6 +177,7 @@ describe('MemberRepository class', () => {
         })
       })
     })
+
     context('잘못 된 refreshToken이 주어지면', () => {
       beforeEach(async () => {
         connection.execute = jest.fn().mockResolvedValue([[undefined] as RowDataPacket[], []])
