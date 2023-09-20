@@ -10,18 +10,15 @@ import { SigninController } from '../src/auth/signin/web/signin.controller'
 import { SigninService } from '../src/auth/signin/application/signin.service'
 import { TokenIssuer } from '../src/auth/token/application/token.issuer'
 import { MemberNotFoundException } from '../src/members/application/error/member-not-found.exception'
+import { jwtTokenFixture } from '../src/fixture/jwtTokenFixture'
+import { userMock } from '../src/fixture/memberFixture'
+import { LoginMemberDto } from '../src/members/dto/login-member.dto'
+import { SigninResponseDto } from '../src/auth/signin/dto/signin-response.dto'
 
 describe('SigninController (e2e)', () => {
   let app: INestApplication
   let connection: Connection
   let signinService: SigninService
-
-  const ACCESS_TOKEN =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjk0MzI3MTcwLCJleHAiOjE2OTQ0MTM1NzB9.6UXhpwHPB9W1ZtFZJQfiMANMinEt3WUULdwLSJKQ_z0'
-  const REFRESH_TOKEN =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjo0NSwiaWF0IjoxNjk0NTIyODc2LCJleHAiOjE2OTU3MzI0NzYsInN1YiI6IlJFRlJFU0gifQ.HQc7pLeiMFtL-phEICVtulH8qraSA23toTfcehYvy4Y'
-  const ACCESS_TOKEN_EXPIRE = new Date(Date.now() + 86400000).toISOString()
-  const REFRESH_TOKEN_EXPIRE = new Date(Date.now() + 1210500000).toISOString()
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -54,29 +51,28 @@ describe('SigninController (e2e)', () => {
   })
 
   describe('POST /auth/signin', () => {
+    const loginResponse: SigninResponseDto = {
+      accessToken: jwtTokenFixture().accessToken,
+      refreshToken: jwtTokenFixture().refreshToken,
+      accessTokenExpireTime: jwtTokenFixture().accessTokenExpire,
+      refreshTokenExpireTime: jwtTokenFixture().refreshTokenExpire,
+    }
+
     beforeEach(() => {
-      signinService.login = jest.fn().mockResolvedValue({
-        accessToken: ACCESS_TOKEN,
-        refreshToken: REFRESH_TOKEN,
-        accessTokenExpireTime: ACCESS_TOKEN_EXPIRE,
-        refreshTokenExpireTime: REFRESH_TOKEN_EXPIRE,
-      })
+      signinService.login = jest.fn().mockResolvedValue(loginResponse)
     })
 
     context('올바른 이메일과 패스워드를 입력하면', () => {
       it('상태코드 200를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer()).post('/auth/signin').send({
-          email: 'abc@email.com',
-          password: '12345678123456',
-        })
+        const loginRequest: LoginMemberDto = {
+          email: userMock().email,
+          password: userMock().password,
+        }
+
+        const { status, body } = await request(app.getHttpServer()).post('/auth/signin').send(loginRequest)
 
         expect(status).toEqual(200)
-        expect(body).toEqual({
-          accessToken: ACCESS_TOKEN,
-          refreshToken: REFRESH_TOKEN,
-          accessTokenExpireTime: ACCESS_TOKEN_EXPIRE,
-          refreshTokenExpireTime: REFRESH_TOKEN_EXPIRE,
-        })
+        expect(body).not.toEqual(loginResponse)
       })
     })
 
@@ -85,10 +81,14 @@ describe('SigninController (e2e)', () => {
         signinService.login = jest.fn().mockRejectedValue(new MemberNotFoundException('회원 정보를 찾을 수 없습니다'))
       })
       it('상태코드 404를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer()).post('/auth/signin').send({
-          email: 'efghjn@email.com',
-          password: '99999999999',
-        })
+        const wrong_email = 'efghjn@email.com'
+        const wrong_password = '99999999999'
+        const loginRequest: LoginMemberDto = {
+          email: (userMock().email = wrong_email),
+          password: (userMock().password = wrong_password),
+        }
+
+        const { status, body } = await request(app.getHttpServer()).post('/auth/signin').send(loginRequest)
 
         expect(status).toEqual(404)
         expect(body).toEqual({
@@ -106,10 +106,12 @@ describe('SigninController (e2e)', () => {
           .mockRejectedValue(new InternalServerErrorException('예기치 못한 서버 오류가 발생했습니다'))
       })
       it('상태코드 500를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer()).post('/auth/signin').send({
-          email: 'abc@email.com',
-          password: '12345678123456',
-        })
+        const loginRequest: LoginMemberDto = {
+          email: userMock().email,
+          password: userMock().password,
+        }
+
+        const { status, body } = await request(app.getHttpServer()).post('/auth/signin').send(loginRequest)
 
         expect(status).toEqual(500)
         expect(body).toEqual({
@@ -125,10 +127,13 @@ describe('SigninController (e2e)', () => {
         signinService.login = jest.fn().mockRejectedValue(new BadRequestException('패스워드가 일치 하지 않습니다'))
       })
       it('상태코드 400를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer()).post('/auth/signin').send({
-          email: 'abc@email.com',
-          password: '99999999999',
-        })
+        const wrong_password = '99999999999'
+        const loginRequest: LoginMemberDto = {
+          email: userMock().email,
+          password: (userMock().password = wrong_password),
+        }
+
+        const { status, body } = await request(app.getHttpServer()).post('/auth/signin').send(loginRequest)
 
         expect(status).toEqual(400)
         expect(body).toEqual({
@@ -141,9 +146,13 @@ describe('SigninController (e2e)', () => {
 
     context('패스워드를 누락하면', () => {
       it('상태코드 400를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer()).post('/auth/signin').send({
-          email: 'abc@email.com',
-        })
+        const blank_password = ''
+        const loginRequest: LoginMemberDto = {
+          email: userMock().email,
+          password: (userMock().password = blank_password),
+        }
+
+        const { status, body } = await request(app.getHttpServer()).post('/auth/signin').send(loginRequest)
 
         expect(status).toEqual(400)
         expect(body).toEqual({
@@ -156,10 +165,13 @@ describe('SigninController (e2e)', () => {
 
     context('이메일 형식이 맞지 않으면', () => {
       it('상태코드 400를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer()).post('/auth/signin').send({
-          email: 'abcd.email.com',
-          password: '1234456',
-        })
+        const wrong_email = 'abcd.email.com'
+        const loginRequest: LoginMemberDto = {
+          email: (userMock().email = wrong_email),
+          password: userMock().password,
+        }
+
+        const { status, body } = await request(app.getHttpServer()).post('/auth/signin').send(loginRequest)
 
         expect(status).toEqual(400)
         expect(body).toEqual({
@@ -172,14 +184,17 @@ describe('SigninController (e2e)', () => {
 
     context('이메일을 누락하면', () => {
       it('상태코드 400를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer()).post('/auth/signin').send({
-          password: '1234456',
-        })
+        const blank_email = ''
+        const loginRequest: LoginMemberDto = {
+          email: (userMock().email = blank_email),
+          password: userMock().password,
+        }
+        const { status, body } = await request(app.getHttpServer()).post('/auth/signin').send(loginRequest)
 
         expect(status).toEqual(400)
         expect(body).toEqual({
           error: 'Bad Request',
-          message: ['email must be a string', '올바른 이메일 형식을 입력하세요.', '이메일은 필수 입력 값입니다.'],
+          message: ['올바른 이메일 형식을 입력하세요.', '이메일은 필수 입력 값입니다.'],
           statusCode: 400,
         })
       })

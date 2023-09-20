@@ -8,18 +8,15 @@ import { SigninService } from '../application/signin.service'
 import { SigninController } from './signin.controller'
 import { TokenIssuer } from '../../token/application/token.issuer'
 import { MemberNotFoundException } from '../../../members/application/error/member-not-found.exception'
+import { jwtTokenFixture } from '../../../fixture/jwtTokenFixture'
+import { userMock } from '../../../fixture/memberFixture'
+import { LoginMemberDto } from '../../../members/dto/login-member.dto'
+import { SigninResponseDto } from '../dto/signin-response.dto'
 
 describe('SignInController class', () => {
   let signinController: SigninController
   let signinService: SigninService
   let connection: Connection
-
-  const ACCESS_TOKEN =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjk0MzI3MTcwLCJleHAiOjE2OTQ0MTM1NzB9.6UXhpwHPB9W1ZtFZJQfiMANMinEt3WUULdwLSJKQ_z0'
-  const REFRESH_TOKEN =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjo0NSwiaWF0IjoxNjk0NTIyODc2LCJleHAiOjE2OTU3MzI0NzYsInN1YiI6IlJFRlJFU0gifQ.HQc7pLeiMFtL-phEICVtulH8qraSA23toTfcehYvy4Y'
-  const ACCESS_TOKEN_EXPIRE = new Date(Date.now() + 86400000)
-  const REFRESH_TOKEN_EXPIRE = new Date(Date.now() + 1210500000)
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -43,23 +40,25 @@ describe('SignInController class', () => {
 
   describe('signinHandler method', () => {
     context('올바른 이메일과 패스워드를 입력하면 ', () => {
+      const loginResponse: SigninResponseDto = {
+        accessToken: jwtTokenFixture().accessToken,
+        refreshToken: jwtTokenFixture().refreshToken,
+        accessTokenExpireTime: jwtTokenFixture().accessTokenExpire,
+        refreshTokenExpireTime: jwtTokenFixture().refreshTokenExpire,
+      }
+
       beforeEach(() => {
-        signinService.login = jest.fn().mockResolvedValue({
-          accessToken: ACCESS_TOKEN,
-          refreshToken: REFRESH_TOKEN,
-          accessTokenExpireTime: ACCESS_TOKEN_EXPIRE,
-          refreshTokenExpireTime: REFRESH_TOKEN_EXPIRE,
-        })
+        signinService.login = jest.fn().mockResolvedValue(loginResponse)
       })
       it('사용자 Token 정보를 리턴해야 한다', async () => {
-        const responseDto = await signinController.signinHandler({ email: 'abc@email.com', password: '12344566' })
+        const loginRequest: LoginMemberDto = {
+          email: userMock().email,
+          password: userMock().password,
+        }
 
-        expect(responseDto).toEqual({
-          accessToken: ACCESS_TOKEN,
-          refreshToken: REFRESH_TOKEN,
-          accessTokenExpireTime: ACCESS_TOKEN_EXPIRE,
-          refreshTokenExpireTime: REFRESH_TOKEN_EXPIRE,
-        })
+        const responseDto = await signinController.signinHandler(loginRequest)
+
+        expect(responseDto).toEqual(loginResponse)
       })
     })
 
@@ -68,7 +67,14 @@ describe('SignInController class', () => {
         signinService.login = jest.fn().mockRejectedValue(new MemberNotFoundException('회원 정보를 찾을 수 없습니다'))
       })
       it('MemberNotFoundException를 던져야 한다', () => {
-        expect(signinController.signinHandler({ email: 'efghjn@email.com', password: '9999999' })).rejects.toThrow(
+        const wrong_email = 'efghjn@email.com'
+        const wrong_password = '99999999999'
+        const loginRequest: LoginMemberDto = {
+          email: (userMock().email = wrong_email),
+          password: (userMock().password = wrong_password),
+        }
+
+        expect(signinController.signinHandler(loginRequest)).rejects.toThrow(
           new MemberNotFoundException('회원 정보를 찾을 수 없습니다'),
         )
       })
