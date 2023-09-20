@@ -2,16 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { Connection, ResultSetHeader, RowDataPacket } from 'mysql2/promise'
 import { MemberRepository } from './member.repository'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
-import { RESPONSE_MEMBER, userMock } from '../../fixture/memberFixture'
-import { MemberType } from './member-type.enum'
-import { Role } from './member-role.enum'
+import { dbMemberMock, userMock } from '../../fixture/memberFixture'
 
 describe('MemberRepository class', () => {
   let connection: Connection
   let memberRepository: MemberRepository
 
-  const REGISTERED_EMAIL = 'abc@email.com'
-  const UNSUBSCRIBED_EMAIL = 'xxxx@email.com'
   const REFRESH_TOKEN =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoxLCJpYXQiOjE2OTQ1MjI0NzUsImV4cCI6MTY5NTczMjA3NSwic3ViIjoiUkVGUkVTSCJ9.A2PfZdj91q6MIapXrvTB6bUd7blhqrrDY2yh0eYdGPY'
   const REFRESH_EXPIRE_TIME = new Date('2023-09-28T14:45:55.144Z')
@@ -63,25 +59,12 @@ describe('MemberRepository class', () => {
   describe('findByEmail method', () => {
     context('찾을 수 있는 email이 주어지면', () => {
       beforeEach(async () => {
-        connection.execute = jest.fn().mockResolvedValue([[RESPONSE_MEMBER] as RowDataPacket[], []])
+        connection.execute = jest.fn().mockResolvedValue([[dbMemberMock] as RowDataPacket[], []])
       })
       it('member 정보를 리턴해야 한다', async () => {
-        const member = await memberRepository.findByEmail(REGISTERED_EMAIL)
+        const member = await memberRepository.findByEmail(userMock().email)
 
-        expect(member).toEqual({
-          memberId: 1,
-          email: 'abc@email.com',
-          memberName: '홍길동',
-          memberType: MemberType.GENERAL,
-          password: '$2b$10$nEU5CvDwcTwsMfZeiRv6UeYxh.Zp796RXh170vrRVPP.w0en8696K',
-          refreshToken: 'eyJhbGciOiJI',
-          tokenExpirationTime: new Date('2023-09-01T23:10:00.009Z'),
-          role: Role.USER,
-          createTime: new Date('2023-09-01T23:10:00.009Z'),
-          updateTime: new Date('2023-09-01T23:10:00.009Z'),
-          createBy: '홍길동',
-          modifiedBy: '김철수',
-        })
+        expect(member).toEqual(userMock())
       })
     })
 
@@ -90,7 +73,7 @@ describe('MemberRepository class', () => {
         connection.execute = jest.fn().mockResolvedValue([[undefined] as RowDataPacket[], []])
       })
       it('undefined를 리턴해야 한다', async () => {
-        const member = await memberRepository.findByEmail(REGISTERED_EMAIL)
+        const member = await memberRepository.findByEmail(userMock().email)
 
         expect(member).toEqual(undefined)
       })
@@ -103,7 +86,7 @@ describe('MemberRepository class', () => {
         connection.execute = jest.fn().mockResolvedValue([[{ emailCount: 1 }] as RowDataPacket[], []])
       })
       it('true를 리턴해야 한다', async () => {
-        const exitedEmail = await memberRepository.existsByEmail(REGISTERED_EMAIL)
+        const exitedEmail = await memberRepository.existsByEmail(userMock().email)
 
         expect(exitedEmail).toEqual(true)
       })
@@ -114,7 +97,8 @@ describe('MemberRepository class', () => {
         connection.execute = jest.fn().mockResolvedValue([[{ emailCount: 0 }] as RowDataPacket[], []])
       })
       it('false를 리턴해야 한다', async () => {
-        const exitedEmail = await memberRepository.existsByEmail(UNSUBSCRIBED_EMAIL)
+        userMock().email = 'xxxx@email.com'
+        const exitedEmail = await memberRepository.existsByEmail(userMock().email)
 
         expect(exitedEmail).toEqual(false)
       })
@@ -130,7 +114,7 @@ describe('MemberRepository class', () => {
         const updatedToken = await memberRepository.updateMemberByRefreshTokenAndExpirationTime(
           REFRESH_TOKEN,
           REFRESH_EXPIRE_TIME,
-          REGISTERED_EMAIL,
+          userMock().email,
         )
 
         expect(updatedToken).toEqual(true)
@@ -145,7 +129,7 @@ describe('MemberRepository class', () => {
         const memberId = await memberRepository.updateMemberByRefreshTokenAndExpirationTime(
           REFRESH_TOKEN,
           REFRESH_EXPIRE_TIME,
-          REGISTERED_EMAIL,
+          userMock().email,
         )
 
         expect(memberId).toEqual(false)
@@ -156,25 +140,12 @@ describe('MemberRepository class', () => {
   describe('findMemberByRefreshToken method', () => {
     context('refreshToken이 주어지면', () => {
       beforeEach(async () => {
-        connection.execute = jest.fn().mockResolvedValue([[RESPONSE_MEMBER] as RowDataPacket[], []])
+        connection.execute = jest.fn().mockResolvedValue([[dbMemberMock] as RowDataPacket[], []])
       })
       it('member 정보를 리턴해야 한다', async () => {
         const member = await memberRepository.findMemberByRefreshToken(REFRESH_TOKEN)
 
-        expect(member).toEqual({
-          memberId: 1,
-          email: 'abc@email.com',
-          memberName: '홍길동',
-          memberType: MemberType.GENERAL,
-          password: '$2b$10$nEU5CvDwcTwsMfZeiRv6UeYxh.Zp796RXh170vrRVPP.w0en8696K',
-          refreshToken: 'eyJhbGciOiJI',
-          tokenExpirationTime: new Date('2023-09-01T23:10:00.009Z'),
-          role: Role.USER,
-          createTime: new Date('2023-09-01T23:10:00.009Z'),
-          updateTime: new Date('2023-09-01T23:10:00.009Z'),
-          createBy: '홍길동',
-          modifiedBy: '김철수',
-        })
+        expect(member).toEqual(userMock())
       })
     })
 

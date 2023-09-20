@@ -19,17 +19,17 @@ export const userMock = (): Member => {
   }
 }
 
-export const RESPONSE_MEMBER = {
-  member_id: 1,
-  email: 'abc@email.com',
-  member_name: '홍길동',
-  member_type: MemberType.GENERAL,
-  password: '$2b$10$nEU5CvDwcTwsMfZeiRv6UeYxh.Zp796RXh170vrRVPP.w0en8696K',
-  refresh_token: 'eyJhbGciOiJI',
-  token_expiration_time: new Date('2023-09-01T23:10:00.009Z'),
-  role: Role.USER,
-  create_time: new Date('2023-09-01T23:10:00.009Z'),
-  update_time: new Date('2023-09-01T23:10:00.009Z'),
-  create_by: '홍길동',
-  modified_by: '김철수',
+export const dbMemberMock = {
+  member_id: userMock().memberId,
+  email: userMock().email,
+  member_name: userMock().memberName,
+  member_type: userMock().memberType,
+  password: userMock().password,
+  refresh_token: userMock().refreshToken,
+  token_expiration_time: userMock().tokenExpirationTime,
+  role: userMock().role,
+  create_time: userMock().createTime,
+  update_time: userMock().updateTime,
+  create_by: userMock().createBy,
+  modified_by: userMock().modifiedBy,
 }
