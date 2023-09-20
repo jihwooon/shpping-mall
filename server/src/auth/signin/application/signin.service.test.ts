@@ -4,16 +4,16 @@ import { MemberRepository } from '../../../members/domain/member.repository'
 import { MYSQL_CONNECTION } from '../../../config/database/constants'
 import { JwtProvider } from '../../../jwt/jwt.provider'
 import { SigninService } from './signin.service'
-import { NotFoundException } from '@nestjs/common'
+import { InternalServerErrorException, BadRequestException } from '@nestjs/common'
 import { PasswordProvider } from '../../../members/application/password.provider'
-import { MEMBER } from '../../../fixture/memberFixture'
+import { TokenIssuer } from '../../token/application/token.issuer'
+import { MemberNotFoundException } from '../../../members/application/error/member-not-found.exception'
 
 describe('Signup class', () => {
   let connect: Connection
   let memberRepository: MemberRepository
   let signinService: SigninService
   let passwordProvider: PasswordProvider
-  let jwtProvider: JwtProvider
 
   const EMAIL = 'abc@email.com'
   const NOT_EXISTED_EMAIL = 'notfound@email.com'
@@ -30,6 +30,7 @@ describe('Signup class', () => {
         SigninService,
         JwtProvider,
         PasswordProvider,
+        TokenIssuer,
         {
           provide: MYSQL_CONNECTION,
           useValue: connect,
@@ -40,7 +41,6 @@ describe('Signup class', () => {
     memberRepository = module.get<MemberRepository>(MemberRepository)
     signinService = module.get<SigninService>(SigninService)
     passwordProvider = module.get<PasswordProvider>(PasswordProvider)
-    jwtProvider = module.get<JwtProvider>(JwtProvider)
   })
 
   describe('login method', () => {
@@ -50,7 +50,7 @@ describe('Signup class', () => {
         memberId: 1,
       })
       passwordProvider.comparePassword = jest.fn().mockResolvedValue(true)
-      memberRepository.updateMemberByRefreshTokenAndExpirationTime = jest.fn().mockImplementation()
+      memberRepository.updateMemberByRefreshTokenAndExpirationTime = jest.fn().mockResolvedValue(true)
     })
     context('가입된 회원 정보를 확인하면', () => {
       it('인증을 성공하고, accessToken과 refreshToken을 리턴 해야 한다', async () => {
@@ -73,9 +73,9 @@ describe('Signup class', () => {
       beforeEach(async () => {
         memberRepository.findByEmail = jest.fn().mockResolvedValue(undefined)
       })
-      it('NotFoundException을 던져야 한다', async () => {
+      it('MemberNotFoundException을 던져야 한다', async () => {
         expect(signinService.login(NOT_EXISTED_EMAIL, PASSWORD)).rejects.toThrow(
-          new NotFoundException('회원 정보를 찾을 수 없습니다'),
+          new MemberNotFoundException('회원 정보를 찾을 수 없습니다'),
         )
       })
     })
@@ -84,45 +84,31 @@ describe('Signup class', () => {
       beforeEach(async () => {
         memberRepository.findByEmail = jest.fn().mockResolvedValue(null)
       })
-      it('NotFoundException을 던져야 한다', async () => {
+      it('MemberNotFoundException을 던져야 한다', async () => {
         expect(signinService.login(NOT_EXISTED_EMAIL, PASSWORD)).rejects.toThrow(
-          new NotFoundException('회원 정보를 찾을 수 없습니다'),
+          new MemberNotFoundException('회원 정보를 찾을 수 없습니다'),
         )
       })
     })
 
     context('찾을 수 없는 패스워드가 주어지면', () => {
       beforeEach(async () => {
-        memberRepository.findByEmail = jest.fn().mockResolvedValue(undefined)
         passwordProvider.comparePassword = jest.fn().mockResolvedValue(false)
       })
-      it('NotFoundException을 던져야 한다', async () => {
+      it('BadRequestException을 던져야 한다', async () => {
         expect(signinService.login(NOT_EXISTED_EMAIL, PASSWORD)).rejects.toThrow(
-          new NotFoundException('회원 정보를 찾을 수 없습니다'),
+          new BadRequestException('패스워드가 일치 하지 않습니다'),
         )
       })
     })
-  })
 
-  describe('updateRefreshTokenAndExpirationTime method', () => {
-    context('refreshToken과 사용자 정보가 주어지면', () => {
-      it('메서드를 호출해야 한다 ', async () => {
-        const spyOn = jest.spyOn(signinService, 'updateRefreshTokenAndExpirationTime').mockResolvedValue()
-        await signinService.updateRefreshTokenAndExpirationTime(
-          {
-            refreshToken: REFRESH_TOKEN,
-            refreshTokenExpireTime: new Date('2023-09-28T14:45:55.144Z'),
-          },
-          MEMBER,
-        )
-
-        expect(spyOn).toHaveBeenCalled()
-        expect(spyOn).toHaveBeenCalledWith(
-          {
-            refreshToken: REFRESH_TOKEN,
-            refreshTokenExpireTime: new Date('2023-09-28T14:45:55.144Z'),
-          },
-          MEMBER,
+    context('가입 된 회원 정보가 주어지고 token과 만료 기한 변경이 실패하면', () => {
+      beforeEach(async () => {
+        memberRepository.updateMemberByRefreshTokenAndExpirationTime = jest.fn().mockResolvedValue(false)
+      })
+      it('InternalServerErrorException을 던져야 한다', async () => {
+        expect(signinService.login(EMAIL, PASSWORD)).rejects.toThrow(
+          new InternalServerErrorException('예기치 못한 서버 오류가 발생했습니다'),
         )
       })
     })

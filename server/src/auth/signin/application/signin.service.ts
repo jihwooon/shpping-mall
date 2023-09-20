@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { MemberRepository } from '../../../members/domain/member.repository'
 import { JwtProvider } from '../../../jwt/jwt.provider'
 import { Authentication } from '../../../jwt/dto/authentication'
 import { PasswordProvider } from '../../../members/application/password.provider'
-import { Member } from '../../../members/domain/member.entity'
+import { TokenIssuer } from '../../token/application/token.issuer'
+import { MemberNotFoundException } from '../../../members/application/error/member-not-found.exception'
 
 @Injectable()
 export class SigninService {
@@ -11,12 +12,13 @@ export class SigninService {
     private readonly memberRepository: MemberRepository,
     private readonly jwtProvider: JwtProvider,
     private readonly passwordProvider: PasswordProvider,
+    private readonly tokenIssuer: TokenIssuer,
   ) {}
 
   async login(email: string, password: string): Promise<Authentication> {
     const member = await this.memberRepository.findByEmail(email)
     if (!member) {
-      throw new NotFoundException('회원 정보를 찾을 수 없습니다')
+      throw new MemberNotFoundException('회원 정보를 찾을 수 없습니다')
     }
 
     const isPasswordMatch = await this.passwordProvider.comparePassword(password, member)
@@ -25,7 +27,7 @@ export class SigninService {
     }
 
     const generateToken = this.jwtProvider.createTokenDTO(member.email)
-    await this.updateRefreshTokenAndExpirationTime(generateToken, member)
+    await this.tokenIssuer.updateRefreshTokenAndExpirationTime(generateToken, member)
 
     return {
       accessToken: generateToken.accessToken,
@@ -33,13 +35,5 @@ export class SigninService {
       refreshToken: generateToken.refreshToken,
       refreshTokenExpireTime: generateToken.refreshTokenExpireTime,
     }
-  }
-
-  async updateRefreshTokenAndExpirationTime(generateToken: any, member: Member) {
-    await this.memberRepository.updateMemberByRefreshTokenAndExpirationTime(
-      generateToken.refreshToken,
-      generateToken.refreshTokenExpireTime,
-      member.email,
-    )
   }
 }

@@ -6,6 +6,8 @@ import { PasswordProvider } from '../../../members/application/password.provider
 import { JwtProvider } from '../../../jwt/jwt.provider'
 import { SigninService } from '../application/signin.service'
 import { SigninController } from './signin.controller'
+import { TokenIssuer } from '../../token/application/token.issuer'
+import { MemberNotFoundException } from '../../../members/application/error/member-not-found.exception'
 
 describe('SignInController class', () => {
   let signinController: SigninController
@@ -27,6 +29,7 @@ describe('SignInController class', () => {
         MemberRepository,
         PasswordProvider,
         JwtProvider,
+        TokenIssuer,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,
@@ -39,17 +42,17 @@ describe('SignInController class', () => {
   })
 
   describe('signinHandler method', () => {
-    beforeEach(() => {
-      signinService.login = jest.fn().mockResolvedValue({
-        accessToken: ACCESS_TOKEN,
-        refreshToken: REFRESH_TOKEN,
-        accessTokenExpireTime: ACCESS_TOKEN_EXPIRE,
-        refreshTokenExpireTime: REFRESH_TOKEN_EXPIRE,
+    context('올바른 이메일과 패스워드를 입력하면 ', () => {
+      beforeEach(() => {
+        signinService.login = jest.fn().mockResolvedValue({
+          accessToken: ACCESS_TOKEN,
+          refreshToken: REFRESH_TOKEN,
+          accessTokenExpireTime: ACCESS_TOKEN_EXPIRE,
+          refreshTokenExpireTime: REFRESH_TOKEN_EXPIRE,
+        })
       })
-    })
-    context('이메일과 패스워드를 입력하면 ', () => {
       it('사용자 Token 정보를 리턴해야 한다', async () => {
-        const responseDto = await signinController.signinHandler({ email: 'abc@email.com', password: '1234456' })
+        const responseDto = await signinController.signinHandler({ email: 'abc@email.com', password: '12344566' })
 
         expect(responseDto).toEqual({
           accessToken: ACCESS_TOKEN,
@@ -57,6 +60,17 @@ describe('SignInController class', () => {
           accessTokenExpireTime: ACCESS_TOKEN_EXPIRE,
           refreshTokenExpireTime: REFRESH_TOKEN_EXPIRE,
         })
+      })
+    })
+
+    context('올바르지 않는 이메일과 패스워드가 입력하면 ', () => {
+      beforeEach(() => {
+        signinService.login = jest.fn().mockRejectedValue(new MemberNotFoundException('회원 정보를 찾을 수 없습니다'))
+      })
+      it('MemberNotFoundException를 던져야 한다', async () => {
+        expect(signinController.signinHandler({ email: 'efghjn@email.com', password: '9999999' })).rejects.toThrow(
+          new MemberNotFoundException('회원 정보를 찾을 수 없습니다'),
+        )
       })
     })
   })
