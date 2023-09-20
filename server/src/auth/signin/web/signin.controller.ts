@@ -10,13 +10,18 @@ export class SigninController {
   @Post('signin')
   @HttpCode(200)
   async signinHandler(@Body() request: LoginMemberDto): Promise<SigninResponseDto> {
-    const response = await this.signinService.login(request.email, request.password)
+    const { email, password } = request
+
+    const { accessToken, refreshToken, accessTokenExpireTime, refreshTokenExpireTime } = await this.signinService.login(
+      email,
+      password,
+    )
 
     return {
-      accessToken: response.accessToken,
-      refreshToken: response.refreshToken,
-      accessTokenExpireTime: response.accessTokenExpireTime,
-      refreshTokenExpireTime: response.refreshTokenExpireTime,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      accessTokenExpireTime: accessTokenExpireTime,
+      refreshTokenExpireTime: refreshTokenExpireTime,
     }
   }
 }

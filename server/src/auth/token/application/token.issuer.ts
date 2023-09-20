@@ -22,11 +22,11 @@ export class TokenIssuer {
       throw new TokenExpiredException('Refresh Token의 유효기간이 만료되었습니다')
     }
 
-    const generateAccessToken = this.jwtProvider.generateAccessToken(member.email)
+    const { accessToken, accessTokenExpireTime } = this.jwtProvider.generateAccessToken(member.email)
 
     return {
-      accessToken: generateAccessToken.accessToken,
-      accessTokenExpireTime: generateAccessToken.accessTokenExpireTime,
+      accessToken: accessToken,
+      accessTokenExpireTime: accessTokenExpireTime,
     }
   }
 

@@ -26,14 +26,15 @@ export class SigninService {
       throw new BadRequestException('패스워드가 일치 하지 않습니다')
     }
 
-    const generateToken = this.jwtProvider.createTokenDTO(member.email)
-    await this.tokenIssuer.updateRefreshTokenAndExpirationTime(generateToken, member)
+    const { accessToken, accessTokenExpireTime, refreshToken, refreshTokenExpireTime } =
+      this.jwtProvider.createTokenDTO(member.email)
+    await this.tokenIssuer.updateRefreshTokenAndExpirationTime({ refreshToken, refreshTokenExpireTime }, member)
 
     return {
-      accessToken: generateToken.accessToken,
-      accessTokenExpireTime: generateToken.accessTokenExpireTime,
-      refreshToken: generateToken.refreshToken,
-      refreshTokenExpireTime: generateToken.refreshTokenExpireTime,
+      accessToken: accessToken,
+      accessTokenExpireTime: accessTokenExpireTime,
+      refreshToken: refreshToken,
+      refreshTokenExpireTime: refreshTokenExpireTime,
     }
   }
 }
