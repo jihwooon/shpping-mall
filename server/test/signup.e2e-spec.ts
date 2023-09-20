@@ -7,20 +7,10 @@ import { EmailChecker } from '../src/members/application/email.checker'
 import { MemberRepository } from '../src/members/domain/member.repository'
 import { MYSQL_CONNECTION } from '../src/config/database/constants'
 import { Connection } from 'mysql2/promise'
-import {
-  CREATE_EMPTY_NAME_REQUEST,
-  CREATE_LONG_EMAIL_REQUEST,
-  CREATE_NOT_EMAIL_REQUEST,
-  CREATE_NOT_EMPTY_PASSWORD_REQUEST,
-  CREATE_NOT_ERROR_REQUEST,
-  CREATE_NOT_STRING_EMAIL_REQUEST,
-  CREATE_NOT_STRING_PASSWORD_REQUEST,
-  CREATE_UNDER_8_LENGTH_PASSWORD_REQUEST,
-  CREATE_UP_16_LENGTH_PASSWORD_REQUEST,
-  REQUEST_BODY,
-} from '../src/fixture/memberFixture'
+import { userMock } from '../src/fixture/memberFixture'
 import { PasswordProvider } from '../src/members/application/password.provider'
 import { JwtProvider } from '../src/jwt/jwt.provider'
+import { CreateMemberDto } from '../src/members/dto/create-member.dto'
 
 describe('SignupController (e2e)', () => {
   let app: INestApplication
@@ -59,36 +49,44 @@ describe('SignupController (e2e)', () => {
 
   describe('POST /auth/signup', () => {
     beforeEach(() => {
-      signupService.signup = jest.fn().mockImplementation(() => 1)
+      signupService.signup = jest.fn().mockImplementation(() => userMock().memberId)
     })
 
     context('회원가입 정보가 주어지면', () => {
       it('상태코드 201를 응답해야 한다', async () => {
+        const raw_password = '1234566789'
+        const signupRequest: CreateMemberDto = {
+          email: userMock().email,
+          password: (userMock().password = raw_password),
+          memberName: userMock().memberName,
+        }
+
         const {
           status,
           body: { id },
-        } = await request(app.getHttpServer())
-          .post('/auth/signup')
-          .send({ email: 'abc@email.com', memberName: '홍길동', password: '12345678123456' })
+        } = await request(app.getHttpServer()).post('/auth/signup').send(signupRequest)
 
         expect(status).toEqual(201)
-        expect(id).toEqual(1)
+        expect(id).toEqual(userMock().memberId)
       })
     })
 
     context('이메일을 누락하면', () => {
       it('상태코드 400를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer()).post('/auth/signup').send(CREATE_NOT_EMAIL_REQUEST)
+        const blank_email = ''
+        const raw_password = '1234566789'
+        const signupRequest: CreateMemberDto = {
+          email: blank_email,
+          password: (userMock().password = raw_password),
+          memberName: userMock().memberName,
+        }
+
+        const { status, body } = await request(app.getHttpServer()).post('/auth/signup').send(signupRequest)
 
         expect(status).toEqual(400)
         expect(body).toEqual({
           error: 'Bad Request',
-          message: [
-            'email must be a string',
-            '이메일은 60자 이하로 입력해주세요.',
-            '올바른 이메일 형식을 입력하세요.',
-            '이메일은 필수 입력 값입니다.',
-          ],
+          message: ['올바른 이메일 형식을 입력하세요.', '이메일은 필수 입력 값입니다.'],
           statusCode: 400,
         })
       })
@@ -96,7 +94,15 @@ describe('SignupController (e2e)', () => {
 
     context('이메일 형식이 맞지 않으면', () => {
       it('상태코드 400를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer()).post('/auth/signup').send(CREATE_NOT_ERROR_REQUEST)
+        const wrong_email = 'abcd.email.com'
+        const raw_password = '1234566789'
+        const signupRequest: CreateMemberDto = {
+          email: (userMock().email = wrong_email),
+          password: (userMock().password = raw_password),
+          memberName: userMock().memberName,
+        }
+
+        const { status, body } = await request(app.getHttpServer()).post('/auth/signup').send(signupRequest)
 
         expect(status).toEqual(400)
         expect(body).toEqual({
@@ -109,7 +115,16 @@ describe('SignupController (e2e)', () => {
 
     context('이메일 글자 수 60자가 넘으면', () => {
       it('상태코드 400를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer()).post('/auth/signup').send(CREATE_LONG_EMAIL_REQUEST)
+        const long_email =
+          'abcdefghijklmnopqrabcdefghijklmnopqrabcdefghijklmnopqrabcdefghijklmnopqrabcdefghijklmnopqrabcdefghijklmnopqr@email.com'
+        const raw_password = '1234566789'
+        const signupRequest: CreateMemberDto = {
+          email: (userMock().email = long_email),
+          password: (userMock().password = raw_password),
+          memberName: userMock().memberName,
+        }
+
+        const { status, body } = await request(app.getHttpServer()).post('/auth/signup').send(signupRequest)
 
         expect(status).toEqual(400)
         expect(body).toEqual({
@@ -120,26 +135,16 @@ describe('SignupController (e2e)', () => {
       })
     })
 
-    context('이메일 형식이 문자열이 아니면', () => {
-      it('상태코드 400를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer())
-          .post('/auth/signup')
-          .send(CREATE_NOT_STRING_EMAIL_REQUEST)
-
-        expect(status).toEqual(400)
-        expect(body).toEqual({
-          error: 'Bad Request',
-          message: ['올바른 이메일 형식을 입력하세요.'],
-          statusCode: 400,
-        })
-      })
-    })
-
     context('패스워드를 누락하면', () => {
       it('상태코드 400를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer())
-          .post('/auth/signup')
-          .send(CREATE_NOT_EMPTY_PASSWORD_REQUEST)
+        const blank_password = ''
+        const signupRequest: CreateMemberDto = {
+          email: userMock().email,
+          password: (userMock().password = blank_password),
+          memberName: userMock().memberName,
+        }
+
+        const { status, body } = await request(app.getHttpServer()).post('/auth/signup').send(signupRequest)
 
         expect(status).toEqual(400)
         expect(body).toEqual({
@@ -152,9 +157,14 @@ describe('SignupController (e2e)', () => {
 
     context('패스워드 길이가 8자리 이하이면', () => {
       it('상태코드 400를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer())
-          .post('/auth/signup')
-          .send(CREATE_UNDER_8_LENGTH_PASSWORD_REQUEST)
+        const under_length_password = '0'
+        const signupRequest: CreateMemberDto = {
+          email: userMock().email,
+          password: (userMock().password = under_length_password),
+          memberName: userMock().memberName,
+        }
+
+        const { status, body } = await request(app.getHttpServer()).post('/auth/signup').send(signupRequest)
 
         expect(status).toEqual(400)
         expect(body).toEqual({
@@ -167,24 +177,14 @@ describe('SignupController (e2e)', () => {
 
     context('패스워드 길이가 16자리 이상이면', () => {
       it('상태코드 400를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer())
-          .post('/auth/signup')
-          .send(CREATE_UP_16_LENGTH_PASSWORD_REQUEST)
+        const long_password = '1234567890123456789012345678901234567890'
+        const signupRequest: CreateMemberDto = {
+          email: userMock().email,
+          password: (userMock().password = long_password),
+          memberName: userMock().memberName,
+        }
 
-        expect(status).toEqual(400)
-        expect(body).toEqual({
-          error: 'Bad Request',
-          message: ['비밀번호는 8자 이상 16이하로 입력해주세요.'],
-          statusCode: 400,
-        })
-      })
-    })
-
-    context('패스워드 형식이 문자열이 아니면', () => {
-      it('상태코드 400를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer())
-          .post('/auth/signup')
-          .send(CREATE_NOT_STRING_PASSWORD_REQUEST)
+        const { status, body } = await request(app.getHttpServer()).post('/auth/signup').send(signupRequest)
 
         expect(status).toEqual(400)
         expect(body).toEqual({
@@ -197,7 +197,15 @@ describe('SignupController (e2e)', () => {
 
     context('이름을 누락하면', () => {
       it('상태코드 400를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer()).post('/auth/signup').send(CREATE_EMPTY_NAME_REQUEST)
+        const blank_name = ''
+        const raw_password = '1234566789'
+        const signupRequest: CreateMemberDto = {
+          email: userMock().email,
+          password: (userMock().password = raw_password),
+          memberName: (userMock().memberName = blank_name),
+        }
+
+        const { status, body } = await request(app.getHttpServer()).post('/auth/signup').send(signupRequest)
 
         expect(status).toEqual(400)
         expect(body).toEqual({

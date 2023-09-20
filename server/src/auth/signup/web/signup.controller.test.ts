@@ -5,10 +5,12 @@ import { Connection } from 'mysql2/promise'
 import { MemberRepository } from '../../../members/domain/member.repository'
 import { EmailChecker } from '../../../members/application/email.checker'
 import { MYSQL_CONNECTION } from '../../../config/database/constants'
-import { CREATE_MEMBER_REQUEST } from '../../../fixture/memberFixture'
+import { userMock } from '../../../fixture/memberFixture'
 import { SignupService } from '../application/signup.service'
 import { PasswordProvider } from '../../../members/application/password.provider'
 import { JwtProvider } from '../../../jwt/jwt.provider'
+import { CreateMemberDto } from '../../../members/dto/create-member.dto'
+import { SignupResponseDto } from '../dto/signup-response.dto'
 
 describe('SignupController class', () => {
   let signupController: SignupController
@@ -37,13 +39,22 @@ describe('SignupController class', () => {
 
   describe('signupHandler method', () => {
     beforeEach(() => {
-      signupService.signup = jest.fn().mockResolvedValue(1)
+      signupService.signup = jest.fn().mockResolvedValue(userMock().memberId)
     })
     context('회원가입 정보 요청이 주어지고, 회원가입 정보 저장 후', () => {
       it('저장 된 id 값을 리턴 해야 한다', async () => {
-        const id = await signupController.signupHandler(CREATE_MEMBER_REQUEST)
+        const signupRequest: CreateMemberDto = {
+          email: userMock().email,
+          password: userMock().password,
+          memberName: userMock().memberName,
+        }
+        const signupResponse: SignupResponseDto = {
+          id: userMock().memberId,
+        }
 
-        expect(id).toEqual({ id: 1 })
+        const id = await signupController.signupHandler(signupRequest)
+
+        expect(id).toEqual(signupResponse)
       })
     })
   })
