@@ -70,7 +70,7 @@ describe('Signup class', () => {
     })
 
     context('찾을 수 없는 이메일이 undefined이면', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         memberRepository.findByEmail = jest.fn().mockResolvedValue(undefined)
       })
       it('MemberNotFoundException을 던져야 한다', async () => {
@@ -81,7 +81,7 @@ describe('Signup class', () => {
     })
 
     context('찾을 수 없는 이메일이 null이면', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         memberRepository.findByEmail = jest.fn().mockResolvedValue(null)
       })
       it('MemberNotFoundException을 던져야 한다', async () => {
@@ -92,7 +92,7 @@ describe('Signup class', () => {
     })
 
     context('찾을 수 없는 패스워드가 주어지면', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         passwordProvider.comparePassword = jest.fn().mockResolvedValue(false)
       })
       it('BadRequestException을 던져야 한다', async () => {
@@ -103,7 +103,7 @@ describe('Signup class', () => {
     })
 
     context('가입 된 회원 정보가 주어지고 token과 만료 기한 변경이 실패하면', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         memberRepository.updateMemberByRefreshTokenAndExpirationTime = jest.fn().mockResolvedValue(false)
       })
       it('InternalServerErrorException을 던져야 한다', async () => {

@@ -67,7 +67,7 @@ describe('SignInController class', () => {
       beforeEach(() => {
         signinService.login = jest.fn().mockRejectedValue(new MemberNotFoundException('회원 정보를 찾을 수 없습니다'))
       })
-      it('MemberNotFoundException를 던져야 한다', async () => {
+      it('MemberNotFoundException를 던져야 한다', () => {
         expect(signinController.signinHandler({ email: 'efghjn@email.com', password: '9999999' })).rejects.toThrow(
           new MemberNotFoundException('회원 정보를 찾을 수 없습니다'),
         )

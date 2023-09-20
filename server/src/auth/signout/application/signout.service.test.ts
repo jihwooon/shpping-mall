@@ -64,7 +64,7 @@ describe('Signout class', () => {
     })
 
     context('accessToken 유효기간이 만료되면', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         jwtProvider.validateToken = jest.fn().mockResolvedValue({
           payload: EMAIL,
           expirationTime: EXPIRED_ACCESS_TOKEN,
@@ -72,7 +72,7 @@ describe('Signout class', () => {
           audience: EMAIL,
         })
       })
-      it('TokenExpiredException을 던져야 한다', async () => {
+      it('TokenExpiredException을 던져야 한다', () => {
         const generateAccessToken = jwtProvider.generateAccessToken(EMAIL)
 
         expect(signoutService.logout(generateAccessToken.accessToken)).rejects.toThrow(
@@ -82,7 +82,7 @@ describe('Signout class', () => {
     })
 
     context('accessToken 타입이 아니면', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         jwtProvider.validateToken = jest.fn().mockResolvedValue({
           payload: EMAIL,
           expirationTime: ACCESS_TOKEN_EXPIRE,
@@ -90,7 +90,7 @@ describe('Signout class', () => {
           audience: EMAIL,
         })
       })
-      it('NotAccessTokenTypeException을 던져야 한다', async () => {
+      it('NotAccessTokenTypeException을 던져야 한다', () => {
         const generateAccessToken = jwtProvider.generateAccessToken(EMAIL)
 
         expect(signoutService.logout(generateAccessToken.accessToken)).rejects.toThrow(
@@ -100,10 +100,10 @@ describe('Signout class', () => {
     })
 
     context('회원 정보가 올바르지 않으면', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         memberRepository.findByEmail = jest.fn().mockResolvedValue(undefined)
       })
-      it('MemberNotFoundException을 던져야 한다', async () => {
+      it('MemberNotFoundException을 던져야 한다', () => {
         const generateAccessToken = jwtProvider.generateAccessToken(EMAIL)
 
         expect(signoutService.logout(generateAccessToken.accessToken)).rejects.toThrow(
@@ -113,10 +113,10 @@ describe('Signout class', () => {
     })
 
     context('가입 된 회원 정보가 주어지고 token과 만료 기한 변경이 실패하면', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         memberRepository.updateMemberByRefreshTokenAndExpirationTime = jest.fn().mockResolvedValue(false)
       })
-      it('InternalServerErrorException을 던져야 한다', async () => {
+      it('InternalServerErrorException을 던져야 한다', () => {
         const generateAccessToken = jwtProvider.generateAccessToken(EMAIL)
 
         expect(signoutService.logout(generateAccessToken.accessToken)).rejects.toThrow(
