@@ -4,7 +4,7 @@ import { TokenIssuer } from './token.issuer'
 import { MemberRepository } from '../../../members/domain/member.repository'
 import { MYSQL_CONNECTION } from '../../../config/database/constants'
 import { MemberNotFoundException } from '../../../members/application/error/member-not-found.exception'
-import { MEMBER } from '../../../fixture/memberFixture'
+import { userMock } from '../../../fixture/memberFixture'
 import { JwtProvider } from '../../../jwt/jwt.provider'
 import { TokenExpiredException } from '../error/token_expired.exception'
 import { InternalServerErrorException } from '@nestjs/common'
@@ -41,7 +41,7 @@ describe('TokenIssuer class', () => {
   describe('createAccessTokenByRefreshToken method', () => {
     context('refreshToken이 주어지면', () => {
       beforeEach(() => {
-        memberRepository.findMemberByRefreshToken = jest.fn().mockResolvedValue(MEMBER)
+        memberRepository.findMemberByRefreshToken = jest.fn().mockResolvedValue(userMock())
         jwtProvider.validateToken = jest.fn().mockResolvedValue('abc@gmail.com')
       })
       it('accessToken과 accessTokenExpireTime을 갱신해야 한다', async () => {
@@ -69,7 +69,7 @@ describe('TokenIssuer class', () => {
 
     context('refreshToken의 유효기간이 만료 되면', () => {
       beforeEach(() => {
-        memberRepository.findMemberByRefreshToken = jest.fn().mockResolvedValue(MEMBER)
+        memberRepository.findMemberByRefreshToken = jest.fn().mockResolvedValue(userMock())
         jwtProvider.validateToken = jest.fn().mockResolvedValue('abc@gmail.com')
       })
       it('TokenExpiredException를 던져야 한다', async () => {
@@ -86,7 +86,7 @@ describe('TokenIssuer class', () => {
         memberRepository.updateMemberByRefreshTokenAndExpirationTime = jest.fn().mockResolvedValue(true)
       })
       it('true를 리턴해야 한다', async () => {
-        const updatedToken = await tokenIssuer.updateRefreshTokenAndExpirationTime(REFRESH_TOKEN, MEMBER)
+        const updatedToken = await tokenIssuer.updateRefreshTokenAndExpirationTime(REFRESH_TOKEN, userMock())
 
         expect(updatedToken).toEqual(true)
       })
@@ -97,7 +97,7 @@ describe('TokenIssuer class', () => {
         memberRepository.updateMemberByRefreshTokenAndExpirationTime = jest.fn().mockResolvedValue(false)
       })
       it('InternalServerErrorException를 던져야 한다', async () => {
-        expect(tokenIssuer.updateRefreshTokenAndExpirationTime(REFRESH_TOKEN, MEMBER)).rejects.toThrow(
+        expect(tokenIssuer.updateRefreshTokenAndExpirationTime(REFRESH_TOKEN, userMock())).rejects.toThrow(
           new InternalServerErrorException('예기치 못한 서버 오류가 발생했습니다'),
         )
       })

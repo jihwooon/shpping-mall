@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { Connection, ResultSetHeader, RowDataPacket } from 'mysql2/promise'
 import { MemberRepository } from './member.repository'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
-import { RESPONSE_MEMBER, MEMBER } from '../../fixture/memberFixture'
+import { RESPONSE_MEMBER, userMock } from '../../fixture/memberFixture'
 import { MemberType } from './member-type.enum'
 import { Role } from './member-role.enum'
 
@@ -42,7 +42,7 @@ describe('MemberRepository class', () => {
         connection.execute = jest.fn().mockResolvedValue([{ insertId: 1 }] as ResultSetHeader[])
       })
       it('생성 된 insertId를 리턴해야 한다', async () => {
-        const insertId = await memberRepository.save(MEMBER)
+        const insertId = await memberRepository.save(userMock())
 
         expect(insertId).toEqual(1)
       })
@@ -53,7 +53,7 @@ describe('MemberRepository class', () => {
         connection.execute = jest.fn().mockResolvedValue([{ insertId: 0 }] as ResultSetHeader[])
       })
       it('undefined를 리턴해야 한다', async () => {
-        const insertId = await memberRepository.save(MEMBER)
+        const insertId = await memberRepository.save(userMock())
 
         expect(insertId).toEqual(undefined)
       })
