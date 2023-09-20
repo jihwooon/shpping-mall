@@ -80,11 +80,17 @@ export class MemberRepository {
     refreshToken: string,
     expireTime: Date,
     email: string,
-  ): Promise<void> {
-    await this.connection.execute<ResultSetHeader>(
+  ): Promise<boolean> {
+    const [{ affectedRows }] = await this.connection.execute<ResultSetHeader>(
       `UPDATE member SET refresh_token = ?, token_expiration_time = ? WHERE email = ?`,
       [refreshToken, expireTime, email],
     )
+
+    if (affectedRows == 0) {
+      return false
+    }
+
+    return affectedRows == 1
   }
 
   async findMemberByRefreshToken(refreshToken: string): Promise<Member> {
