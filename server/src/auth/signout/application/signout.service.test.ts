@@ -9,6 +9,7 @@ import { TokenType } from '../../../jwt/token-type.enum'
 import { MemberNotFoundException } from '../../../members/application/error/member-not-found.exception'
 import { NotAccessTokenTypeException } from '../../token/error/not-access-token-type.exception'
 import { InternalServerErrorException } from '@nestjs/common'
+import { TokenIssuer } from '../../token/application/token.issuer'
 
 describe('Signout class', () => {
   let connect: Connection
@@ -26,6 +27,7 @@ describe('Signout class', () => {
         MemberRepository,
         SignoutService,
         JwtProvider,
+        TokenIssuer,
         {
           provide: MYSQL_CONNECTION,
           useValue: connect,
@@ -39,19 +41,19 @@ describe('Signout class', () => {
   })
 
   describe('logout method', () => {
-    context('액세스 토큰으로 요청이 성공하면', () => {
-      beforeEach(async () => {
-        jwtProvider.validateToken = jest.fn().mockResolvedValue({
-          payload: EMAIL,
-          expirationTime: ACCESS_TOKEN_EXPIRE,
-          subject: TokenType.ACCESS,
-          audience: EMAIL,
-        })
-        memberRepository.findByEmail = jest.fn().mockResolvedValue({
-          email: EMAIL,
-        })
-        memberRepository.updateMemberByRefreshTokenAndExpirationTime = jest.fn().mockResolvedValue(true)
+    beforeEach(async () => {
+      jwtProvider.validateToken = jest.fn().mockResolvedValue({
+        payload: EMAIL,
+        expirationTime: ACCESS_TOKEN_EXPIRE,
+        subject: TokenType.ACCESS,
+        audience: EMAIL,
       })
+      memberRepository.findByEmail = jest.fn().mockResolvedValue({
+        email: EMAIL,
+      })
+      memberRepository.updateMemberByRefreshTokenAndExpirationTime = jest.fn().mockResolvedValue(true)
+    })
+    context('accessToken이 주어지면', () => {
       it('true를 리턴해야 한다', async () => {
         const generateAccessToken = jwtProvider.generateAccessToken(EMAIL)
 
@@ -61,16 +63,13 @@ describe('Signout class', () => {
       })
     })
 
-    context('액세스 토큰 유효기간이 만료되면', () => {
+    context('accessToken 유효기간이 만료되면', () => {
       beforeEach(async () => {
         jwtProvider.validateToken = jest.fn().mockResolvedValue({
           payload: EMAIL,
           expirationTime: EXPIRED_ACCESS_TOKEN,
           subject: TokenType.ACCESS,
           audience: EMAIL,
-        })
-        memberRepository.findByEmail = jest.fn().mockResolvedValue({
-          email: EMAIL,
         })
       })
       it('TokenExpiredException을 던져야 한다', async () => {
@@ -82,16 +81,13 @@ describe('Signout class', () => {
       })
     })
 
-    context('액세스 토큰 타입이 다르면', () => {
+    context('accessToken 타입이 아니면', () => {
       beforeEach(async () => {
         jwtProvider.validateToken = jest.fn().mockResolvedValue({
           payload: EMAIL,
           expirationTime: ACCESS_TOKEN_EXPIRE,
           subject: TokenType.REFRESH,
           audience: EMAIL,
-        })
-        memberRepository.findByEmail = jest.fn().mockResolvedValue({
-          email: EMAIL,
         })
       })
       it('NotAccessTokenTypeException을 던져야 한다', async () => {
@@ -105,12 +101,6 @@ describe('Signout class', () => {
 
     context('회원 정보가 올바르지 않으면', () => {
       beforeEach(async () => {
-        jwtProvider.validateToken = jest.fn().mockResolvedValue({
-          payload: EMAIL,
-          expirationTime: ACCESS_TOKEN_EXPIRE,
-          subject: TokenType.ACCESS,
-          audience: EMAIL,
-        })
         memberRepository.findByEmail = jest.fn().mockResolvedValue(undefined)
       })
       it('MemberNotFoundException을 던져야 한다', async () => {
@@ -122,11 +112,8 @@ describe('Signout class', () => {
       })
     })
 
-    context('리프레시 토큰과 리프레시 토큰 유효기간 변경이 실패하면', () => {
+    context('가입 된 회원 정보가 주어지고 token과 만료 기한 변경이 실패하면', () => {
       beforeEach(async () => {
-        memberRepository.findByEmail = jest.fn().mockResolvedValue({
-          email: EMAIL,
-        })
         memberRepository.updateMemberByRefreshTokenAndExpirationTime = jest.fn().mockResolvedValue(false)
       })
       it('InternalServerErrorException을 던져야 한다', async () => {

@@ -6,6 +6,8 @@ import { MemberRepository } from '../../../members/domain/member.repository'
 import { MYSQL_CONNECTION } from '../../../config/database/constants'
 import { JwtProvider } from '../../../jwt/jwt.provider'
 import { Response } from 'express'
+import { TokenIssuer } from '../../token/application/token.issuer'
+import { MemberNotFoundException } from '../../../members/application/error/member-not-found.exception'
 
 describe('SignoutController class', () => {
   let signoutController: SignoutController
@@ -27,6 +29,7 @@ describe('SignoutController class', () => {
         SignoutService,
         MemberRepository,
         JwtProvider,
+        TokenIssuer,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,
@@ -39,14 +42,25 @@ describe('SignoutController class', () => {
   })
 
   describe('signoutHandler method', () => {
-    context('accessToken이 주어지면', () => {
-      beforeEach(() => {
-        signoutService.logout = jest.fn().mockResolvedValue(true)
-      })
+    beforeEach(() => {
+      signoutService.logout = jest.fn().mockResolvedValue(true)
+    })
+    context('accessToken이 주어지고 요청이 성공하면', () => {
       it('logout success를 리턴해야 한다', async () => {
         const response = await signoutController.signoutHandler(HEADERS, responseMock)
 
         expect(response).toEqual('logout success')
+      })
+    })
+
+    context('accessToken을 인증 할 수 없으면', () => {
+      beforeEach(() => {
+        signoutService.logout = jest.fn().mockRejectedValue(new MemberNotFoundException('회원 정보를 찾을 수 없습니다'))
+      })
+      it('MemberNotFoundException을 던져야 한다', async () => {
+        expect(signoutController.signoutHandler(HEADERS, responseMock)).rejects.toThrow(
+          new MemberNotFoundException('회원 정보를 찾을 수 없습니다'),
+        )
       })
     })
   })

@@ -7,7 +7,7 @@ export class SignoutController {
   constructor(private readonly signoutService: SignoutService) {}
 
   @Post('signout')
-  @HttpCode(201)
+  @HttpCode(200)
   async signoutHandler(@Headers() headers: any, @Res() response: Response) {
     const accessToken = headers.authorization.split('Bearer ')[1]
 
