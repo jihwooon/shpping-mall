@@ -1,14 +1,19 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { MemberRepository } from '../../../members/domain/member.repository'
 import { JwtProvider } from '../../../jwt/jwt.provider'
 import { TokenExpiredException } from '../../token/error/token_expired.exception'
 import { TokenType } from '../../../jwt/token-type.enum'
 import { MemberNotFoundException } from '../../../members/application/error/member-not-found.exception'
 import { NotAccessTokenTypeException } from '../../token/error/not-access-token-type.exception'
+import { TokenIssuer } from '../../token/application/token.issuer'
 
 @Injectable()
 export class SignoutService {
-  constructor(private readonly memberRepository: MemberRepository, private readonly jwtProvider: JwtProvider) {}
+  constructor(
+    private readonly memberRepository: MemberRepository,
+    private readonly jwtProvider: JwtProvider,
+    private readonly tokenIssuer: TokenIssuer,
+  ) {}
 
   async logout(accessToken: string): Promise<boolean> {
     const { expirationTime, subject, payload, audience } = await this.jwtProvider.validateToken(accessToken)
@@ -29,15 +34,7 @@ export class SignoutService {
 
     const expiredToken = this.jwtProvider.expiredRefreshToken(member.email, new Date())
 
-    const updatedRefreshToken = await this.memberRepository.updateMemberByRefreshTokenAndExpirationTime(
-      expiredToken.refreshToken,
-      expiredToken.refreshTokenExpireTime,
-      member.email,
-    )
-
-    if (!updatedRefreshToken) {
-      throw new InternalServerErrorException('예기치 못한 서버 오류가 발생했습니다')
-    }
+    const updatedRefreshToken = await this.tokenIssuer.updateRefreshTokenAndExpirationTime(expiredToken, member)
 
     return updatedRefreshToken
   }
