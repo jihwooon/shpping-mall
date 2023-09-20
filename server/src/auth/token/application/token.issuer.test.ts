@@ -7,6 +7,7 @@ import { MemberNotFoundException } from '../../../members/application/error/memb
 import { MEMBER } from '../../../fixture/memberFixture'
 import { JwtProvider } from '../../../jwt/jwt.provider'
 import { TokenExpiredException } from '../error/token_expired.exception'
+import { InternalServerErrorException } from '@nestjs/common'
 
 describe('TokenIssuer class', () => {
   let connect: Connection
@@ -74,6 +75,30 @@ describe('TokenIssuer class', () => {
       it('TokenExpiredException를 던져야 한다', async () => {
         expect(tokenIssuer.createAccessTokenByRefreshToken(REFRESH_TOKEN, EXPIRED_TIME)).rejects.toThrow(
           new TokenExpiredException('Refresh Token의 유효기간이 만료되었습니다'),
+        )
+      })
+    })
+  })
+
+  describe('updateRefreshTokenAndExpirationTime method', () => {
+    context('token과 회원 정보가 주어지고 변경이 성공하면', () => {
+      beforeEach(() => {
+        memberRepository.updateMemberByRefreshTokenAndExpirationTime = jest.fn().mockResolvedValue(true)
+      })
+      it('true를 리턴해야 한다', async () => {
+        const updatedToken = await tokenIssuer.updateRefreshTokenAndExpirationTime(REFRESH_TOKEN, MEMBER)
+
+        expect(updatedToken).toEqual(true)
+      })
+    })
+
+    context('token과 회원 정보가 주어지고 변경이 실패하면', () => {
+      beforeEach(() => {
+        memberRepository.updateMemberByRefreshTokenAndExpirationTime = jest.fn().mockResolvedValue(false)
+      })
+      it('InternalServerErrorException를 던져야 한다', async () => {
+        expect(tokenIssuer.updateRefreshTokenAndExpirationTime(REFRESH_TOKEN, MEMBER)).rejects.toThrow(
+          new InternalServerErrorException('예기치 못한 서버 오류가 발생했습니다'),
         )
       })
     })
