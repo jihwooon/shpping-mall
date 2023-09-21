@@ -11,16 +11,12 @@ import { TokenIssuer } from '../src/auth/token/application/token.issuer'
 import { TokenExpiredException } from '../src/auth/token/error/token_expired.exception'
 import { NotAccessTokenTypeException } from '../src/auth/token/error/not-access-token-type.exception'
 import { MemberNotFoundException } from '../src/members/application/error/member-not-found.exception'
+import { jwtTokenFixture } from '../src/fixture/jwtTokenFixture'
 
 describe('SignoutController (e2e)', () => {
   let app: INestApplication
   let connection: Connection
   let signoutService: SignoutService
-
-  const ACCESS_TOKEN =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjk0MzI3MTcwLCJleHAiOjE2OTQ0MTM1NzB9.6UXhpwHPB9W1ZtFZJQfiMANMinEt3WUULdwLSJKQ_z0'
-  const INVALID_ACCESS_TOKEN =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjk0MzI3MTcwLCJleHAiOjE2OTQ0MTM1NzB9.6UXhpwHPB9W1ZtFZJQfiMANMinEt3WUULdwLSJKQ123'
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -52,7 +48,7 @@ describe('SignoutController (e2e)', () => {
       it('상태코드 200를 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer())
           .post('/auth/signout')
-          .set('Authorization', 'Bearer ' + ACCESS_TOKEN)
+          .set('Authorization', 'Bearer ' + jwtTokenFixture().accessToken)
 
         expect(status).toEqual(200)
         expect(body).toEqual('logout success')
@@ -64,9 +60,12 @@ describe('SignoutController (e2e)', () => {
         signoutService.logout = jest.fn().mockRejectedValue(new UnauthorizedException('인증 할 수 없는 token 입니다'))
       })
       it('상태코드 401를 응답해야 한다', async () => {
+        const invalid_access_token = (jwtTokenFixture().accessToken =
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjk0MzI3MTcwLCJleHAiOjE2OTQ0MTM1NzB9.6UXhpwHPB9W1ZtFZJQfiMANMinEt3WUULdwLSJKQ123')
+
         const { status, body } = await request(app.getHttpServer())
           .post('/auth/signout')
-          .set('Authorization', 'Bearer ' + INVALID_ACCESS_TOKEN)
+          .set('Authorization', 'Bearer ' + invalid_access_token)
 
         expect(status).toEqual(401)
         expect(body).toEqual({ error: 'Unauthorized', message: '인증 할 수 없는 token 입니다', statusCode: 401 })
@@ -82,7 +81,7 @@ describe('SignoutController (e2e)', () => {
       it('상태코드 400를 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer())
           .post('/auth/signout')
-          .set('Authorization', 'Bearer ' + ACCESS_TOKEN)
+          .set('Authorization', 'Bearer ' + jwtTokenFixture().accessToken)
 
         expect(status).toEqual(400)
         expect(body).toEqual({
@@ -102,7 +101,7 @@ describe('SignoutController (e2e)', () => {
       it('상태코드 401를 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer())
           .post('/auth/signout')
-          .set('Authorization', 'Bearer ' + ACCESS_TOKEN)
+          .set('Authorization', 'Bearer ' + jwtTokenFixture().accessToken)
 
         expect(status).toEqual(401)
         expect(body).toEqual({
@@ -120,7 +119,7 @@ describe('SignoutController (e2e)', () => {
       it('상태코드 404를 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer())
           .post('/auth/signout')
-          .set('Authorization', 'Bearer ' + ACCESS_TOKEN)
+          .set('Authorization', 'Bearer ' + jwtTokenFixture().accessToken)
 
         expect(status).toEqual(404)
         expect(body).toEqual({
@@ -140,7 +139,7 @@ describe('SignoutController (e2e)', () => {
       it('상태코드 500를 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer())
           .post('/auth/signout')
-          .set('Authorization', 'Bearer ' + ACCESS_TOKEN)
+          .set('Authorization', 'Bearer ' + jwtTokenFixture().accessToken)
 
         expect(status).toEqual(500)
         expect(body).toEqual({

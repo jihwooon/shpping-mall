@@ -8,20 +8,14 @@ import { InternalServerErrorException, BadRequestException } from '@nestjs/commo
 import { PasswordProvider } from '../../../members/application/password.provider'
 import { TokenIssuer } from '../../token/application/token.issuer'
 import { MemberNotFoundException } from '../../../members/application/error/member-not-found.exception'
+import { userMock } from '../../../fixture/memberFixture'
+import { jwtTokenFixture } from '../../../fixture/jwtTokenFixture'
 
 describe('Signup class', () => {
   let connect: Connection
   let memberRepository: MemberRepository
   let signinService: SigninService
   let passwordProvider: PasswordProvider
-
-  const EMAIL = 'abc@email.com'
-  const NOT_EXISTED_EMAIL = 'notfound@email.com'
-  const PASSWORD = '123456'
-  const ACCESS_TOKEN =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoxLCJpYXQiOjE2OTQzNDA2MDQsImV4cCI6MTY5NDQyNzAwNH0.CeU8XsvPM1SWtHVzonZWR-WatmOEVRIXYXpezsyAYfg'
-  const REFRESH_TOKEN =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoxLCJpYXQiOjE2OTQ1MjI0NzUsImV4cCI6MTY5NTczMjA3NSwic3ViIjoiUkVGUkVTSCJ9.A2PfZdj91q6MIapXrvTB6bUd7blhqrrDY2yh0eYdGPY'
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -45,69 +39,74 @@ describe('Signup class', () => {
 
   describe('login method', () => {
     beforeEach(() => {
-      memberRepository.findByEmail = jest.fn().mockResolvedValue({
-        email: EMAIL,
-        memberId: 1,
-      })
+      memberRepository.findByEmail = jest.fn().mockResolvedValue(userMock())
       passwordProvider.comparePassword = jest.fn().mockResolvedValue(true)
       memberRepository.updateMemberByRefreshTokenAndExpirationTime = jest.fn().mockResolvedValue(true)
     })
     context('가입된 회원 정보를 확인하면', () => {
       it('인증을 성공하고, accessToken과 refreshToken을 리턴 해야 한다', async () => {
-        const authentication = await signinService.login(EMAIL, PASSWORD)
+        const authentication = await signinService.login(userMock().email, userMock().password)
 
         expect(authentication).not.toEqual({
-          accessToken: ACCESS_TOKEN,
-          refreshToken: REFRESH_TOKEN,
+          accessToken: jwtTokenFixture().accessToken,
+          refreshToken: jwtTokenFixture().refreshToken,
         })
       })
       it('인증을 성공하고, accessTokenExpire과 refreshTokenExpire을 리턴 해야 한다', async () => {
-        const authentication = await signinService.login(EMAIL, PASSWORD)
+        const { accessTokenExpireTime, refreshTokenExpireTime } = await signinService.login(
+          userMock().email,
+          userMock().password,
+        )
 
-        expect(authentication.accessTokenExpireTime).toBeTruthy()
-        expect(authentication.refreshTokenExpireTime).toBeTruthy()
+        expect(accessTokenExpireTime).toBeTruthy()
+        expect(refreshTokenExpireTime).toBeTruthy()
       })
     })
 
     context('찾을 수 없는 이메일이 undefined이면', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         memberRepository.findByEmail = jest.fn().mockResolvedValue(undefined)
       })
       it('MemberNotFoundException을 던져야 한다', async () => {
-        expect(signinService.login(NOT_EXISTED_EMAIL, PASSWORD)).rejects.toThrow(
+        const not_found_email = 'notfound@email.com'
+
+        expect(signinService.login((userMock().email = not_found_email), userMock().password)).rejects.toThrow(
           new MemberNotFoundException('회원 정보를 찾을 수 없습니다'),
         )
       })
     })
 
     context('찾을 수 없는 이메일이 null이면', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         memberRepository.findByEmail = jest.fn().mockResolvedValue(null)
       })
       it('MemberNotFoundException을 던져야 한다', async () => {
-        expect(signinService.login(NOT_EXISTED_EMAIL, PASSWORD)).rejects.toThrow(
+        const not_found_email = 'notfound@email.com'
+
+        expect(signinService.login((userMock().email = not_found_email), userMock().password)).rejects.toThrow(
           new MemberNotFoundException('회원 정보를 찾을 수 없습니다'),
         )
       })
     })
 
     context('찾을 수 없는 패스워드가 주어지면', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         passwordProvider.comparePassword = jest.fn().mockResolvedValue(false)
       })
       it('BadRequestException을 던져야 한다', async () => {
-        expect(signinService.login(NOT_EXISTED_EMAIL, PASSWORD)).rejects.toThrow(
+        const not_found_password = 'not_found_password'
+        expect(signinService.login(userMock().email, (userMock().password = not_found_password))).rejects.toThrow(
           new BadRequestException('패스워드가 일치 하지 않습니다'),
         )
       })
     })
 
     context('가입 된 회원 정보가 주어지고 token과 만료 기한 변경이 실패하면', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         memberRepository.updateMemberByRefreshTokenAndExpirationTime = jest.fn().mockResolvedValue(false)
       })
       it('InternalServerErrorException을 던져야 한다', async () => {
-        expect(signinService.login(EMAIL, PASSWORD)).rejects.toThrow(
+        expect(signinService.login(userMock().email, userMock().password)).rejects.toThrow(
           new InternalServerErrorException('예기치 못한 서버 오류가 발생했습니다'),
         )
       })

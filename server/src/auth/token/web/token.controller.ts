@@ -11,11 +11,14 @@ export class TokenController {
   async createAccessTokenByRefreshTokenHandler(@Headers() headers: any): Promise<AccessTokenResponseDto> {
     const refreshToken = headers.authorization.split('Bearer ')[1]
 
-    const accessTokenDto = await this.tokenIssuer.createAccessTokenByRefreshToken(refreshToken, new Date())
+    const { accessToken, accessTokenExpireTime } = await this.tokenIssuer.createAccessTokenByRefreshToken(
+      refreshToken,
+      new Date(),
+    )
 
     return {
-      accessToken: accessTokenDto.accessToken,
-      accessTokenExpireTime: accessTokenDto.accessTokenExpireTime,
+      accessToken: accessToken,
+      accessTokenExpireTime: accessTokenExpireTime,
     }
   }
 }

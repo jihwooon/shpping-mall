@@ -10,7 +10,9 @@ export class SignupController {
   @Post('signup')
   @HttpCode(201)
   async signupHandler(@Body() request: CreateMemberDto): Promise<SignupResponseDto> {
-    const id = await this.signupService.signup(request.email, request.password, request.memberName)
+    const { email, password, memberName } = request
+
+    const id = await this.signupService.signup(email, password, memberName)
 
     return {
       id: id,

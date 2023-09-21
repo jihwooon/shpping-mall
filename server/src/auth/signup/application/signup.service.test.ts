@@ -6,6 +6,7 @@ import { MYSQL_CONNECTION } from '../../../config/database/constants'
 import { SignupService } from './signup.service'
 import { PasswordProvider } from '../../../members/application/password.provider'
 import { JwtProvider } from '../../../jwt/jwt.provider'
+import { userMock } from '../../../fixture/memberFixture'
 
 describe('Signup class', () => {
   let connect: Connection
@@ -36,14 +37,14 @@ describe('Signup class', () => {
   describe('sinup method', () => {
     beforeEach(async () => {
       emailChecker.checkDuplicatedEmail = jest.fn().mockResolvedValue(undefined)
-      memberRepository.save = jest.fn().mockImplementation(() => 1)
+      memberRepository.save = jest.fn().mockImplementation(() => userMock().memberId)
     })
 
     context('회원가입 정보 저장이 되면', () => {
       it('저장 된 id 값을 리턴해야 한다', async () => {
-        const id = await signupService.signup('abc@email.com', '123456', '홍길동')
+        const id = await signupService.signup(userMock().email, userMock().password, userMock().memberName)
 
-        expect(id).toEqual(1)
+        expect(id).toEqual(userMock().memberId)
       })
     })
   })

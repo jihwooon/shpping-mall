@@ -8,6 +8,7 @@ import { JwtProvider } from '../../../jwt/jwt.provider'
 import { Response } from 'express'
 import { TokenIssuer } from '../../token/application/token.issuer'
 import { MemberNotFoundException } from '../../../members/application/error/member-not-found.exception'
+import { jwtTokenFixture } from '../../../fixture/jwtTokenFixture'
 
 describe('SignoutController class', () => {
   let signoutController: SignoutController
@@ -15,8 +16,7 @@ describe('SignoutController class', () => {
   let connection: Connection
 
   const HEADERS = {
-    authorization:
-      'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoxLCJpYXQiOjE2OTQ1MjI0NzUsImV4cCI6MTY5NTczMjA3NSwic3ViIjoiUkVGUkVTSCJ9.A2PfZdj91q6MIapXrvTB6bUd7blhqrrDY2yh0eYdGPY',
+    authorization: 'Bearer ' + jwtTokenFixture().accessToken,
   }
   const responseMock = {
     json: jest.fn((x) => x),

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { PasswordProvider } from './password.provider'
 import { BadRequestException } from '@nestjs/common'
-import { MEMBER } from '../../fixture/memberFixture'
+import { userMock } from '../../fixture/memberFixture'
 
 describe('PasswordProvider class', () => {
   let passwordProvider: PasswordProvider
@@ -52,14 +52,14 @@ describe('PasswordProvider class', () => {
   describe('comparePassword method', () => {
     context('입력 받은 패스워드와 저장된 패스워드가 일치하면', () => {
       it('true를 리턴 해야 한다', async () => {
-        const hashedPassword = await passwordProvider.comparePassword(RAW_PASSWORD, MEMBER)
+        const hashedPassword = await passwordProvider.comparePassword(RAW_PASSWORD, userMock())
 
         expect(hashedPassword).toEqual(true)
       })
     })
     context('입력 받은 패스워드와 저장된 패스워드가 일치하지 않으면', () => {
       it('false를 리턴 해야 한다', async () => {
-        const hashedPassword = await passwordProvider.comparePassword(FAIL_PASSWORD, MEMBER)
+        const hashedPassword = await passwordProvider.comparePassword(FAIL_PASSWORD, userMock())
 
         expect(hashedPassword).toEqual(false)
       })

@@ -33,7 +33,6 @@ export class SignoutService {
     }
 
     const expiredToken = this.jwtProvider.expiredRefreshToken(member.email, new Date())
-
     const updatedRefreshToken = await this.tokenIssuer.updateRefreshTokenAndExpirationTime(expiredToken, member)
 
     return updatedRefreshToken
