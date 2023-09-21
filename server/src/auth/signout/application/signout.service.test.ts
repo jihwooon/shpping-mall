@@ -10,16 +10,14 @@ import { MemberNotFoundException } from '../../../members/application/error/memb
 import { NotAccessTokenTypeException } from '../../token/error/not-access-token-type.exception'
 import { InternalServerErrorException } from '@nestjs/common'
 import { TokenIssuer } from '../../token/application/token.issuer'
+import { userMock } from '../../../fixture/memberFixture'
+import { jwtTokenFixture } from '../../../fixture/jwtTokenFixture'
 
 describe('Signout class', () => {
   let connect: Connection
   let memberRepository: MemberRepository
   let signoutService: SignoutService
   let jwtProvider: JwtProvider
-
-  const EMAIL = 'abc@email.com'
-  const ACCESS_TOKEN_EXPIRE = Date.now() + 86400000
-  const EXPIRED_ACCESS_TOKEN = 0
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -43,19 +41,19 @@ describe('Signout class', () => {
   describe('logout method', () => {
     beforeEach(async () => {
       jwtProvider.validateToken = jest.fn().mockResolvedValue({
-        payload: EMAIL,
-        expirationTime: ACCESS_TOKEN_EXPIRE,
-        subject: TokenType.ACCESS,
-        audience: EMAIL,
+        payload: userMock().email,
+        expirationTime: jwtTokenFixture().accessTokenExpire,
+        subject: jwtTokenFixture().tokenType,
+        audience: userMock().email,
       })
       memberRepository.findByEmail = jest.fn().mockResolvedValue({
-        email: EMAIL,
+        email: userMock().email,
       })
       memberRepository.updateMemberByRefreshTokenAndExpirationTime = jest.fn().mockResolvedValue(true)
     })
     context('accessToken이 주어지면', () => {
       it('true를 리턴해야 한다', async () => {
-        const generateAccessToken = jwtProvider.generateAccessToken(EMAIL)
+        const generateAccessToken = jwtProvider.generateAccessToken(userMock().email)
 
         const memberId = await signoutService.logout(generateAccessToken.accessToken)
 
@@ -66,14 +64,14 @@ describe('Signout class', () => {
     context('accessToken 유효기간이 만료되면', () => {
       beforeEach(() => {
         jwtProvider.validateToken = jest.fn().mockResolvedValue({
-          payload: EMAIL,
-          expirationTime: EXPIRED_ACCESS_TOKEN,
-          subject: TokenType.ACCESS,
-          audience: EMAIL,
+          payload: userMock().email,
+          expirationTime: (jwtTokenFixture().accessTokenExpire = new Date(0)),
+          subject: jwtTokenFixture().tokenType,
+          audience: userMock().email,
         })
       })
       it('TokenExpiredException을 던져야 한다', () => {
-        const generateAccessToken = jwtProvider.generateAccessToken(EMAIL)
+        const generateAccessToken = jwtProvider.generateAccessToken(userMock().email)
 
         expect(signoutService.logout(generateAccessToken.accessToken)).rejects.toThrow(
           new TokenExpiredException('AccessToken 유효기간이 만료되었습니다'),
@@ -84,14 +82,14 @@ describe('Signout class', () => {
     context('accessToken 타입이 아니면', () => {
       beforeEach(() => {
         jwtProvider.validateToken = jest.fn().mockResolvedValue({
-          payload: EMAIL,
-          expirationTime: ACCESS_TOKEN_EXPIRE,
-          subject: TokenType.REFRESH,
-          audience: EMAIL,
+          payload: userMock().email,
+          expirationTime: jwtTokenFixture().accessTokenExpire,
+          subject: (jwtTokenFixture().tokenType = TokenType.REFRESH),
+          audience: userMock().email,
         })
       })
       it('NotAccessTokenTypeException을 던져야 한다', () => {
-        const generateAccessToken = jwtProvider.generateAccessToken(EMAIL)
+        const generateAccessToken = jwtProvider.generateAccessToken(userMock().email)
 
         expect(signoutService.logout(generateAccessToken.accessToken)).rejects.toThrow(
           new NotAccessTokenTypeException('AccessToken Type이 아닙니다'),
@@ -104,7 +102,7 @@ describe('Signout class', () => {
         memberRepository.findByEmail = jest.fn().mockResolvedValue(undefined)
       })
       it('MemberNotFoundException을 던져야 한다', () => {
-        const generateAccessToken = jwtProvider.generateAccessToken(EMAIL)
+        const generateAccessToken = jwtProvider.generateAccessToken(userMock().email)
 
         expect(signoutService.logout(generateAccessToken.accessToken)).rejects.toThrow(
           new MemberNotFoundException('회원 정보를 찾을 수 없습니다'),
@@ -117,7 +115,7 @@ describe('Signout class', () => {
         memberRepository.updateMemberByRefreshTokenAndExpirationTime = jest.fn().mockResolvedValue(false)
       })
       it('InternalServerErrorException을 던져야 한다', () => {
-        const generateAccessToken = jwtProvider.generateAccessToken(EMAIL)
+        const generateAccessToken = jwtProvider.generateAccessToken(userMock().email)
 
         expect(signoutService.logout(generateAccessToken.accessToken)).rejects.toThrow(
           new InternalServerErrorException('예기치 못한 서버 오류가 발생했습니다'),
