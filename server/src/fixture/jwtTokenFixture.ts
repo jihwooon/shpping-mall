@@ -9,5 +9,7 @@ export const jwtTokenFixture = () => {
     accessTokenExpire: new Date(Date.now() + 86400000),
     refreshTokenExpire: new Date(Date.now() + 1210500000),
     tokenType: TokenType.ACCESS,
+    now: new Date('2023-08-19T04:48:42.487Z'),
+    tokenExpired: new Date('2023-12-01T04:48:42.487Z'),
   }
 }
