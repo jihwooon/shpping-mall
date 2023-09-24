@@ -27,13 +27,25 @@ describe('ItemRepository class', () => {
   })
 
   describe('save method', () => {
-    context('item 객체가 주어지면', () => {
-      it('메서드 호출을 검즘해야 한다.', async () => {
-        const spyOn = jest.spyOn(itemRepository, 'save').mockResolvedValue()
-        await itemRepository.save(itemMock())
+    context('item 정보가 저장에 성공하면', () => {
+      beforeEach(async () => {
+        connection.execute = jest.fn().mockResolvedValue([{ insertId: 1 }] as ResultSetHeader[])
+      })
+      it('생성 된 insertId를 리턴해야 한다', async () => {
+        const insertId = await itemRepository.save(itemMock())
 
-        expect(spyOn).toHaveBeenCalled()
-        expect(spyOn).toHaveBeenCalledWith(itemMock())
+        expect(insertId).toEqual(1)
+      })
+    })
+
+    context('item 정보가 저장에 실패하면', () => {
+      beforeEach(async () => {
+        connection.execute = jest.fn().mockResolvedValue([{ insertId: 0 }] as ResultSetHeader[])
+      })
+      it('undefined를 리턴해야 한다', async () => {
+        const insertId = await itemRepository.save(itemMock())
+
+        expect(insertId).toEqual(undefined)
       })
     })
   })
