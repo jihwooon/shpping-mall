@@ -1,11 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { ItemRepository } from '../domain/item.repository'
-import { GET_RESPONSE, ITEMS } from '../../fixture/itemFixture'
+import { itemMock } from '../../fixture/itemFixture'
 import { NotFoundException } from '@nestjs/common'
 import { ItemDetailController } from './item-detail.controller'
 import { ItemReader } from '../application/item.reader'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
 import { Connection } from 'mysql2/promise'
+import { ItemResponse } from '../dto/detail-item.dto'
 
 describe('ItemController class', () => {
   let itemController: ItemDetailController
@@ -30,29 +31,37 @@ describe('ItemController class', () => {
   })
 
   describe('getItemHandler method', () => {
-    const ID = 1
-    const NOT_FOUND_ID = 9999
     context('id가 주어지면', () => {
       beforeEach(() => {
-        itemReader.getItem = jest.fn().mockImplementation(() => ITEMS)
+        itemReader.getItem = jest.fn().mockImplementation(() => itemMock())
       })
       it('저장된 객체 정보를 리턴해야 한다', async () => {
-        const item = await itemController.getItemHandler(ID)
+        const itemInfoResponse: ItemResponse = {
+          id: itemMock().id,
+          itemName: itemMock().itemName,
+          itemDetail: itemMock().itemDetail,
+          price: itemMock().price,
+          stockNumber: itemMock().stockNumber,
+          sellStatus: itemMock().itemSellStatus,
+        }
 
-        expect(item).toEqual(GET_RESPONSE)
+        const item = await itemController.getItemHandler(itemMock().id)
+
+        expect(item).toEqual(itemInfoResponse)
       })
     })
 
     context('잘못된 id가 주어지면', () => {
+      const not_found_id = (itemMock().id = 99999)
       beforeEach(() => {
         itemReader.getItem = jest
           .fn()
-          .mockRejectedValue(new NotFoundException(`${NOT_FOUND_ID}에 해당하는 상품을 찾을 수 없습니다.`))
+          .mockRejectedValue(new NotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`))
       })
 
       it('NotFoundException을 던져야 한다', async () => {
-        expect(itemController.getItemHandler(NOT_FOUND_ID)).rejects.toThrow(
-          new NotFoundException(`${NOT_FOUND_ID}에 해당하는 상품을 찾을 수 없습니다.`),
+        expect(itemController.getItemHandler(not_found_id)).rejects.toThrow(
+          new NotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`),
         )
       })
     })
