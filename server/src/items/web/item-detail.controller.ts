@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common'
-import { ItemInfoResponse } from '../dto/search-item.dto'
+import { ItemResponse } from '../dto/detail-item.dto'
 import { ItemReader } from '../application/item.reader'
 
 @Controller('items')
@@ -7,16 +7,16 @@ export class ItemDetailController {
   constructor(private readonly itemService: ItemReader) {}
 
   @Get(':id')
-  async getItemHandler(@Param('id') id: number): Promise<ItemInfoResponse> {
-    const response = await this.itemService.getItem(id)
+  async getItemHandler(@Param('id') id: number): Promise<ItemResponse> {
+    const { itemName, itemDetail, price, stockNumber, itemSellStatus } = await this.itemService.getItem(id)
 
-    return new ItemInfoResponse({
-      id: response.id,
-      itemName: response.itemName,
-      itemDetail: response.itemDetail,
-      price: response.price,
-      stockNumber: response.stockNumber,
-      sellStatus: response.itemSellStatus,
+    return new ItemResponse({
+      id: id,
+      itemName: itemName,
+      itemDetail: itemDetail,
+      price: price,
+      stockNumber: stockNumber,
+      sellStatus: itemSellStatus,
     })
   }
 }

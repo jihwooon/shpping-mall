@@ -1,7 +1,7 @@
 import { NotFoundException } from '@nestjs/common'
 import { ItemRepository } from '../domain/item.repository'
 import { Test, TestingModule } from '@nestjs/testing'
-import { ITEMS } from '../../fixture/itemFixture'
+import { itemMock } from '../../fixture/itemFixture'
 import { ItemReader } from './item.reader'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
 import { Connection } from 'mysql2/promise'
@@ -28,17 +28,15 @@ describe('ItemReader class', () => {
   })
 
   describe('findById method', () => {
-    const ID = 1
-    const NOT_FOUND_ID = 99999
     context('id가 주어지면', () => {
       beforeEach(() => {
-        itemRepository.findById = jest.fn().mockImplementation(() => ITEMS)
+        itemRepository.findById = jest.fn().mockImplementation(() => itemMock())
       })
 
       it('item 객체를 리턴해야 한다', async () => {
-        const item = await itemReader.getItem(ID)
+        const item = await itemReader.getItem(itemMock().id)
 
-        expect(item).toBe(ITEMS)
+        expect(item).toStrictEqual(itemMock())
       })
     })
 
@@ -48,8 +46,9 @@ describe('ItemReader class', () => {
       })
 
       it('NotFoundException을 던져야 한다', async () => {
-        expect(itemReader.getItem(NOT_FOUND_ID)).rejects.toThrow(
-          new NotFoundException(`${NOT_FOUND_ID}에 해당하는 상품을 찾을 수 없습니다.`, {
+        const not_found_id = (itemMock().id = 99999)
+        expect(itemReader.getItem(not_found_id)).rejects.toThrow(
+          new NotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`, {
             cause: new Error(),
             description: 'NOT_FOUND',
           }),

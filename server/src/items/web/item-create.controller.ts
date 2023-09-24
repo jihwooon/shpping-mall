@@ -1,5 +1,5 @@
 import { Item } from '../domain/item.entity'
-import { ItemInfoRequest } from '../dto/insert-item.dto'
+import { CreateItemRequest } from '../dto/save-item.dto'
 import { ItemCreater } from '../application/item.creater'
 import { Body, Controller, Post, HttpCode } from '@nestjs/common'
 
@@ -9,15 +9,16 @@ export class ItemCreateController {
 
   @Post()
   @HttpCode(204)
-  async createItemHandler(@Body() request: ItemInfoRequest): Promise<void> {
+  async createItemHandler(@Body() request: CreateItemRequest): Promise<void> {
+    const { itemName, itemDetail, price, stockNumber, sellStatus } = request
+
     await this.itemService.registerItem(
       new Item({
-        id: request.id,
-        itemName: request.itemName,
-        itemDetail: request.itemDetail,
-        price: request.price,
-        stockNumber: request.stockNumber,
-        sellStatus: request.sellStatus,
+        itemName: itemName,
+        itemDetail: itemDetail,
+        price: price,
+        stockNumber: stockNumber,
+        sellStatus: sellStatus,
       }),
     )
   }

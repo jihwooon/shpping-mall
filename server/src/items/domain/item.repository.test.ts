@@ -1,14 +1,12 @@
 import { Connection, ResultSetHeader, RowDataPacket } from 'mysql2/promise'
 import { Test, TestingModule } from '@nestjs/testing'
-import { DB_RESPONSE, ITEMS } from '../../fixture/itemFixture'
+import { dbItemMock, itemMock } from '../../fixture/itemFixture'
 import { ItemRepository } from './item.repository'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
 
 describe('ItemRepository class', () => {
   let connection: Connection
   let itemRepository: ItemRepository
-  const ID = 1
-  const NOT_FOUND_ID = 9999
 
   connection = {
     execute: jest.fn(),
@@ -32,10 +30,10 @@ describe('ItemRepository class', () => {
     context('item 객체가 주어지면', () => {
       it('메서드 호출을 검즘해야 한다.', async () => {
         const spyOn = jest.spyOn(itemRepository, 'save').mockResolvedValue()
-        await itemRepository.save(ITEMS)
+        await itemRepository.save(itemMock())
 
         expect(spyOn).toHaveBeenCalled()
-        expect(spyOn).toHaveBeenCalledWith(ITEMS)
+        expect(spyOn).toHaveBeenCalledWith(itemMock())
       })
     })
   })
@@ -43,23 +41,12 @@ describe('ItemRepository class', () => {
   describe('findById method', () => {
     context('id가 주어지면', () => {
       beforeEach(async () => {
-        connection.execute = jest.fn().mockResolvedValue([[DB_RESPONSE] as RowDataPacket[], []])
+        connection.execute = jest.fn().mockResolvedValue([[dbItemMock] as RowDataPacket[], []])
       })
       it('item 객체를 리턴해야 한다', async () => {
-        const items = await itemRepository.findById(ID)
+        const items = await itemRepository.findById(itemMock().id)
 
-        expect(items).toEqual({
-          id: 1,
-          itemName: 'New Balance 530 Steel Grey',
-          itemDetail: 'M990WT6',
-          price: 130000,
-          itemSellStatus: 'SELL',
-          stockNumber: 5,
-          createTime: new Date('2023-09-04T07:31:02'),
-          updateTime: null,
-          createBy: null,
-          modifiedBy: null,
-        })
+        expect(items).toEqual(itemMock())
       })
     })
 
@@ -68,7 +55,8 @@ describe('ItemRepository class', () => {
         connection.execute = jest.fn().mockResolvedValue([[undefined] as RowDataPacket[], []])
       })
       it('undefined를 리턴해야 한다', async () => {
-        const item = await itemRepository.findById(NOT_FOUND_ID)
+        const not_found_id = (itemMock().id = 9999)
+        const item = await itemRepository.findById(not_found_id)
 
         expect(item).toEqual(undefined)
       })
@@ -81,7 +69,7 @@ describe('ItemRepository class', () => {
         connection.execute = jest.fn().mockResolvedValue([{ affectedRows: 1 }] as ResultSetHeader[])
       })
       it('true를 리턴해야 한다', async () => {
-        const items = await itemRepository.update(ID, ITEMS)
+        const items = await itemRepository.update(itemMock().id, itemMock())
 
         expect(items).toEqual(true)
       })
@@ -91,7 +79,7 @@ describe('ItemRepository class', () => {
         connection.execute = jest.fn().mockResolvedValue([{ affectedRows: 0 }] as ResultSetHeader[])
       })
       it('false를 리턴해야 한다', async () => {
-        const items = await itemRepository.update(ID, ITEMS)
+        const items = await itemRepository.update(itemMock().id, itemMock())
 
         expect(items).toEqual(false)
       })

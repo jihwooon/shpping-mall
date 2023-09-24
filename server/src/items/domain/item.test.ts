@@ -1,12 +1,12 @@
 import { Item } from './item.entity'
-import { ITEMS } from '../../fixture/itemFixture'
+import { itemMock } from '../../fixture/itemFixture'
 
 describe('Item', () => {
   let items: Item
 
   describe('객체가 주어지면', () => {
     beforeEach(() => {
-      items = new Item(ITEMS)
+      items = new Item(itemMock())
     })
 
     it('값을 리턴해야 리턴해야 한다', () => {
