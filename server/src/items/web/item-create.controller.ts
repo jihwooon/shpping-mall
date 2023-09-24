@@ -10,13 +10,15 @@ export class ItemCreateController {
   @Post()
   @HttpCode(204)
   async createItemHandler(@Body() request: CreateItemRequest): Promise<void> {
+    const { itemName, itemDetail, price, stockNumber, sellStatus } = request
+
     await this.itemService.registerItem(
       new Item({
-        itemName: request.itemName,
-        itemDetail: request.itemDetail,
-        price: request.price,
-        stockNumber: request.stockNumber,
-        sellStatus: request.sellStatus,
+        itemName: itemName,
+        itemDetail: itemDetail,
+        price: price,
+        stockNumber: stockNumber,
+        sellStatus: sellStatus,
       }),
     )
   }

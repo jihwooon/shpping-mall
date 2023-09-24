@@ -8,15 +8,15 @@ export class ItemDetailController {
 
   @Get(':id')
   async getItemHandler(@Param('id') id: number): Promise<ItemResponse> {
-    const response = await this.itemService.getItem(id)
+    const { itemName, itemDetail, price, stockNumber, itemSellStatus } = await this.itemService.getItem(id)
 
     return new ItemResponse({
-      id: response.id,
-      itemName: response.itemName,
-      itemDetail: response.itemDetail,
-      price: response.price,
-      stockNumber: response.stockNumber,
-      sellStatus: response.itemSellStatus,
+      id: id,
+      itemName: itemName,
+      itemDetail: itemDetail,
+      price: price,
+      stockNumber: stockNumber,
+      sellStatus: itemSellStatus,
     })
   }
 }
