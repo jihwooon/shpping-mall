@@ -1,6 +1,6 @@
 import { Controller, Patch, Param, Body } from '@nestjs/common'
 import { ItemUpdater } from '../application/item.updater'
-import { UpdateItemInfoRequest } from '../dto/update-item.dto'
+import { UpdateItemRequest } from '../dto/update-item.dto'
 import { Item } from '../domain/item.entity'
 
 @Controller('items')
@@ -8,7 +8,7 @@ export class ItemUpdateController {
   constructor(private readonly itemService: ItemUpdater) {}
 
   @Patch(':id')
-  async updateItemHandler(@Param('id') id: number, @Body() request: UpdateItemInfoRequest): Promise<boolean> {
+  async updateItemHandler(@Param('id') id: number, @Body() request: UpdateItemRequest): Promise<boolean> {
     const response = await this.itemService.updateItem(
       id,
       new Item({
