@@ -1,6 +1,6 @@
 import { ItemStatusEnum } from '../domain/item-status.enum'
 
-export class ItemInfoResponse {
+export class ItemResponse {
   id: number
 
   itemName: string

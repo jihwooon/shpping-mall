@@ -1,9 +1,7 @@
 import { ItemStatusEnum } from '../domain/item-status.enum'
 import { IsNotEmpty, IsString, IsNumber, IsEnum } from 'class-validator'
 
-export class ItemInfoRequest {
-  id: number
-
+export class CreateItemRequest {
   @IsNotEmpty({ message: '상품명은 필수 입력 값입니다.' })
   @IsString()
   itemName: string
