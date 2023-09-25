@@ -1,4 +1,5 @@
 import { ItemStatusEnum } from './item-status.enum'
+import { Member } from '../../members/domain/member.entity'
 export class Item {
   id: number
 
@@ -20,6 +21,8 @@ export class Item {
 
   price: number
 
+  member: Member
+
   constructor({
     id = 0,
     createTime = new Date(),
@@ -31,6 +34,7 @@ export class Item {
     sellStatus = ItemStatusEnum.SELL,
     stockNumber = 0,
     price = 0,
+    member = new Member({}),
   }: {
     id?: number
     createTime?: Date
@@ -42,6 +46,7 @@ export class Item {
     sellStatus?: ItemStatusEnum
     stockNumber?: number
     price?: number
+    member?: Member
   }) {
     this.id = id
     this.createTime = createTime
@@ -53,5 +58,6 @@ export class Item {
     this.itemSellStatus = sellStatus
     this.stockNumber = stockNumber
     this.price = price
+    this.member = member
   }
 }

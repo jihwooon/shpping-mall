@@ -11,7 +11,7 @@ export class ItemRepository {
 
   async save(items: Item): Promise<number> {
     const [{ insertId }] = await this.connection.execute<ResultSetHeader>(
-      `INSERT INTO item (item_id, item_name, item_detail, item_price, item_sell_status, stock_number, create_time, update_time, create_by, modified_by ) VALUES (?,?,?,?,?,?,?,?,?,?)`,
+      `INSERT INTO item (item_id, item_name, item_detail, item_price, item_sell_status, stock_number, create_time, update_time, create_by, modified_by, member_id ) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
       [
         items.id,
         items.itemName,
@@ -23,6 +23,7 @@ export class ItemRepository {
         items.updateTime,
         items.createBy,
         items.modifiedBy,
+        items.member.memberId,
       ],
     )
 
@@ -35,7 +36,7 @@ export class ItemRepository {
 
   async findById(id: number): Promise<Item | undefined> {
     const [rows] = await this.connection.execute<RowDataPacket[]>(
-      `SELECT item_id, item_name, item_detail, item_price, item_sell_status, stock_number, create_time, update_time, create_by, modified_by FROM item WHERE item_id = ?`,
+      `SELECT item_id, item_name, item_detail, item_price, item_sell_status, stock_number, create_time, update_time, create_by, modified_by, member_id FROM item WHERE item_id = ?`,
       [id],
     )
 
@@ -56,6 +57,7 @@ export class ItemRepository {
       updateTime: row['update_time'],
       createBy: row['create_by'],
       modifiedBy: row['modified_by'],
+      member: row['member_id'],
     }
   }
 

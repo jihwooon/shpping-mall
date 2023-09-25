@@ -1,6 +1,6 @@
 import { Connection, ResultSetHeader, RowDataPacket } from 'mysql2/promise'
 import { Test, TestingModule } from '@nestjs/testing'
-import { dbItemMock, itemMock } from '../../fixture/itemFixture'
+import { dbItemMock, detailItemMock, itemMock } from '../../fixture/itemFixture'
 import { ItemRepository } from './item.repository'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
 
@@ -58,7 +58,7 @@ describe('ItemRepository class', () => {
       it('item 객체를 리턴해야 한다', async () => {
         const items = await itemRepository.findById(itemMock().id)
 
-        expect(items).toEqual(itemMock())
+        expect(items).toEqual(detailItemMock)
       })
     })
 
