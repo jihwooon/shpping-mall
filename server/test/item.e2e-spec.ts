@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { INestApplication, NotFoundException, ValidationPipe } from '@nestjs/common'
+import { INestApplication, NotFoundException, ValidationPipe, InternalServerErrorException } from '@nestjs/common'
 import * as request from 'supertest'
 import { ItemCreater } from '../src/items/application/item.creater'
 import { ItemReader } from '../src/items/application/item.reader'
@@ -55,11 +55,36 @@ describe('ItemController (e2e)', () => {
 
   describe('POST /items', () => {
     beforeEach(() => {
-      itemCreater.registerItem = jest.fn().mockResolvedValue(undefined)
+      itemCreater.registerItem = jest.fn().mockResolvedValue(itemMock().id)
     })
 
-    context('Item 객체가 주어지면', () => {
-      it('상태코드 204를 응답해야 한다', async () => {
+    context('Item 객체가 주어지고 저장을 성공하면', () => {
+      it('상태코드 201를 응답해야 한다', async () => {
+        const itemRequest: CreateItemRequest = {
+          itemName: itemMock().itemName,
+          itemDetail: itemMock().itemDetail,
+          price: itemMock().price,
+          stockNumber: itemMock().stockNumber,
+          sellStatus: itemMock().itemSellStatus,
+        }
+
+        const {
+          status,
+          body: { id },
+        } = await request(app.getHttpServer()).post('/items').send(itemRequest)
+
+        expect(status).toEqual(201)
+        expect(id).toEqual(itemMock().id)
+      })
+    })
+
+    context('Item 객체가 주어지고 저장을 실패하면', () => {
+      beforeEach(() => {
+        itemCreater.registerItem = jest
+          .fn()
+          .mockRejectedValue(new InternalServerErrorException('예기치 못한 서버 오류가 발생했습니다'))
+      })
+      it('상태코드 500를 응답해야 한다', async () => {
         const itemRequest: CreateItemRequest = {
           itemName: itemMock().itemName,
           itemDetail: itemMock().itemDetail,
@@ -70,8 +95,12 @@ describe('ItemController (e2e)', () => {
 
         const { status, body } = await request(app.getHttpServer()).post('/items').send(itemRequest)
 
-        expect(status).toEqual(204)
-        expect(body).toEqual({})
+        expect(status).toEqual(500)
+        expect(body).toEqual({
+          error: 'Internal Server Error',
+          message: '예기치 못한 서버 오류가 발생했습니다',
+          statusCode: 500,
+        })
       })
     })
 

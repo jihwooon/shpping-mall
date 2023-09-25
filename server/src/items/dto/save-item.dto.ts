@@ -21,3 +21,7 @@ export class CreateItemRequest {
   @IsEnum({ sellStatus: ItemStatusEnum.SELL })
   sellStatus: ItemStatusEnum
 }
+
+export class CreateItemResponse {
+  id: number
+}
