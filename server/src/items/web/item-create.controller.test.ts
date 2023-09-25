@@ -7,11 +7,17 @@ import { MYSQL_CONNECTION } from '../../config/database/constants'
 import { Connection } from 'mysql2/promise'
 import { CreateItemRequest } from '../dto/save-item.dto'
 import { InternalServerErrorException } from '@nestjs/common'
+import { MemberRepository } from '../../members/domain/member.repository'
+import { JwtProvider } from '../../jwt/jwt.provider'
 
 describe('ItemController class', () => {
   let itemController: ItemCreateController
   let itemCreater: ItemCreater
   let connection: Connection
+
+  const requestMock = {
+    user: jest.fn((x) => x),
+  } as unknown as Request
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -19,6 +25,8 @@ describe('ItemController class', () => {
       providers: [
         ItemCreater,
         ItemRepository,
+        MemberRepository,
+        JwtProvider,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,
@@ -43,7 +51,7 @@ describe('ItemController class', () => {
         itemCreater.registerItem = jest.fn().mockResolvedValue(itemMock().id)
       })
       it('id를 리턴해야 한다', async () => {
-        const id = await itemController.createItemHandler(itemRequest)
+        const id = await itemController.createItemHandler(itemRequest, requestMock)
 
         expect(id).toEqual({
           id: itemMock().id,
@@ -58,7 +66,7 @@ describe('ItemController class', () => {
           .mockRejectedValue(new InternalServerErrorException('예기치 못한 서버 오류가 발생했습니다'))
       })
       it('InternalServerErrorException를 던져야 한다', async () => {
-        expect(itemController.createItemHandler(itemRequest)).rejects.toThrow(
+        expect(itemController.createItemHandler(itemRequest, requestMock)).rejects.toThrow(
           new InternalServerErrorException('예기치 못한 서버 오류가 발생했습니다'),
         )
       })
