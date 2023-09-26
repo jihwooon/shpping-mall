@@ -2,13 +2,14 @@ import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/
 import * as jwt from 'jsonwebtoken'
 import * as dotenv from 'dotenv'
 import { TokenType } from './token-type.enum'
+import { Role } from '../members/domain/member-role.enum'
 
 dotenv.config()
 
 @Injectable()
 export class JwtProvider {
-  createTokenDTO(email: string) {
-    const generateAccessToken = this.generateAccessToken(email)
+  createTokenDTO(email: string, role: Role) {
+    const generateAccessToken = this.generateAccessToken(email, role)
     const generateRefreshToken = this.generateRefreshToken(email)
 
     return {
@@ -18,9 +19,13 @@ export class JwtProvider {
       refreshTokenExpireTime: generateRefreshToken.refreshTokenExpireTime,
     }
   }
-  generateAccessToken(email: string) {
+  generateAccessToken(email: string, role: Role) {
     const accessTokenExpireTime = this.createAccessTokenExpireTime()
-    const accessToken = this.generateToken(email, accessTokenExpireTime, TokenType.ACCESS)
+    const payload = {
+      email: email,
+      role: role,
+    }
+    const accessToken = this.generateToken(payload, accessTokenExpireTime, TokenType.ACCESS)
 
     return {
       accessToken: accessToken,
@@ -30,7 +35,10 @@ export class JwtProvider {
 
   generateRefreshToken(email: string) {
     const refreshTokenExpireTime = this.createRefreshTokenExpireTime()
-    const refreshToken = this.generateToken(email, refreshTokenExpireTime, TokenType.REFRESH)
+    const payload = {
+      email: email,
+    }
+    const refreshToken = this.generateToken(payload, refreshTokenExpireTime, TokenType.REFRESH)
 
     return {
       refreshToken: refreshToken,
@@ -38,15 +46,10 @@ export class JwtProvider {
     }
   }
 
-  generateToken(email: string, expireTime: Date, tokenType: string) {
-    if (email == undefined || email == null || email == '') {
-      throw new BadRequestException(`id는 ${email}이 될 수 없습니다`)
-    }
-
-    return jwt.sign({ payload: email }, process.env.JWT_SECRET, {
+  generateToken(payload: object, expireTime: Date, tokenType: string) {
+    return jwt.sign(payload, process.env.JWT_SECRET, {
       subject: tokenType,
       expiresIn: expireTime.getTime() - 1728000000 + 30970630,
-      audience: email,
     })
   }
 
@@ -56,13 +59,14 @@ export class JwtProvider {
     }
 
     try {
-      const { payload, sub, exp, aud } = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload
+      const { email, role, iat, exp, sub } = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload
 
       return {
-        payload: payload,
-        expirationTime: exp,
-        subject: sub,
-        audience: aud,
+        email: email,
+        role: role,
+        iat: iat,
+        exp: exp,
+        sub: sub,
       }
     } catch (e) {
       throw new UnauthorizedException('인증 할 수 없는 token 입니다')
@@ -70,11 +74,11 @@ export class JwtProvider {
   }
 
   expiredRefreshToken(email: string, now: Date) {
-    if (email == undefined || email == null || email == '') {
-      throw new BadRequestException(`email은 ${email}이 될 수 없습니다`)
+    const payload = {
+      email: email,
     }
 
-    const refreshToken = this.generateToken(email, now, TokenType.REFRESH)
+    const refreshToken = this.generateToken(payload, now, TokenType.REFRESH)
 
     return {
       refreshToken: refreshToken,
