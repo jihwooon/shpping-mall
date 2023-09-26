@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { INestApplication, NotFoundException, ValidationPipe, InternalServerErrorException } from '@nestjs/common'
+import { INestApplication, InternalServerErrorException, NotFoundException, ValidationPipe } from '@nestjs/common'
 import * as request from 'supertest'
 import { ItemCreater } from '../src/items/application/item.creater'
 import { ItemReader } from '../src/items/application/item.reader'
@@ -14,6 +14,11 @@ import { Connection } from 'mysql2/promise'
 import { CreateItemRequest } from '../src/items/dto/save-item.dto'
 import { ItemResponse } from '../src/items/dto/detail-item.dto'
 import { UpdateItemRequest } from '../src/items/dto/update-item.dto'
+import { MemberRepository } from '../src/members/domain/member.repository'
+import { userMock } from '../src/fixture/memberFixture'
+import { JwtAuthGuard } from '../src/config/auth/guards/jwt-auth.guard'
+import { jwtTokenFixture } from '../src/fixture/jwtTokenFixture'
+import { JwtProvider } from '../src/jwt/jwt.provider'
 
 describe('ItemController (e2e)', () => {
   let app: INestApplication
@@ -21,6 +26,7 @@ describe('ItemController (e2e)', () => {
   let itemCreater: ItemCreater
   let itemReader: ItemReader
   let itemUpdater: ItemUpdater
+  let jwtProvider: JwtProvider
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -30,6 +36,9 @@ describe('ItemController (e2e)', () => {
         ItemCreater,
         ItemReader,
         ItemUpdater,
+        MemberRepository,
+        JwtProvider,
+        JwtAuthGuard,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,
@@ -40,6 +49,7 @@ describe('ItemController (e2e)', () => {
     itemCreater = moduleFixture.get<ItemCreater>(ItemCreater)
     itemReader = moduleFixture.get<ItemReader>(ItemReader)
     itemUpdater = moduleFixture.get<ItemUpdater>(ItemUpdater)
+    jwtProvider = moduleFixture.get<JwtProvider>(JwtProvider)
 
     app = moduleFixture.createNestApplication()
 
@@ -56,6 +66,7 @@ describe('ItemController (e2e)', () => {
   describe('POST /items', () => {
     beforeEach(() => {
       itemCreater.registerItem = jest.fn().mockResolvedValue(itemMock().id)
+      jwtProvider.validateToken = jest.fn().mockResolvedValue(userMock().email)
     })
 
     context('Item 객체가 주어지고 저장을 성공하면', () => {
@@ -71,7 +82,10 @@ describe('ItemController (e2e)', () => {
         const {
           status,
           body: { id },
-        } = await request(app.getHttpServer()).post('/items').send(itemRequest)
+        } = await request(app.getHttpServer())
+          .post('/items')
+          .set('Authorization', 'Bearer ' + jwtTokenFixture().accessToken)
+          .send(itemRequest)
 
         expect(status).toEqual(201)
         expect(id).toEqual(itemMock().id)
@@ -93,7 +107,10 @@ describe('ItemController (e2e)', () => {
           sellStatus: itemMock().itemSellStatus,
         }
 
-        const { status, body } = await request(app.getHttpServer()).post('/items').send(itemRequest)
+        const { status, body } = await request(app.getHttpServer())
+          .post('/items')
+          .send(itemRequest)
+          .set('Authorization', 'Bearer ' + jwtTokenFixture().accessToken)
 
         expect(status).toEqual(500)
         expect(body).toEqual({
@@ -114,7 +131,10 @@ describe('ItemController (e2e)', () => {
           stockNumber: itemMock().stockNumber,
           sellStatus: itemMock().itemSellStatus,
         }
-        const { status, body } = await request(app.getHttpServer()).post('/items').send(itemRequest)
+        const { status, body } = await request(app.getHttpServer())
+          .post('/items')
+          .send(itemRequest)
+          .set('Authorization', 'Bearer ' + jwtTokenFixture().accessToken)
 
         expect(status).toEqual(400)
         expect(body).toEqual({
@@ -135,7 +155,10 @@ describe('ItemController (e2e)', () => {
           stockNumber: itemMock().stockNumber,
           sellStatus: itemMock().itemSellStatus,
         }
-        const { status, body } = await request(app.getHttpServer()).post('/items').send(itemRequest)
+        const { status, body } = await request(app.getHttpServer())
+          .post('/items')
+          .send(itemRequest)
+          .set('Authorization', 'Bearer ' + jwtTokenFixture().accessToken)
 
         expect(status).toEqual(400)
         expect(body).toEqual({
@@ -156,7 +179,10 @@ describe('ItemController (e2e)', () => {
           stockNumber: itemMock().stockNumber,
           sellStatus: itemMock().itemSellStatus,
         }
-        const { status, body } = await request(app.getHttpServer()).post('/items').send(itemRequest)
+        const { status, body } = await request(app.getHttpServer())
+          .post('/items')
+          .send(itemRequest)
+          .set('Authorization', 'Bearer ' + jwtTokenFixture().accessToken)
 
         expect(status).toEqual(400)
         expect(body).toEqual({
@@ -177,7 +203,10 @@ describe('ItemController (e2e)', () => {
           stockNumber: blank_stockNumber,
           sellStatus: itemMock().itemSellStatus,
         }
-        const { status, body } = await request(app.getHttpServer()).post('/items').send(itemRequest)
+        const { status, body } = await request(app.getHttpServer())
+          .post('/items')
+          .send(itemRequest)
+          .set('Authorization', 'Bearer ' + jwtTokenFixture().accessToken)
 
         expect(status).toEqual(400)
         expect(body).toEqual({
