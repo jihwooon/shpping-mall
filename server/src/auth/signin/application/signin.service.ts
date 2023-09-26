@@ -27,7 +27,7 @@ export class SigninService {
     }
 
     const { accessToken, accessTokenExpireTime, refreshToken, refreshTokenExpireTime } =
-      this.jwtProvider.createTokenDTO(member.email)
+      this.jwtProvider.createTokenDTO(member.email, member.role)
     await this.tokenIssuer.updateRefreshTokenAndExpirationTime({ refreshToken, refreshTokenExpireTime }, member)
 
     return {

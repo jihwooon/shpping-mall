@@ -40,11 +40,23 @@ describe('Signup class', () => {
       memberRepository.save = jest.fn().mockImplementation(() => userMock().memberId)
     })
 
-    context('회원가입 정보 저장이 되면', () => {
+    context('회원의 정보가 주어지고 회원 가입 성공하면', () => {
       it('저장 된 id 값을 리턴해야 한다', async () => {
         const id = await signupService.signup(userMock().email, userMock().password, userMock().memberName)
 
         expect(id).toEqual(userMock().memberId)
+      })
+    })
+
+    context('회원의 정보가 주어지고 회원 가입 실패하면', () => {
+      beforeEach(async () => {
+        emailChecker.checkDuplicatedEmail = jest.fn().mockResolvedValue(undefined)
+        memberRepository.save = jest.fn().mockImplementation(undefined)
+      })
+      it('undefined을 리턴해야 한다', async () => {
+        const id = await signupService.signup(userMock().email, userMock().password, userMock().memberName)
+
+        expect(id).toEqual(undefined)
       })
     })
   })
