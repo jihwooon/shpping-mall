@@ -7,6 +7,7 @@ import { Connection } from 'mysql2/promise'
 import { itemMock } from '../../fixture/itemFixture'
 import { NotFoundException } from '@nestjs/common'
 import { UpdateItemRequest } from '../dto/update-item.dto'
+import { JwtProvider } from '../../jwt/jwt.provider'
 
 describe('ItemUpdateController class', () => {
   let itemController: ItemUpdateController
@@ -19,6 +20,7 @@ describe('ItemUpdateController class', () => {
       providers: [
         ItemUpdater,
         ItemRepository,
+        JwtProvider,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,
@@ -38,7 +40,7 @@ describe('ItemUpdateController class', () => {
       sellStatus: itemMock().itemSellStatus,
       stockNumber: itemMock().stockNumber,
     }
-    context('it와 변경 된 Item 객체가 주어지면', () => {
+    context('회원 id와 상품 정보가 주어지고 변경에 성공하면', () => {
       beforeEach(() => {
         itemUpdater.updateItem = jest.fn().mockImplementation(() => true)
       })
@@ -49,7 +51,7 @@ describe('ItemUpdateController class', () => {
       })
     })
 
-    context('잘못된 id와 변경 된 Item 객체가 주어지면', () => {
+    context('회원 id와 상품 정보가 주어지고 변경에 실패하면', () => {
       const not_found_id = (itemMock().id = 9999)
       beforeEach(() => {
         itemUpdater.updateItem = jest
