@@ -16,14 +16,13 @@ export class SignoutService {
   ) {}
 
   async logout(accessToken: string): Promise<boolean> {
-    const { expirationTime, subject, payload, audience } = await this.jwtProvider.validateToken(accessToken)
-    const email = audience.toString()
+    const { exp, sub, email } = await this.jwtProvider.validateToken(accessToken)
 
-    if (expirationTime < Date.now()) {
+    if (exp < Date.now()) {
       throw new TokenExpiredException('AccessToken 유효기간이 만료되었습니다')
     }
 
-    if (subject != TokenType.ACCESS) {
+    if (sub != TokenType.ACCESS) {
       throw new NotAccessTokenTypeException('AccessToken Type이 아닙니다')
     }
 
