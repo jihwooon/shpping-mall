@@ -1,5 +1,6 @@
 import { ItemStatusEnum } from '../items/domain/item-status.enum'
 import { Item } from '../items/domain/item.entity'
+import { userMock } from './memberFixture'
 
 export const itemMock = (): Item => {
   return {
@@ -13,6 +14,7 @@ export const itemMock = (): Item => {
     itemSellStatus: ItemStatusEnum.SELL,
     stockNumber: 10,
     price: 130000,
+    member: userMock(),
   }
 }
 
@@ -27,4 +29,19 @@ export const dbItemMock = {
   modified_by: itemMock().modifiedBy,
   stock_number: itemMock().stockNumber,
   create_by: itemMock().createBy,
+  member_id: userMock().memberId,
+}
+
+export const detailItemMock = {
+  id: itemMock().id,
+  createTime: itemMock().createTime,
+  updateTime: itemMock().updateTime,
+  itemDetail: itemMock().itemDetail,
+  itemName: itemMock().itemName,
+  price: itemMock().price,
+  itemSellStatus: itemMock().itemSellStatus,
+  modifiedBy: itemMock().modifiedBy,
+  stockNumber: itemMock().stockNumber,
+  createBy: itemMock().createBy,
+  member: userMock().memberId,
 }
