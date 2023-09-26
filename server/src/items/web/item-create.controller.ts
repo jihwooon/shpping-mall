@@ -3,6 +3,9 @@ import { CreateItemRequest, CreateItemResponse } from '../dto/save-item.dto'
 import { ItemCreater } from '../application/item.creater'
 import { Body, Controller, HttpCode, Post, Req, UseGuards } from '@nestjs/common'
 import { JwtAuthGuard } from '../../config/auth/guards/jwt-auth.guard'
+import { RolesGuard } from '../../config/auth/guards/role-auth.guard'
+import { Roles } from '../../config/auth/role.decorator'
+import { Role } from '../../members/domain/member-role.enum'
 
 @Controller('items')
 export class ItemCreateController {
@@ -10,10 +13,11 @@ export class ItemCreateController {
 
   @Post()
   @HttpCode(201)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   async createItemHandler(@Body() dto: CreateItemRequest, @Req() req: any): Promise<CreateItemResponse> {
     const { itemName, itemDetail, price, stockNumber, sellStatus } = dto
-    const { payload } = req?.user
+    const { email } = req?.user
 
     const id = await this.itemService.registerItem(
       new Item({
@@ -23,7 +27,7 @@ export class ItemCreateController {
         stockNumber: stockNumber,
         sellStatus: sellStatus,
       }),
-      payload,
+      email,
     )
 
     return {

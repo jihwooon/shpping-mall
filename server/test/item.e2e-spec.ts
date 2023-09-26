@@ -1,5 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { INestApplication, InternalServerErrorException, NotFoundException, ValidationPipe } from '@nestjs/common'
+import {
+  INestApplication,
+  InternalServerErrorException,
+  NotFoundException,
+  ValidationPipe,
+  ForbiddenException,
+} from '@nestjs/common'
 import * as request from 'supertest'
 import { ItemCreater } from '../src/items/application/item.creater'
 import { ItemReader } from '../src/items/application/item.reader'
@@ -19,6 +25,7 @@ import { userMock } from '../src/fixture/memberFixture'
 import { JwtAuthGuard } from '../src/config/auth/guards/jwt-auth.guard'
 import { jwtTokenFixture } from '../src/fixture/jwtTokenFixture'
 import { JwtProvider } from '../src/jwt/jwt.provider'
+import { RolesGuard } from '../src/config/auth/guards/role-auth.guard'
 
 describe('ItemController (e2e)', () => {
   let app: INestApplication
@@ -27,6 +34,7 @@ describe('ItemController (e2e)', () => {
   let itemReader: ItemReader
   let itemUpdater: ItemUpdater
   let jwtProvider: JwtProvider
+  let rolesGuard: RolesGuard
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -39,6 +47,7 @@ describe('ItemController (e2e)', () => {
         MemberRepository,
         JwtProvider,
         JwtAuthGuard,
+        RolesGuard,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,
@@ -50,6 +59,7 @@ describe('ItemController (e2e)', () => {
     itemReader = moduleFixture.get<ItemReader>(ItemReader)
     itemUpdater = moduleFixture.get<ItemUpdater>(ItemUpdater)
     jwtProvider = moduleFixture.get<JwtProvider>(JwtProvider)
+    rolesGuard = moduleFixture.get<RolesGuard>(RolesGuard)
 
     app = moduleFixture.createNestApplication()
 
@@ -67,9 +77,10 @@ describe('ItemController (e2e)', () => {
     beforeEach(() => {
       itemCreater.registerItem = jest.fn().mockResolvedValue(itemMock().id)
       jwtProvider.validateToken = jest.fn().mockResolvedValue(userMock().email)
+      rolesGuard.canActivate = jest.fn().mockResolvedValue(true)
     })
 
-    context('Item 객체가 주어지고 저장을 성공하면', () => {
+    context('상품 정보가 주어지고 저장을 성공하면', () => {
       it('상태코드 201를 응답해야 한다', async () => {
         const itemRequest: CreateItemRequest = {
           itemName: itemMock().itemName,
@@ -92,7 +103,7 @@ describe('ItemController (e2e)', () => {
       })
     })
 
-    context('Item 객체가 주어지고 저장을 실패하면', () => {
+    context('상품 정보가 주어지고 저장을 실패하면', () => {
       beforeEach(() => {
         itemCreater.registerItem = jest
           .fn()
@@ -118,6 +129,29 @@ describe('ItemController (e2e)', () => {
           message: '예기치 못한 서버 오류가 발생했습니다',
           statusCode: 500,
         })
+      })
+    })
+
+    context('상품 정보가 주어지고 권한 접근에 실패하면', () => {
+      beforeEach(() => {
+        rolesGuard.canActivate = jest.fn().mockRejectedValue(new ForbiddenException('접근 할 수 없는 권한입니다'))
+      })
+      it('상태코드 403를 응답해야 한다', async () => {
+        const itemRequest: CreateItemRequest = {
+          itemName: itemMock().itemName,
+          itemDetail: itemMock().itemDetail,
+          price: itemMock().price,
+          stockNumber: itemMock().stockNumber,
+          sellStatus: itemMock().itemSellStatus,
+        }
+
+        const { status, body } = await request(app.getHttpServer())
+          .post('/items')
+          .set('Authorization', 'Bearer ' + jwtTokenFixture().accessToken)
+          .send(itemRequest)
+
+        expect(status).toEqual(403)
+        expect(body).toEqual({ error: 'Forbidden', message: '접근 할 수 없는 권한입니다', statusCode: 403 })
       })
     })
 
