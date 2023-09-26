@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import {
+  ForbiddenException,
   INestApplication,
   InternalServerErrorException,
   NotFoundException,
   ValidationPipe,
-  ForbiddenException,
 } from '@nestjs/common'
 import * as request from 'supertest'
 import { ItemCreater } from '../src/items/application/item.creater'
@@ -18,7 +18,6 @@ import { ItemRepository } from '../src/items/domain/item.repository'
 import { MYSQL_CONNECTION } from '../src/config/database/constants'
 import { Connection } from 'mysql2/promise'
 import { CreateItemRequest } from '../src/items/dto/save-item.dto'
-import { ItemResponse } from '../src/items/dto/detail-item.dto'
 import { UpdateItemRequest } from '../src/items/dto/update-item.dto'
 import { MemberRepository } from '../src/members/domain/member.repository'
 import { userMock } from '../src/fixture/memberFixture'
@@ -27,11 +26,10 @@ import { jwtTokenFixture } from '../src/fixture/jwtTokenFixture'
 import { JwtProvider } from '../src/jwt/jwt.provider'
 import { RolesGuard } from '../src/config/auth/guards/role-auth.guard'
 
-describe('ItemController (e2e)', () => {
+describe('ItemCreateController (e2e)', () => {
   let app: INestApplication
   let connection: Connection
   let itemCreater: ItemCreater
-  let itemReader: ItemReader
   let itemUpdater: ItemUpdater
   let jwtProvider: JwtProvider
   let rolesGuard: RolesGuard
@@ -56,7 +54,6 @@ describe('ItemController (e2e)', () => {
     }).compile()
 
     itemCreater = moduleFixture.get<ItemCreater>(ItemCreater)
-    itemReader = moduleFixture.get<ItemReader>(ItemReader)
     itemUpdater = moduleFixture.get<ItemUpdater>(ItemUpdater)
     jwtProvider = moduleFixture.get<JwtProvider>(JwtProvider)
     rolesGuard = moduleFixture.get<RolesGuard>(RolesGuard)
@@ -250,48 +247,6 @@ describe('ItemController (e2e)', () => {
             '재고는 필수 입력 값입니다.',
           ],
           statusCode: 400,
-        })
-      })
-    })
-  })
-
-  describe('GET /items/:id', () => {
-    const itemResponse: ItemResponse = {
-      id: itemMock().id,
-      itemName: itemMock().itemName,
-      itemDetail: itemMock().itemDetail,
-      price: itemMock().price,
-      stockNumber: itemMock().stockNumber,
-      sellStatus: itemMock().itemSellStatus,
-    }
-    context('id 요청을 하면', () => {
-      beforeEach(() => {
-        itemReader.getItem = jest.fn().mockImplementation(() => itemResponse)
-      })
-
-      it('상태코드 200을 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer()).get(`/items/${itemMock().id}`)
-
-        expect(status).toEqual(200)
-        expect(body).toEqual(itemResponse)
-      })
-    })
-
-    context('잘못된 id 요청을 하면', () => {
-      const not_found_id = (itemMock().id = 9999)
-      beforeEach(() => {
-        itemReader.getItem = jest
-          .fn()
-          .mockRejectedValue(new NotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`))
-      })
-      it('상태코드 404를 응답해야 한다', async () => {
-        const { status, body } = await request(app.getHttpServer()).get(`/items/${not_found_id}`)
-
-        expect(status).toEqual(404)
-        expect(body).toEqual({
-          error: 'Not Found',
-          message: '9999에 해당하는 상품을 찾을 수 없습니다.',
-          statusCode: 404,
         })
       })
     })
