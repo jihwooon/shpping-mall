@@ -7,6 +7,7 @@ import { ItemReader } from '../application/item.reader'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
 import { Connection } from 'mysql2/promise'
 import { ItemResponse } from '../dto/detail-item.dto'
+import { JwtProvider } from '../../jwt/jwt.provider'
 
 describe('ItemController class', () => {
   let itemController: ItemDetailController
@@ -19,6 +20,7 @@ describe('ItemController class', () => {
       providers: [
         ItemReader,
         ItemRepository,
+        JwtProvider,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,
