@@ -7,10 +7,12 @@ import { ItemRepository } from './domain/item.repository'
 import { DatabaseModule } from '../config/database/database.module'
 import { ItemUpdateController } from './web/item-update.controller'
 import { ItemUpdater } from './application/item.updater'
+import { MemberRepository } from '../members/domain/member.repository'
+import { JwtProvider } from '../jwt/jwt.provider'
 
 @Module({
   imports: [DatabaseModule],
   controllers: [ItemCreateController, ItemDetailController, ItemUpdateController],
-  providers: [ItemCreater, ItemRepository, ItemReader, ItemUpdater],
+  providers: [ItemCreater, ItemRepository, ItemReader, ItemUpdater, MemberRepository, JwtProvider],
 })
 export class ItemModule {}
