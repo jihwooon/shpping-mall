@@ -8,36 +8,42 @@ import { MYSQL_CONNECTION } from '../../config/database/constants'
 import { Connection } from 'mysql2/promise'
 import { ItemResponse } from '../dto/detail-item.dto'
 import { JwtProvider } from '../../jwt/jwt.provider'
+import { when } from 'jest-when'
 
 describe('ItemController class', () => {
   let itemController: ItemDetailController
-  let itemReader: ItemReader
   let connection: Connection
+
+  const ItemReaderMock = {
+    getItem: jest.fn(),
+  }
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [ItemDetailController],
       providers: [
-        ItemReader,
         ItemRepository,
         JwtProvider,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,
         },
+        {
+          provide: ItemReader,
+          useValue: ItemReaderMock,
+        },
       ],
     }).compile()
 
     itemController = app.get<ItemDetailController>(ItemDetailController)
-    itemReader = app.get<ItemReader>(ItemReader)
   })
 
   describe('getItemHandler method', () => {
-    context('id가 주어지면', () => {
-      beforeEach(() => {
-        itemReader.getItem = jest.fn().mockImplementation(() => itemMock())
-      })
-      it('저장된 객체 정보를 리턴해야 한다', async () => {
+    beforeEach(() => {
+      when(ItemReaderMock.getItem).calledWith(itemMock().id).mockResolvedValue(itemMock())
+    })
+    context('상품 id가 주어지고 요청을 성공하면', () => {
+      it('상품 정보를 리턴해야 한다', async () => {
         const itemInfoResponse: ItemResponse = {
           id: itemMock().id,
           itemName: itemMock().itemName,
@@ -53,14 +59,13 @@ describe('ItemController class', () => {
       })
     })
 
-    context('잘못된 id가 주어지면', () => {
+    context('상품 id가 주어지고 요청을 실패하면', () => {
       const not_found_id = (itemMock().id = 99999)
       beforeEach(() => {
-        itemReader.getItem = jest
-          .fn()
+        when(ItemReaderMock.getItem)
+          .calledWith(not_found_id)
           .mockRejectedValue(new NotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`))
       })
-
       it('NotFoundException을 던져야 한다', async () => {
         expect(itemController.getItemHandler(not_found_id)).rejects.toThrow(
           new NotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`),

@@ -5,34 +5,39 @@ import { itemMock } from '../../fixture/itemFixture'
 import { ItemReader } from './item.reader'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
 import { Connection } from 'mysql2/promise'
+import { when } from 'jest-when'
 
 describe('ItemReader class', () => {
   let itemReader: ItemReader
-  let itemRepository: ItemRepository
   let connect: Connection
+
+  const ItemRepositoryMock = {
+    findById: jest.fn(),
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ItemRepository,
         ItemReader,
         {
           provide: MYSQL_CONNECTION,
           useValue: connect,
         },
+        {
+          provide: ItemRepository,
+          useValue: ItemRepositoryMock,
+        },
       ],
     }).compile()
 
     itemReader = module.get<ItemReader>(ItemReader)
-    itemRepository = module.get<ItemRepository>(ItemRepository)
   })
 
   describe('findById method', () => {
-    context('id가 주어지면', () => {
-      beforeEach(() => {
-        itemRepository.findById = jest.fn().mockImplementation(() => itemMock())
-      })
-
+    beforeEach(() => {
+      when(ItemRepositoryMock.findById).calledWith(itemMock().id).mockReturnValue(itemMock())
+    })
+    context('상품 id가 주어지고 요청을 성공하면', () => {
       it('item 객체를 리턴해야 한다', async () => {
         const item = await itemReader.getItem(itemMock().id)
 
@@ -40,13 +45,10 @@ describe('ItemReader class', () => {
       })
     })
 
-    context('잘못된 id가 주어지면', () => {
-      beforeEach(() => {
-        itemRepository.findById = jest.fn().mockResolvedValue(undefined)
-      })
-
+    context('상품 id가 주어지고 요청을 실패하면', () => {
       it('NotFoundException을 던져야 한다', async () => {
         const not_found_id = (itemMock().id = 99999)
+
         expect(itemReader.getItem(not_found_id)).rejects.toThrow(
           new NotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`, {
             cause: new Error(),
