@@ -85,6 +85,7 @@ describe('ItemRepository class', () => {
         expect(items).toEqual(true)
       })
     })
+
     context('잘못된 id와 수정 할 item 객체가 주어지면', () => {
       beforeEach(async () => {
         ItemRepositoryMock.execute.mockResolvedValue([{ affectedRows: 0 }] as ResultSetHeader[])

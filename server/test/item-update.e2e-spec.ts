@@ -1,5 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { INestApplication, NotFoundException, ValidationPipe, ForbiddenException } from '@nestjs/common'
+import {
+  INestApplication,
+  NotFoundException,
+  ValidationPipe,
+  ForbiddenException,
+  CanActivate,
+  UnauthorizedException,
+} from '@nestjs/common'
 import * as request from 'supertest'
 import { ItemCreater } from '../src/items/application/item.creater'
 import { ItemReader } from '../src/items/application/item.reader'
@@ -18,13 +25,23 @@ import { JwtProvider } from '../src/jwt/jwt.provider'
 import { RolesGuard } from '../src/config/auth/guards/role-auth.guard'
 import { jwtTokenFixture } from '../src/fixture/jwtTokenFixture'
 import { userMock } from '../src/fixture/memberFixture'
+import { when } from 'jest-when'
 
-describe('ItemCreateController (e2e)', () => {
+describe('ItemUpdateController (e2e)', () => {
   let app: INestApplication
   let connection: Connection
-  let itemUpdater: ItemUpdater
-  let jwtProvider: JwtProvider
-  let rolesGuard: RolesGuard
+
+  const RolesGuardMock: CanActivate = {
+    canActivate: jest.fn(() => true),
+  }
+
+  const ItemUpdaterMock = {
+    updateItem: jest.fn(),
+  }
+
+  const JwtProviderMock = {
+    validateToken: jest.fn(),
+  }
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -33,21 +50,25 @@ describe('ItemCreateController (e2e)', () => {
         ItemRepository,
         ItemCreater,
         ItemReader,
-        ItemUpdater,
         MemberRepository,
-        JwtProvider,
         JwtAuthGuard,
-        RolesGuard,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,
         },
+        {
+          provide: JwtProvider,
+          useValue: JwtProviderMock,
+        },
+        {
+          provide: ItemUpdater,
+          useValue: ItemUpdaterMock,
+        },
       ],
-    }).compile()
-
-    jwtProvider = moduleFixture.get<JwtProvider>(JwtProvider)
-    itemUpdater = moduleFixture.get<ItemUpdater>(ItemUpdater)
-    rolesGuard = moduleFixture.get<RolesGuard>(RolesGuard)
+    })
+      .overrideGuard(RolesGuard)
+      .useValue(RolesGuardMock)
+      .compile()
 
     app = moduleFixture.createNestApplication()
 
@@ -63,13 +84,15 @@ describe('ItemCreateController (e2e)', () => {
 
   describe('PATCH /items/:id', () => {
     beforeEach(() => {
-      itemUpdater.updateItem = jest.fn().mockImplementation(() => true)
-      jwtProvider.validateToken = jest.fn().mockResolvedValue(userMock().email)
-      rolesGuard.canActivate = jest.fn().mockResolvedValue(true)
+      when(ItemUpdaterMock.updateItem)
+        .calledWith(itemMock().id, expect.anything())
+        .mockImplementation(() => true)
+      when(RolesGuardMock.canActivate).mockResolvedValue(true)
+      when(JwtProviderMock.validateToken).calledWith(jwtTokenFixture().accessToken).mockResolvedValue(userMock().email)
     })
 
-    context('회원 id와 상품 정보가 주어지고 변경에 성공하면', () => {
-      it('상태코드 200을 응답한다', async () => {
+    context('상품 id와 상품 정보가 주어지고 변경에 성공하면', () => {
+      it('200 OK를 응답해야 한다', async () => {
         const updateItemRequest: UpdateItemRequest = {
           itemName: itemMock().itemName,
           itemDetail: itemMock().itemDetail,
@@ -86,15 +109,15 @@ describe('ItemCreateController (e2e)', () => {
       })
     })
 
-    context('회원 id와 상품 정보가 주어지고 변경에 실패하면', () => {
+    context('상품 id와 상품 정보가 주어지고 변경에 실패하면', () => {
       const not_found_id = (itemMock().id = 9999)
       beforeEach(() => {
-        itemUpdater.updateItem = jest
-          .fn()
-          .mockRejectedValue(new NotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`))
+        when(ItemUpdaterMock.updateItem).mockImplementation(() => {
+          throw new NotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`)
+        })
       })
 
-      it('상태코드 404을 응답해야 한다', async () => {
+      it('404 ItemNotFound를 응답해야 한다', async () => {
         const updateItemRequest: UpdateItemRequest = {
           itemName: itemMock().itemName,
           itemDetail: itemMock().itemDetail,
@@ -102,6 +125,7 @@ describe('ItemCreateController (e2e)', () => {
           price: itemMock().price,
           stockNumber: itemMock().stockNumber,
         }
+
         const { status, body } = await request(app.getHttpServer())
           .patch(`/items/${not_found_id}`)
           .send(updateItemRequest)
@@ -110,18 +134,20 @@ describe('ItemCreateController (e2e)', () => {
         expect(status).toEqual(404)
         expect(body).toEqual({
           error: 'Not Found',
-          message: '9999에 해당하는 상품을 찾을 수 없습니다.',
+          message: `${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`,
           statusCode: 404,
         })
       })
     })
 
-    context('회원 id와 상품 정보가 주어지고 권한 접근을 실패하면', () => {
+    context('상품 id와 상품 정보가 주어지고 권한 접근을 실패하면', () => {
       beforeEach(() => {
-        rolesGuard.canActivate = jest.fn().mockRejectedValue(new ForbiddenException('접근 할 수 없는 권한입니다'))
+        when(RolesGuardMock.canActivate).mockImplementation(() => {
+          throw new ForbiddenException('접근 할 수 없는 권한입니다')
+        })
       })
 
-      it('상태코드 403을 응답해야 한다', async () => {
+      it('403 Forbidden를 응답해야 한다', async () => {
         const updateItemRequest: UpdateItemRequest = {
           itemName: itemMock().itemName,
           itemDetail: itemMock().itemDetail,
@@ -139,8 +165,50 @@ describe('ItemCreateController (e2e)', () => {
       })
     })
 
+    context('상품 id와 상품 정보가 주어지고 토큰을 찾을 수 없으면', () => {
+      it('403 Forbidden를 응답해야 한다', async () => {
+        const updateItemRequest: UpdateItemRequest = {
+          itemName: itemMock().itemName,
+          itemDetail: itemMock().itemDetail,
+          sellStatus: itemMock().itemSellStatus,
+          price: itemMock().price,
+          stockNumber: itemMock().stockNumber,
+        }
+        const { status, body } = await request(app.getHttpServer())
+          .patch(`/items/${itemMock().id}`)
+          .send(updateItemRequest)
+
+        expect(status).toEqual(403)
+        expect(body).toEqual({ error: 'Forbidden', message: '요청에서 인증 토큰을 찾을 수 없습니다', statusCode: 403 })
+      })
+    })
+
+    context('상품 id와 상품 정보가 주어지고 토큰이 인증되지 않으면', () => {
+      when(JwtProviderMock.validateToken)
+        .calledWith(jwtTokenFixture().invalidToken)
+        .mockImplementation(() => {
+          throw new UnauthorizedException('인증 할 수 없는 token 입니다')
+        })
+      it('401 Unauthorized를 응답해야 한다', async () => {
+        const updateItemRequest: UpdateItemRequest = {
+          itemName: itemMock().itemName,
+          itemDetail: itemMock().itemDetail,
+          sellStatus: itemMock().itemSellStatus,
+          price: itemMock().price,
+          stockNumber: itemMock().stockNumber,
+        }
+        const { status, body } = await request(app.getHttpServer())
+          .patch(`/items/${itemMock().id}`)
+          .send(updateItemRequest)
+          .set('Authorization', 'Bearer ' + jwtTokenFixture().invalidToken)
+
+        expect(status).toEqual(401)
+        expect(body).toEqual({ error: 'Unauthorized', message: '인증 할 수 없는 token 입니다', statusCode: 401 })
+      })
+    })
+
     context('상풍명을 누락하면', () => {
-      it('상태코드 400를 응답해야 한다', async () => {
+      it('400 Bad Request를 응답해야 한다', async () => {
         const not_found_itemName = (itemMock().itemName = '')
         const updateItemRequest: UpdateItemRequest = {
           itemName: not_found_itemName,
@@ -164,7 +232,7 @@ describe('ItemCreateController (e2e)', () => {
     })
 
     context('상품 상세를 누락하면', () => {
-      it('상태코드 400를 응답해야 한다', async () => {
+      it('400 Bad Request를 응답해야 한다', async () => {
         const not_found_itemDetail = (itemMock().itemDetail = '')
         const updateItemRequest: UpdateItemRequest = {
           itemName: itemMock().itemName,
@@ -188,7 +256,7 @@ describe('ItemCreateController (e2e)', () => {
     })
 
     context('가격를 누락하면', () => {
-      it('상태코드 400를 응답해야 한다', async () => {
+      it('400 Bad Request를 응답해야 한다', async () => {
         const not_found_price = (itemMock().price = undefined)
         const updateItemRequest: UpdateItemRequest = {
           itemName: itemMock().itemName,
@@ -213,7 +281,7 @@ describe('ItemCreateController (e2e)', () => {
     })
 
     context('재고를 누락하면', () => {
-      it('상태코드 400를 응답해야 한다', async () => {
+      it('400 Bad Request를 응답해야 한다', async () => {
         const not_found_stockName = (itemMock().stockNumber = undefined)
         const updateItemRequest: UpdateItemRequest = {
           itemName: itemMock().itemName,
