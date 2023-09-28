@@ -1,11 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import {
-  CanActivate,
-  ForbiddenException,
-  INestApplication,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common'
+import { CanActivate, ForbiddenException, INestApplication, UnauthorizedException } from '@nestjs/common'
 import * as request from 'supertest'
 import { ItemCreater } from '../src/items/application/item.creater'
 import { ItemReader } from '../src/items/application/item.reader'
@@ -24,6 +18,7 @@ import { jwtTokenFixture } from '../src/fixture/jwtTokenFixture'
 import { JwtProvider } from '../src/jwt/jwt.provider'
 import { RolesGuard } from '../src/config/auth/guards/role-auth.guard'
 import { when } from 'jest-when'
+import { ItemNotFoundException } from '../src/items/error/item-not-found.exception'
 
 describe('ItemDetailController (e2e)', () => {
   let app: INestApplication
@@ -75,13 +70,13 @@ describe('ItemDetailController (e2e)', () => {
 
   describe('GET /items/:id', () => {
     beforeEach(() => {
-      when(ItemReaderMock.getItem).mockResolvedValue(itemMock())
+      when(ItemReaderMock.getItem).calledWith(itemMock().id).mockResolvedValue(itemMock())
       when(JwtProviderMock.validateToken).mockResolvedValue(userMock().email)
     })
     context('상품 id가 주어지고 요청을 성공하면', () => {
       it('200 OK를 응답해야 한다', async () => {
         const itemResponse = {
-          id: itemMock().id + '',
+          id: itemMock().id,
           itemName: itemMock().itemName,
           itemDetail: itemMock().itemDetail,
           price: itemMock().price,
@@ -100,20 +95,22 @@ describe('ItemDetailController (e2e)', () => {
     context('상품 id가 주어지고 요청을 실패하면', () => {
       const not_found_id = (itemMock().id = 9999)
       beforeEach(() => {
-        when(ItemReaderMock.getItem).mockImplementation(() => {
-          throw new NotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`)
-        })
+        when(ItemReaderMock.getItem)
+          .calledWith(not_found_id)
+          .mockImplementation(() => {
+            throw new ItemNotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`)
+          })
       })
 
-      it('404 Item Not Found를 응답해야 한다', async () => {
+      it('404 Not Found를 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer())
           .get(`/items/${not_found_id}`)
           .set('Authorization', 'Bearer ' + jwtTokenFixture().accessToken)
 
         expect(status).toEqual(404)
         expect(body).toEqual({
-          error: 'Not Found',
-          message: '9999에 해당하는 상품을 찾을 수 없습니다.',
+          error: 'ITEM_NOT_FOUND',
+          message: `${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`,
           statusCode: 404,
         })
       })

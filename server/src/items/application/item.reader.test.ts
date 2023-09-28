@@ -1,4 +1,3 @@
-import { NotFoundException } from '@nestjs/common'
 import { ItemRepository } from '../domain/item.repository'
 import { Test, TestingModule } from '@nestjs/testing'
 import { itemMock } from '../../fixture/itemFixture'
@@ -6,6 +5,7 @@ import { ItemReader } from './item.reader'
 import { MYSQL_CONNECTION } from '../../config/database/constants'
 import { Connection } from 'mysql2/promise'
 import { when } from 'jest-when'
+import { ItemNotFoundException } from '../error/item-not-found.exception'
 
 describe('ItemReader class', () => {
   let itemReader: ItemReader
@@ -50,10 +50,7 @@ describe('ItemReader class', () => {
         const not_found_id = (itemMock().id = 99999)
 
         expect(itemReader.getItem(not_found_id)).rejects.toThrow(
-          new NotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`, {
-            cause: new Error(),
-            description: 'NOT_FOUND',
-          }),
+          new ItemNotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`),
         )
       })
     })
