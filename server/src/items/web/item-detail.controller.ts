@@ -13,16 +13,18 @@ export class ItemDetailController {
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  async getItemHandler(@Param('id') id: number): Promise<ItemResponse> {
-    const { itemName, itemDetail, price, stockNumber, itemSellStatus } = await this.itemService.getItem(id)
+  async getItemHandler(@Param('id') itemId: string): Promise<ItemResponse> {
+    const { id, itemName, itemDetail, price, stockNumber, itemSellStatus } = await this.itemService.getItem(
+      parseInt(itemId),
+    )
 
-    return new ItemResponse({
+    return {
       id: id,
       itemName: itemName,
       itemDetail: itemDetail,
       price: price,
       stockNumber: stockNumber,
       sellStatus: itemSellStatus,
-    })
+    }
   }
 }

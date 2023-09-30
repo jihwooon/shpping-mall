@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { INestApplication, NotFoundException, ForbiddenException } from '@nestjs/common'
+import { CanActivate, ForbiddenException, INestApplication, UnauthorizedException } from '@nestjs/common'
 import * as request from 'supertest'
 import { ItemCreater } from '../src/items/application/item.creater'
 import { ItemReader } from '../src/items/application/item.reader'
@@ -17,36 +17,51 @@ import { JwtAuthGuard } from '../src/config/auth/guards/jwt-auth.guard'
 import { jwtTokenFixture } from '../src/fixture/jwtTokenFixture'
 import { JwtProvider } from '../src/jwt/jwt.provider'
 import { RolesGuard } from '../src/config/auth/guards/role-auth.guard'
+import { when } from 'jest-when'
+import { ItemNotFoundException } from '../src/items/error/item-not-found.exception'
 
 describe('ItemDetailController (e2e)', () => {
   let app: INestApplication
   let connection: Connection
-  let itemReader: ItemReader
-  let jwtProvider: JwtProvider
-  let rolesGuard: RolesGuard
+
+  const RolesGuardMock: CanActivate = {
+    canActivate: jest.fn(() => true),
+  }
+
+  const ItemReaderMock = {
+    getItem: jest.fn(),
+  }
+
+  const JwtProviderMock = {
+    validateToken: jest.fn(),
+  }
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [ItemCreateController, ItemDetailController, ItemUpdateController],
       providers: [
         ItemRepository,
-        ItemReader,
         ItemCreater,
         ItemUpdater,
         MemberRepository,
-        JwtProvider,
         JwtAuthGuard,
-        RolesGuard,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,
         },
+        {
+          provide: ItemReader,
+          useValue: ItemReaderMock,
+        },
+        {
+          provide: JwtProvider,
+          useValue: JwtProviderMock,
+        },
       ],
-    }).compile()
-
-    itemReader = moduleFixture.get<ItemReader>(ItemReader)
-    rolesGuard = moduleFixture.get<RolesGuard>(RolesGuard)
-    jwtProvider = moduleFixture.get<JwtProvider>(JwtProvider)
+    })
+      .overrideGuard(RolesGuard)
+      .useValue(RolesGuardMock)
+      .compile()
 
     app = moduleFixture.createNestApplication()
 
@@ -55,14 +70,13 @@ describe('ItemDetailController (e2e)', () => {
 
   describe('GET /items/:id', () => {
     beforeEach(() => {
-      itemReader.getItem = jest.fn().mockImplementation(() => itemMock())
-      jwtProvider.validateToken = jest.fn().mockResolvedValue(userMock().email)
-      rolesGuard.canActivate = jest.fn().mockResolvedValue(true)
+      when(ItemReaderMock.getItem).calledWith(itemMock().id).mockResolvedValue(itemMock())
+      when(JwtProviderMock.validateToken).mockResolvedValue(userMock().email)
     })
-    context('회원 id가 주어지고 요청을 성공하면', () => {
-      it('상태코드 200을 응답해야 한다', async () => {
+    context('상품 id가 주어지고 요청을 성공하면', () => {
+      it('200 OK를 응답해야 한다', async () => {
         const itemResponse = {
-          id: itemMock().id + '',
+          id: itemMock().id,
           itemName: itemMock().itemName,
           itemDetail: itemMock().itemDetail,
           price: itemMock().price,
@@ -78,38 +92,68 @@ describe('ItemDetailController (e2e)', () => {
       })
     })
 
-    context('회원 id가 주어지고 요청을 실패하면', () => {
+    context('상품 id가 주어지고 요청을 실패하면', () => {
       const not_found_id = (itemMock().id = 9999)
       beforeEach(() => {
-        itemReader.getItem = jest
-          .fn()
-          .mockRejectedValue(new NotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`))
+        when(ItemReaderMock.getItem)
+          .calledWith(not_found_id)
+          .mockImplementation(() => {
+            throw new ItemNotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`)
+          })
       })
-      it('상태코드 404를 응답해야 한다', async () => {
+
+      it('404 Not Found를 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer())
           .get(`/items/${not_found_id}`)
           .set('Authorization', 'Bearer ' + jwtTokenFixture().accessToken)
 
         expect(status).toEqual(404)
         expect(body).toEqual({
-          error: 'Not Found',
-          message: '9999에 해당하는 상품을 찾을 수 없습니다.',
+          error: 'ITEM_NOT_FOUND',
+          message: `${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`,
           statusCode: 404,
         })
       })
     })
 
-    context('회원 id가 주어지고 권한 접근을 실패하면', () => {
+    context('상품 id가 주어지고 권한 접근을 실패하면', () => {
       beforeEach(() => {
-        rolesGuard.canActivate = jest.fn().mockRejectedValue(new ForbiddenException('접근 할 수 없는 권한입니다'))
+        when(RolesGuardMock.canActivate).mockImplementation(() => {
+          throw new ForbiddenException('접근 할 수 없는 권한입니다')
+        })
       })
-      it('상태코드 403을 응답해야 한다', async () => {
+      it('403 Forbidden을 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer())
           .get(`/items/${itemMock().id}`)
           .set('Authorization', 'Bearer ' + jwtTokenFixture().accessToken)
 
         expect(status).toEqual(403)
         expect(body).toEqual({ error: 'Forbidden', message: '접근 할 수 없는 권한입니다', statusCode: 403 })
+      })
+    })
+
+    context('상품 id가 주어지고 토큰을 찾을 수 없으면', () => {
+      when(JwtProviderMock.validateToken)
+        .calledWith(jwtTokenFixture().invalidToken)
+        .mockImplementation(() => {
+          throw new UnauthorizedException('인증 할 수 없는 token 입니다')
+        })
+      it('403 Forbidden을 응답해야 한다', async () => {
+        const { status, body } = await request(app.getHttpServer()).get(`/items/${itemMock().id}`)
+
+        expect(status).toEqual(403)
+        expect(body).toEqual({ error: 'Forbidden', message: '요청에서 인증 토큰을 찾을 수 없습니다', statusCode: 403 })
+      })
+    })
+
+    context('상품 id가 주어지고 토큰이 인증되지 않으면', () => {
+      it('401 Unauthorized를 응답해야 한다', async () => {
+        const { status, body } = await request(app.getHttpServer())
+          .get(`/items/${itemMock().id}`)
+          .set('Authorization', 'Bearer ' + jwtTokenFixture().invalidToken)
+
+        expect(status).toEqual(401)
+        expect(body).toEqual({ error: 'Unauthorized', message: '인증 할 수 없는 token 입니다', statusCode: 401 })
       })
     })
   })

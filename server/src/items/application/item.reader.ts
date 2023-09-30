@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { Item } from '../domain/item.entity'
 import { ItemRepository } from '../domain/item.repository'
+import { ItemNotFoundException } from '../error/item-not-found.exception'
 
 @Injectable()
 export class ItemReader {
@@ -10,10 +11,7 @@ export class ItemReader {
     const item = await this.itemRepository.findById(id)
 
     if (!item) {
-      throw new NotFoundException(`${id}에 해당하는 상품을 찾을 수 없습니다.`, {
-        cause: new Error(),
-        description: 'Not Found',
-      })
+      throw new ItemNotFoundException(`${id}에 해당하는 상품을 찾을 수 없습니다.`)
     }
 
     return item

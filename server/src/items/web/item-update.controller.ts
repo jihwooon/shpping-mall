@@ -14,11 +14,11 @@ export class ItemUpdateController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  async updateItemHandler(@Param('id') id: number, @Body() request: UpdateItemRequest): Promise<boolean> {
+  async updateItemHandler(@Param('id') id: string, @Body() request: UpdateItemRequest): Promise<boolean> {
     const { itemName, itemDetail, price, stockNumber, sellStatus } = request
 
     return await this.itemService.updateItem(
-      id,
+      parseInt(id),
       new Item({
         itemName: itemName,
         itemDetail: itemDetail,

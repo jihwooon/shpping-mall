@@ -11,5 +11,7 @@ export const jwtTokenFixture = () => {
     tokenType: TokenType.ACCESS,
     now: new Date('2023-08-19T04:48:42.487Z'),
     tokenExpired: new Date('2023-12-01T04:48:42.487Z'),
+    invalidToken:
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjk0MzI3MTcwLCJleHAiOjE2OTQ0MTM1NzB9.6UXhpwHPB9W1ZtFZJQfiMANMinEt3WUULdwLSJKQ_2',
   }
 }
