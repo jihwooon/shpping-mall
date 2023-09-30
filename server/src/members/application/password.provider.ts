@@ -1,7 +1,5 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
-import { BadRequestException } from '@nestjs/common'
-import { Member } from '../domain/member.entity'
 
 @Injectable()
 export class PasswordProvider {
@@ -15,7 +13,7 @@ export class PasswordProvider {
     return hashedPassword
   }
 
-  async comparePassword(password: string, member: Member): Promise<boolean> {
-    return bcrypt.compare(password, member.password)
+  async comparePassword(rawPassword: string, password: string): Promise<boolean> {
+    return bcrypt.compare(rawPassword, password)
   }
 }
