@@ -52,7 +52,7 @@ describe('ItemUpdateController class', () => {
     })
     context('상품 정보와 상품 id가 주어지고 변경에 성공하면', () => {
       it('true를 리턴해야 한다', async () => {
-        const updatedItem = await itemController.updateItemHandler(itemMock().id, updateItem)
+        const updatedItem = await itemController.updateItemHandler(String(itemMock().id), updateItem)
 
         expect(updatedItem).toEqual(true)
       })
@@ -61,7 +61,7 @@ describe('ItemUpdateController class', () => {
     context('상품 정보가 주어지고 상품 id가 올바르지 않으면', () => {
       it('undefined를 리턴해야 한다', async () => {
         const not_found_id = (itemMock().id = 9999)
-        const updatedItem = await itemController.updateItemHandler(not_found_id, updateItem)
+        const updatedItem = await itemController.updateItemHandler(String(not_found_id), updateItem)
 
         expect(updatedItem).toEqual(undefined)
       })

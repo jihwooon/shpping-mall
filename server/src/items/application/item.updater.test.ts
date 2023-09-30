@@ -1,5 +1,4 @@
 import { Connection } from 'mysql2/promise'
-import { NotFoundException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { ItemUpdater } from './item.updater'
 import { ItemRepository } from '../domain/item.repository'
@@ -9,6 +8,8 @@ import { when } from 'jest-when'
 import { Item } from '../domain/item.entity'
 import { ItemStatusEnum } from '../domain/item-status.enum'
 import { userMock } from '../../fixture/memberFixture'
+import { ItemNotFoundException } from '../error/item-not-found.exception'
+import { ItemUpdatedFailException } from '../error/item-updated-fail.exception'
 
 describe('ItemUpdater class', () => {
   let itemUpdater: ItemUpdater
@@ -16,6 +17,7 @@ describe('ItemUpdater class', () => {
 
   const ItemRepositoryMock = {
     update: jest.fn(),
+    findById: jest.fn(),
   }
 
   const updatedItem = new Item({
@@ -52,6 +54,7 @@ describe('ItemUpdater class', () => {
 
   describe('updateItem method', () => {
     beforeEach(() => {
+      when(ItemRepositoryMock.findById).calledWith(itemMock().id).mockReturnValue(itemMock())
       when(ItemRepositoryMock.update)
         .calledWith(itemMock().id, updatedItem)
         .mockImplementation(() => true)
@@ -70,21 +73,15 @@ describe('ItemUpdater class', () => {
 
       it('NotFoundException을 던져야 한다', async () => {
         expect(itemUpdater.updateItem(not_found_id, updatedItem)).rejects.toThrow(
-          new NotFoundException(`${not_found_id}에 해당하는 상품 변경을 실패했습니다.`, {
-            cause: new Error(),
-            description: 'NOT_FOUND',
-          }),
+          new ItemNotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`),
         )
       })
     })
 
-    context('상품 id이 주어지고 상품이 변경 되지 않으면', () => {
-      it('NotFoundException을 던져야 한다', async () => {
+    context('상품 id이 주어지고 상품이 변경을 실패하면', () => {
+      it('ItemUpdatedFailException을 던져야 한다', async () => {
         expect(itemUpdater.updateItem(itemMock().id, itemMock())).rejects.toThrow(
-          new NotFoundException(`${itemMock().id}에 해당하는 상품 변경을 실패했습니다.`, {
-            cause: new Error(),
-            description: 'NOT_FOUND',
-          }),
+          new ItemUpdatedFailException(`해당 상품 변경에 실패했습니다`),
         )
       })
     })
