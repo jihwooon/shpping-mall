@@ -15,13 +15,13 @@ export class SigninService {
     private readonly tokenIssuer: TokenIssuer,
   ) {}
 
-  async login(email: string, password: string): Promise<Authentication> {
+  async login(email: string, rawPassword: string): Promise<Authentication> {
     const member = await this.memberRepository.findByEmail(email)
     if (!member) {
       throw new MemberNotFoundException('회원 정보를 찾을 수 없습니다')
     }
 
-    const isPasswordMatch = await this.passwordProvider.comparePassword(password, member)
+    const isPasswordMatch = await this.passwordProvider.comparePassword(rawPassword, member.password)
     if (!isPasswordMatch) {
       throw new BadRequestException('패스워드가 일치 하지 않습니다')
     }
