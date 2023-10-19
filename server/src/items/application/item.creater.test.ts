@@ -9,6 +9,9 @@ import { userMock } from '../../fixture/memberFixture'
 import { MemberRepository } from '../../members/domain/member.repository'
 import { MemberNotFoundException } from '../../members/application/error/member-not-found.exception'
 import { when } from 'jest-when'
+import { filesMock } from '../../fixture/itemImageFixture'
+import { ItemImageService } from '../../item-images/application/item-image.service'
+import { ItemImageRepository } from '../../item-images/domain/item-image.repository'
 
 describe('ItemCreater class', () => {
   let itemCreater: ItemCreater
@@ -16,16 +19,22 @@ describe('ItemCreater class', () => {
 
   const ItemRepositoryMock = {
     save: jest.fn(),
+    findById: jest.fn(),
   }
 
   const MemberRepositoryMock = {
     findByEmail: jest.fn(),
   }
 
+  const ItemImageRepositoryMock = {
+    save: jest.fn(),
+  }
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ItemCreater,
+        ItemImageService,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,
@@ -38,6 +47,10 @@ describe('ItemCreater class', () => {
           provide: MemberRepository,
           useValue: MemberRepositoryMock,
         },
+        {
+          provide: ItemImageRepository,
+          useValue: ItemImageRepositoryMock,
+        },
       ],
     }).compile()
 
@@ -48,11 +61,12 @@ describe('ItemCreater class', () => {
     beforeEach(() => {
       when(ItemRepositoryMock.save).calledWith(expect.anything()).mockResolvedValue(itemMock().id)
       when(MemberRepositoryMock.findByEmail).calledWith(userMock().email).mockResolvedValue(itemMock())
+      when(ItemRepositoryMock.findById).calledWith(itemMock().id).mockResolvedValue(itemMock())
     })
 
     context('상품 정보가 주어지고 저장을 성공하면', () => {
       it('저장된 id 값을 리턴해야 한다', async () => {
-        const id = await itemCreater.registerItem(itemMock(), userMock().email)
+        const id = await itemCreater.registerItem(itemMock(), userMock().email, filesMock())
 
         expect(id).toEqual(itemMock().id)
       })
@@ -65,7 +79,7 @@ describe('ItemCreater class', () => {
         })
       })
       it('InternalServerErrorException를 던져야 한다', async () => {
-        expect(itemCreater.registerItem(itemMock(), userMock().email)).rejects.toThrow(
+        expect(itemCreater.registerItem(itemMock(), userMock().email, filesMock())).rejects.toThrow(
           new InternalServerErrorException('예기치 못한 서버 오류가 발생했습니다'),
         )
       })
@@ -75,7 +89,7 @@ describe('ItemCreater class', () => {
       it('MemberNotFoundException를 던져야 한다', async () => {
         const not_found_email = (userMock().email = 'defg@email.com')
 
-        expect(itemCreater.registerItem(itemMock(), not_found_email)).rejects.toThrow(
+        expect(itemCreater.registerItem(itemMock(), not_found_email, filesMock())).rejects.toThrow(
           new MemberNotFoundException('회원 정보를 찾을 수 없습니다'),
         )
       })
