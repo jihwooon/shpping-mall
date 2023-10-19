@@ -27,6 +27,8 @@ import { userMock } from '../src/fixture/memberFixture'
 import { when } from 'jest-when'
 import { ItemNotFoundException } from '../src/items/error/item-not-found.exception'
 import { ItemUpdatedFailException } from '../src/items/error/item-updated-fail.exception'
+import { ItemImageService } from '../src/item-images/application/item-image.service'
+import { ItemImageRepository } from '../src/item-images/domain/item-image.repository'
 
 describe('ItemUpdateController (e2e)', () => {
   let app: INestApplication
@@ -53,6 +55,8 @@ describe('ItemUpdateController (e2e)', () => {
         ItemReader,
         MemberRepository,
         JwtAuthGuard,
+        ItemImageService,
+        ItemImageRepository,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,
