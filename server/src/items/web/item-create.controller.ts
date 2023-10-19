@@ -1,7 +1,8 @@
 import { Item } from '../domain/item.entity'
 import { CreateItemRequest, CreateItemResponse } from '../dto/save-item.dto'
 import { ItemCreater } from '../application/item.creater'
-import { Body, Controller, HttpCode, Post, Req, UseGuards } from '@nestjs/common'
+import { Body, Controller, HttpCode, Post, Req, UseGuards, UseInterceptors, UploadedFiles } from '@nestjs/common'
+import { FilesInterceptor } from '@nestjs/platform-express'
 import { JwtAuthGuard } from '../../config/auth/guards/jwt-auth.guard'
 import { RolesGuard } from '../../config/auth/guards/role-auth.guard'
 import { Roles } from '../../config/auth/role.decorator'
@@ -15,7 +16,12 @@ export class ItemCreateController {
   @HttpCode(201)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  async createItemHandler(@Body() dto: CreateItemRequest, @Req() req: any): Promise<CreateItemResponse> {
+  @UseInterceptors(FilesInterceptor('files', 5))
+  async createItemHandler(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() dto: CreateItemRequest,
+    @Req() req: any,
+  ): Promise<CreateItemResponse> {
     const { itemName, itemDetail, price, stockNumber, sellStatus } = dto
     const { email } = req?.user
 
@@ -28,6 +34,7 @@ export class ItemCreateController {
         sellStatus: sellStatus,
       }),
       email,
+      files,
     )
 
     return {

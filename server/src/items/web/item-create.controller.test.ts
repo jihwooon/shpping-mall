@@ -25,6 +25,21 @@ describe('ItemController class', () => {
     registerItem: jest.fn(),
   }
 
+  const fileMock: Express.Multer.File[] = [
+    {
+      originalname: 'file.csv',
+      mimetype: 'text/csv',
+      path: 'something',
+      buffer: Buffer.from('one,two,three'),
+      fieldname: '',
+      encoding: '',
+      size: 0,
+      stream: undefined,
+      destination: '',
+      filename: '',
+    },
+  ]
+
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [ItemCreateController],
@@ -58,7 +73,7 @@ describe('ItemController class', () => {
     })
     context('상품 정보가 주어지고 저장을 성공하면', () => {
       it('id를 리턴해야 한다', async () => {
-        const id = await itemController.createItemHandler(itemRequest, requestMock)
+        const id = await itemController.createItemHandler(fileMock, itemRequest, requestMock)
 
         expect(id).toEqual({
           id: itemMock().id,
@@ -73,7 +88,7 @@ describe('ItemController class', () => {
         })
       })
       it('InternalServerErrorException를 던져야 한다', async () => {
-        expect(itemController.createItemHandler(itemRequest, requestMock)).rejects.toThrow(
+        expect(itemController.createItemHandler(fileMock, itemRequest, requestMock)).rejects.toThrow(
           new InternalServerErrorException('예기치 못한 서버 오류가 발생했습니다'),
         )
       })
