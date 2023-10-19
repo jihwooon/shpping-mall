@@ -11,11 +11,9 @@ export class CreateItemRequest {
   itemDetail: string
 
   @IsNotEmpty({ message: '가격은 필수 입력 값입니다.' })
-  @IsNumber()
   price: number
 
   @IsNotEmpty({ message: '재고는 필수 입력 값입니다.' })
-  @IsNumber()
   stockNumber: number
 
   @IsEnum({ sellStatus: ItemStatusEnum.SELL })
