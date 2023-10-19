@@ -15,3 +15,43 @@ export const itemImageMock = (): ItemImage => {
     item: itemMock(),
   }
 }
+
+export const filesMock = (): Express.Multer.File[] => [
+  {
+    originalname: 'file1.jpg',
+    mimetype: 'text/jpg',
+    path: 'something',
+    buffer: Buffer.from('one,two,three'),
+    fieldname: '',
+    encoding: '',
+    size: 0,
+    stream: undefined,
+    destination: '',
+    filename: '',
+  },
+  {
+    originalname: 'file2.jpg',
+    mimetype: 'text/jpg',
+    path: 'something',
+    buffer: Buffer.from('one,two,three'),
+    fieldname: '',
+    encoding: '',
+    size: 0,
+    stream: undefined,
+    destination: '',
+    filename: '',
+  },
+]
+
+export const fileMock = (): Express.Multer.File => ({
+  originalname: 'file1.jpg',
+  mimetype: 'text/jpg',
+  path: 'something',
+  buffer: Buffer.from('one,two,three'),
+  fieldname: '',
+  encoding: '',
+  size: 0,
+  stream: undefined,
+  destination: '',
+  filename: '',
+})
