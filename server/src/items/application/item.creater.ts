@@ -3,14 +3,14 @@ import { Item } from '../domain/item.entity'
 import { ItemRepository } from '../domain/item.repository'
 import { MemberRepository } from '../../members/domain/member.repository'
 import { MemberNotFoundException } from '../../members/application/error/member-not-found.exception'
-import { ItemImageService } from '../../item-images/application/item-image.service'
+import { ItemImageCreater } from '../../item-images/application/item-image.creater'
 
 @Injectable()
 export class ItemCreater {
   constructor(
     private readonly itemRepository: ItemRepository,
     private readonly memberRepository: MemberRepository,
-    private readonly itemImageService: ItemImageService,
+    private readonly itemImageService: ItemImageCreater,
   ) {}
 
   async registerItem(items: Item, email: string, files: Express.Multer.File[]): Promise<number> {

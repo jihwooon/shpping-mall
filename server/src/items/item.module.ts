@@ -9,7 +9,7 @@ import { ItemUpdateController } from './web/item-update.controller'
 import { ItemUpdater } from './application/item.updater'
 import { MemberRepository } from '../members/domain/member.repository'
 import { JwtProvider } from '../jwt/jwt.provider'
-import { ItemImageService } from '../item-images/application/item-image.service'
+import { ItemImageCreater } from '../item-images/application/item-image.creater'
 import { ItemImageRepository } from '../item-images/domain/item-image.repository'
 import { MulterModule } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
@@ -42,7 +42,7 @@ import { v4 as uuid } from 'uuid'
     ItemUpdater,
     MemberRepository,
     JwtProvider,
-    ItemImageService,
+    ItemImageCreater,
     ItemImageRepository,
   ],
 })

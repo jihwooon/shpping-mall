@@ -5,7 +5,7 @@ import { ItemRepository } from '../../items/domain/item.repository'
 import { ItemNotFoundException } from '../../items/error/item-not-found.exception'
 
 @Injectable()
-export class ItemImageService {
+export class ItemImageCreater {
   constructor(
     private readonly itemImageRepository: ItemImageRepository,
     private readonly itemRepository: ItemRepository,

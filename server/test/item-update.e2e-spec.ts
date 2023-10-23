@@ -27,7 +27,7 @@ import { userMock } from '../src/fixture/memberFixture'
 import { when } from 'jest-when'
 import { ItemNotFoundException } from '../src/items/error/item-not-found.exception'
 import { ItemUpdatedFailException } from '../src/items/error/item-updated-fail.exception'
-import { ItemImageService } from '../src/item-images/application/item-image.service'
+import { ItemImageCreater } from '../src/item-images/application/item-image.creater'
 import { ItemImageRepository } from '../src/item-images/domain/item-image.repository'
 
 describe('ItemUpdateController (e2e)', () => {
@@ -55,7 +55,7 @@ describe('ItemUpdateController (e2e)', () => {
         ItemReader,
         MemberRepository,
         JwtAuthGuard,
-        ItemImageService,
+        ItemImageCreater,
         ItemImageRepository,
         {
           provide: MYSQL_CONNECTION,

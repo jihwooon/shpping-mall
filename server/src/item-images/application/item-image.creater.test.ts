@@ -4,12 +4,12 @@ import { MYSQL_CONNECTION } from '../../config/database/constants'
 import { Connection } from 'mysql2/promise'
 import { when } from 'jest-when'
 import { fileMock, filesMock } from '../../fixture/itemImageFixture'
-import { ItemImageService } from '../../item-images/application/item-image.service'
+import { ItemImageCreater } from './item-image.creater'
 import { ItemImageRepository } from '../../item-images/domain/item-image.repository'
 import { ItemRepository } from '../../items/domain/item.repository'
 
-describe('ItemImageService class', () => {
-  let itemImageService: ItemImageService
+describe('ItemImageCreater class', () => {
+  let itemImageService: ItemImageCreater
   let connection: Connection
 
   const ItemRepositoryMock = {
@@ -24,7 +24,7 @@ describe('ItemImageService class', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ItemImageService,
+        ItemImageCreater,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,
@@ -40,7 +40,7 @@ describe('ItemImageService class', () => {
       ],
     }).compile()
 
-    itemImageService = module.get<ItemImageService>(ItemImageService)
+    itemImageService = module.get<ItemImageCreater>(ItemImageCreater)
   })
 
   describe('saveItemImages method', () => {
