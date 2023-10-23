@@ -14,21 +14,23 @@ export class ItemCreater {
   ) {}
 
   async registerItem(items: Item, email: string, files: Express.Multer.File[]): Promise<number> {
+    const { itemName, itemDetail, price, stockNumber, itemSellStatus } = items
+
     const member = await this.memberRepository.findByEmail(email)
     if (!member) {
       throw new MemberNotFoundException('회원 정보를 찾을 수 없습니다')
     }
 
-    const savedItem = new Item({
-      itemName: items.itemName,
-      itemDetail: items.itemDetail,
-      price: items.price,
-      stockNumber: items.stockNumber,
-      sellStatus: items.itemSellStatus,
-      member: member,
-    })
-
-    const savedId = await this.itemRepository.save(savedItem)
+    const savedId = await this.itemRepository.save(
+      new Item({
+        itemName: itemName,
+        itemDetail: itemDetail,
+        price: price,
+        stockNumber: stockNumber,
+        sellStatus: itemSellStatus,
+        member: member,
+      }),
+    )
     await this.itemImageService.saveItemImages(savedId, files)
 
     if (!savedId) {

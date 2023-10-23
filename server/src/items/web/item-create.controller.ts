@@ -29,8 +29,8 @@ export class ItemCreateController {
       new Item({
         itemName: itemName,
         itemDetail: itemDetail,
-        price: price,
-        stockNumber: stockNumber,
+        price: Number(price),
+        stockNumber: Number(stockNumber),
         sellStatus: sellStatus,
       }),
       email,
