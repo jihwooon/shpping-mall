@@ -10,7 +10,7 @@ import { MemberRepository } from '../../members/domain/member.repository'
 import { MemberNotFoundException } from '../../members/application/error/member-not-found.exception'
 import { when } from 'jest-when'
 import { filesMock } from '../../fixture/itemImageFixture'
-import { ItemImageService } from '../../item-images/application/item-image.service'
+import { ItemImageCreater } from '../../item-images/application/item-image.creater'
 import { ItemImageRepository } from '../../item-images/domain/item-image.repository'
 
 describe('ItemCreater class', () => {
@@ -34,7 +34,7 @@ describe('ItemCreater class', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ItemCreater,
-        ItemImageService,
+        ItemImageCreater,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,

@@ -16,7 +16,7 @@ export class ItemCreateController {
   @HttpCode(201)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(FilesInterceptor('files', 5))
+  @UseInterceptors(FilesInterceptor('files'))
   async createItemHandler(
     @UploadedFiles() files: Express.Multer.File[],
     @Body() dto: CreateItemRequest,
