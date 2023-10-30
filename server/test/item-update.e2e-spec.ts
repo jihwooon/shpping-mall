@@ -29,6 +29,7 @@ import { ItemNotFoundException } from '../src/items/error/item-not-found.excepti
 import { ItemUpdatedFailException } from '../src/items/error/item-updated-fail.exception'
 import { ItemImageCreater } from '../src/item-images/application/item-image.creater'
 import { ItemImageRepository } from '../src/item-images/domain/item-image.repository'
+import { MemberNotFoundException } from '../src/members/application/error/member-not-found.exception'
 
 describe('ItemUpdateController (e2e)', () => {
   let app: INestApplication
@@ -98,7 +99,7 @@ describe('ItemUpdateController (e2e)', () => {
 
     beforeEach(() => {
       when(ItemUpdaterMock.updateItem)
-        .calledWith(itemMock().id, expect.anything())
+        .calledWith(userMock().email, itemMock().id, expect.anything())
         .mockImplementation(() => true)
       when(RolesGuardMock.canActivate).mockResolvedValue(true)
       when(JwtProviderMock.validateToken).calledWith(jwtTokenFixture().accessToken).mockResolvedValue(userMock().email)
@@ -106,23 +107,22 @@ describe('ItemUpdateController (e2e)', () => {
 
     context('상품 id와 상품 정보가 주어지고 변경에 성공하면', () => {
       it('200 OK를 응답해야 한다', async () => {
-        const { status } = await request(app.getHttpServer())
+        const { status, body } = await request(app.getHttpServer())
           .patch(`/items/${itemMock().id}`)
           .send(updateItemRequest)
           .set('Authorization', 'Bearer ' + jwtTokenFixture().accessToken)
 
         expect(status).toEqual(200)
+        expect(body).toBeTruthy()
       })
     })
 
     context('찾을 수 없는 상품 id이 주어지고 변경 된 상품이 주어지면', () => {
       const not_found_id = (itemMock().id = 9999)
       beforeEach(() => {
-        when(ItemUpdaterMock.updateItem)
-          .calledWith(not_found_id, expect.anything())
-          .mockImplementation(() => {
-            throw new ItemNotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다`)
-          })
+        when(ItemUpdaterMock.updateItem).mockImplementation(() => {
+          throw new ItemNotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다`)
+        })
       })
 
       it('404 ItemNotFound를 응답해야 한다', async () => {
@@ -142,11 +142,9 @@ describe('ItemUpdateController (e2e)', () => {
 
     context('상품 id와 상품 정보가 주어지고 변경에 실패하면', () => {
       beforeEach(() => {
-        when(ItemUpdaterMock.updateItem)
-          .calledWith(itemMock().id, expect.anything())
-          .mockImplementation(() => {
-            throw new ItemUpdatedFailException(`해당 상품 변경에 실패했습니다`)
-          })
+        when(ItemUpdaterMock.updateItem).mockImplementation(() => {
+          throw new ItemUpdatedFailException(`해당 상품 변경에 실패했습니다`)
+        })
       })
       it('500 InternalServerErrorException를 응답해야 한다', async () => {
         const { status, body } = await request(app.getHttpServer())
@@ -323,6 +321,23 @@ describe('ItemUpdateController (e2e)', () => {
           ],
           statusCode: 400,
         })
+      })
+    })
+
+    context('올바른 이메일이 주어지지 않으면', () => {
+      beforeEach(() => {
+        when(ItemUpdaterMock.updateItem).mockImplementation(() => {
+          throw new MemberNotFoundException('회원 정보를 찾을 수 없습니다')
+        })
+      })
+      it('404 MemberNotFoundException를 응답해야 한다', async () => {
+        const { status, body } = await request(app.getHttpServer())
+          .patch(`/items/${itemMock().id}`)
+          .send(updateItemRequest)
+          .set('Authorization', 'Bearer ' + jwtTokenFixture().accessToken)
+
+        expect(status).toEqual(404)
+        expect(body).toEqual({ error: 'MEMBER_NOT_EXITED', message: '회원 정보를 찾을 수 없습니다', statusCode: 404 })
       })
     })
   })

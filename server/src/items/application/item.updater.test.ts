@@ -10,6 +10,7 @@ import { ItemStatusEnum } from '../domain/item-status.enum'
 import { userMock } from '../../fixture/memberFixture'
 import { ItemNotFoundException } from '../error/item-not-found.exception'
 import { ItemUpdatedFailException } from '../error/item-updated-fail.exception'
+import { MemberRepository } from '../../members/domain/member.repository'
 
 describe('ItemUpdater class', () => {
   let itemUpdater: ItemUpdater
@@ -20,8 +21,12 @@ describe('ItemUpdater class', () => {
     findById: jest.fn(),
   }
 
+  const MemberRepositoryMock = {
+    findByEmail: jest.fn(),
+  }
+
   const updatedItem = new Item({
-    id: 1,
+    id: itemMock().id,
     createTime: new Date('2023-09-01T23:10:00.009Z'),
     updateTime: new Date('2023-09-01T23:10:00.009Z'),
     createBy: '생성자',
@@ -46,6 +51,10 @@ describe('ItemUpdater class', () => {
           provide: ItemRepository,
           useValue: ItemRepositoryMock,
         },
+        {
+          provide: MemberRepository,
+          useValue: MemberRepositoryMock,
+        },
       ],
     }).compile()
 
@@ -55,14 +64,15 @@ describe('ItemUpdater class', () => {
   describe('updateItem method', () => {
     beforeEach(() => {
       when(ItemRepositoryMock.findById).calledWith(itemMock().id).mockReturnValue(itemMock())
+      when(MemberRepositoryMock.findByEmail).calledWith(userMock().email).mockResolvedValue(userMock().memberId)
       when(ItemRepositoryMock.update)
-        .calledWith(itemMock().id, updatedItem)
+        .calledWith(itemMock().id, expect.anything())
         .mockImplementation(() => true)
     })
 
     context('상품 id와 변경 된 상품이 주어지면', () => {
       it('true를 리턴해야 한다.', async () => {
-        const item = await itemUpdater.updateItem(itemMock().id, updatedItem)
+        const item = await itemUpdater.updateItem(userMock().email, itemMock().id, updatedItem)
 
         expect(item).toBe(true)
       })
@@ -72,15 +82,20 @@ describe('ItemUpdater class', () => {
       const not_found_id = (itemMock().id = 99999)
 
       it('NotFoundException을 던져야 한다', async () => {
-        expect(itemUpdater.updateItem(not_found_id, updatedItem)).rejects.toThrow(
+        expect(itemUpdater.updateItem(userMock().email, not_found_id, updatedItem)).rejects.toThrow(
           new ItemNotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`),
         )
       })
     })
 
     context('상품 id이 주어지고 상품이 변경을 실패하면', () => {
+      beforeEach(() => {
+        when(ItemRepositoryMock.update)
+          .calledWith(itemMock().id, expect.anything())
+          .mockImplementation(() => false)
+      })
       it('ItemUpdatedFailException을 던져야 한다', async () => {
-        expect(itemUpdater.updateItem(itemMock().id, itemMock())).rejects.toThrow(
+        expect(itemUpdater.updateItem(userMock().email, itemMock().id, itemMock())).rejects.toThrow(
           new ItemUpdatedFailException(`해당 상품 변경에 실패했습니다`),
         )
       })
