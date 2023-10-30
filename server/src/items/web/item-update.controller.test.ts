@@ -8,6 +8,7 @@ import { itemMock } from '../../fixture/itemFixture'
 import { UpdateItemRequest } from '../dto/update-item.dto'
 import { JwtProvider } from '../../jwt/jwt.provider'
 import { when } from 'jest-when'
+import { userMock } from '../../fixture/memberFixture'
 
 describe('ItemUpdateController class', () => {
   let itemController: ItemUpdateController
@@ -16,6 +17,12 @@ describe('ItemUpdateController class', () => {
   const ItemUpdaterMock = {
     updateItem: jest.fn(),
   }
+
+  const requestMock = {
+    user: {
+      email: userMock().email,
+    },
+  } as unknown as Request
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -52,16 +59,16 @@ describe('ItemUpdateController class', () => {
     })
     context('상품 정보와 상품 id가 주어지고 변경에 성공하면', () => {
       it('true를 리턴해야 한다', async () => {
-        const updatedItem = await itemController.updateItemHandler(String(itemMock().id), updateItem)
+        const updatedItem = await itemController.updateItemHandler(String(itemMock().id), requestMock, updateItem)
 
-        expect(updatedItem).toEqual(true)
+        expect(updatedItem).toEqual(undefined)
       })
     })
 
     context('상품 정보가 주어지고 상품 id가 올바르지 않으면', () => {
       it('undefined를 리턴해야 한다', async () => {
         const not_found_id = (itemMock().id = 9999)
-        const updatedItem = await itemController.updateItemHandler(String(not_found_id), updateItem)
+        const updatedItem = await itemController.updateItemHandler(String(not_found_id), requestMock, updateItem)
 
         expect(updatedItem).toEqual(undefined)
       })

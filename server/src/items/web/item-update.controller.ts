@@ -1,4 +1,4 @@
-import { Controller, Patch, Param, Body, UseGuards } from '@nestjs/common'
+import { Controller, Patch, Param, Body, UseGuards, Req } from '@nestjs/common'
 import { ItemUpdater } from '../application/item.updater'
 import { UpdateItemRequest } from '../dto/update-item.dto'
 import { Item } from '../domain/item.entity'
@@ -14,10 +14,16 @@ export class ItemUpdateController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  async updateItemHandler(@Param('id') id: string, @Body() request: UpdateItemRequest): Promise<boolean> {
+  async updateItemHandler(
+    @Param('id') id: string,
+    @Req() req: any,
+    @Body() request: UpdateItemRequest,
+  ): Promise<boolean> {
     const { itemName, itemDetail, price, stockNumber, sellStatus } = request
+    const { email } = req?.user
 
     return await this.itemService.updateItem(
+      email,
       parseInt(id),
       new Item({
         itemName: itemName,
