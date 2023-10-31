@@ -291,7 +291,7 @@ describe('ItemUpdateController (e2e)', () => {
         expect(status).toEqual(400)
         expect(body).toEqual({
           error: 'Bad Request',
-          message: ['price must be a number conforming to the specified constraints', '가격은 필수 입력 값입니다.'],
+          message: ['가격은 필수 입력 값입니다.'],
           statusCode: 400,
         })
       })
@@ -315,10 +315,7 @@ describe('ItemUpdateController (e2e)', () => {
         expect(status).toEqual(400)
         expect(body).toEqual({
           error: 'Bad Request',
-          message: [
-            'stockNumber must be a number conforming to the specified constraints',
-            '재고는 필수 입력 값입니다.',
-          ],
+          message: ['재고는 필수 입력 값입니다.'],
           statusCode: 400,
         })
       })

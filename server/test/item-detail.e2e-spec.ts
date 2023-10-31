@@ -21,6 +21,7 @@ import { when } from 'jest-when'
 import { ItemNotFoundException } from '../src/items/error/item-not-found.exception'
 import { ItemImageCreater } from '../src/item-images/application/item-image.creater'
 import { ItemImageRepository } from '../src/item-images/domain/item-image.repository'
+import { ItemImageUpdater } from '../src/item-images/application/item-image.updater'
 
 describe('ItemDetailController (e2e)', () => {
   let app: INestApplication
@@ -47,6 +48,7 @@ describe('ItemDetailController (e2e)', () => {
         ItemUpdater,
         ItemImageCreater,
         ItemImageRepository,
+        ItemImageUpdater,
         MemberRepository,
         JwtAuthGuard,
         {
