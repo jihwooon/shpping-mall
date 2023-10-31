@@ -5,12 +5,17 @@ import { ItemNotFoundException } from '../error/item-not-found.exception'
 import { ItemUpdatedFailException } from '../error/item-updated-fail.exception'
 import { MemberRepository } from '../../members/domain/member.repository'
 import { MemberNotFoundException } from '../../members/application/error/member-not-found.exception'
+import { ItemImageUpdater } from '../../item-images/application/item-image.updater'
 
 @Injectable()
 export class ItemUpdater {
-  constructor(private readonly itemRepository: ItemRepository, private readonly memberRepository: MemberRepository) {}
+  constructor(
+    private readonly itemRepository: ItemRepository,
+    private readonly memberRepository: MemberRepository,
+    private readonly itemImageUpdater: ItemImageUpdater,
+  ) {}
 
-  async updateItem(email: string, itemId: number, items: Item): Promise<boolean> {
+  async updateItem(email: string, itemId: number, items: Item, files: Express.Multer.File[]): Promise<boolean> {
     const { itemName, itemDetail, price, stockNumber, itemSellStatus } = items
 
     const member = await this.memberRepository.findByEmail(email)
@@ -20,8 +25,10 @@ export class ItemUpdater {
 
     const item = await this.itemRepository.findById(itemId)
     if (!item) {
-      throw new ItemNotFoundException(`${itemId}에 해당하는 상품을 찾을 수 없습니다.`)
+      throw new ItemNotFoundException(`${item.id}에 해당하는 상품을 찾을 수 없습니다.`)
     }
+
+    await this.itemImageUpdater.updateItemImages(files, item)
 
     const updatedItem = await this.itemRepository.update(
       item.id,
