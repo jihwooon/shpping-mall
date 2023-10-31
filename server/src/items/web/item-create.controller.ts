@@ -7,6 +7,7 @@ import { JwtAuthGuard } from '../../config/auth/guards/jwt-auth.guard'
 import { RolesGuard } from '../../config/auth/guards/role-auth.guard'
 import { Roles } from '../../config/auth/role.decorator'
 import { Role } from '../../members/domain/member-role.enum'
+import { multerDiskOptions } from '../../config/multer/multer.options'
 
 @Controller('items')
 export class ItemCreateController {
@@ -16,7 +17,7 @@ export class ItemCreateController {
   @HttpCode(201)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(FilesInterceptor('files'))
+  @UseInterceptors(FilesInterceptor('files', null, multerDiskOptions))
   async createItemHandler(
     @UploadedFiles() files: Express.Multer.File[],
     @Body() dto: CreateItemRequest,

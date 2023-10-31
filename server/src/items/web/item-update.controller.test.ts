@@ -9,6 +9,7 @@ import { UpdateItemRequest } from '../dto/update-item.dto'
 import { JwtProvider } from '../../jwt/jwt.provider'
 import { when } from 'jest-when'
 import { userMock } from '../../fixture/memberFixture'
+import { filesMock } from '../../fixture/itemImageFixture'
 
 describe('ItemUpdateController class', () => {
   let itemController: ItemUpdateController
@@ -59,7 +60,12 @@ describe('ItemUpdateController class', () => {
     })
     context('상품 정보와 상품 id가 주어지고 변경에 성공하면', () => {
       it('true를 리턴해야 한다', async () => {
-        const updatedItem = await itemController.updateItemHandler(String(itemMock().id), requestMock, updateItem)
+        const updatedItem = await itemController.updateItemHandler(
+          String(itemMock().id),
+          filesMock(),
+          requestMock,
+          updateItem,
+        )
 
         expect(updatedItem).toEqual(undefined)
       })
@@ -68,7 +74,12 @@ describe('ItemUpdateController class', () => {
     context('상품 정보가 주어지고 상품 id가 올바르지 않으면', () => {
       it('undefined를 리턴해야 한다', async () => {
         const not_found_id = (itemMock().id = 9999)
-        const updatedItem = await itemController.updateItemHandler(String(not_found_id), requestMock, updateItem)
+        const updatedItem = await itemController.updateItemHandler(
+          String(not_found_id),
+          filesMock(),
+          requestMock,
+          updateItem,
+        )
 
         expect(updatedItem).toEqual(undefined)
       })

@@ -11,6 +11,9 @@ import { userMock } from '../../fixture/memberFixture'
 import { ItemNotFoundException } from '../error/item-not-found.exception'
 import { ItemUpdatedFailException } from '../error/item-updated-fail.exception'
 import { MemberRepository } from '../../members/domain/member.repository'
+import { filesMock, itemImageListMock, itemImageMock } from '../../fixture/itemImageFixture'
+import { ItemImageUpdater } from '../../item-images/application/item-image.updater'
+import { ItemImageRepository } from '../../item-images/domain/item-image.repository'
 
 describe('ItemUpdater class', () => {
   let itemUpdater: ItemUpdater
@@ -23,6 +26,11 @@ describe('ItemUpdater class', () => {
 
   const MemberRepositoryMock = {
     findByEmail: jest.fn(),
+  }
+
+  const ItemImageRepositoryMock = {
+    findByItemOrderByItemImageIdAsc: jest.fn(),
+    update: jest.fn(),
   }
 
   const updatedItem = new Item({
@@ -43,6 +51,7 @@ describe('ItemUpdater class', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ItemUpdater,
+        ItemImageUpdater,
         {
           provide: MYSQL_CONNECTION,
           useValue: connection,
@@ -54,6 +63,10 @@ describe('ItemUpdater class', () => {
         {
           provide: MemberRepository,
           useValue: MemberRepositoryMock,
+        },
+        {
+          provide: ItemImageRepository,
+          useValue: ItemImageRepositoryMock,
         },
       ],
     }).compile()
@@ -68,11 +81,17 @@ describe('ItemUpdater class', () => {
       when(ItemRepositoryMock.update)
         .calledWith(itemMock().id, expect.anything())
         .mockImplementation(() => true)
+      when(ItemImageRepositoryMock.findByItemOrderByItemImageIdAsc)
+        .calledWith(itemMock().id)
+        .mockResolvedValue(itemImageListMock())
+      when(ItemImageRepositoryMock.update)
+        .calledWith(itemImageMock().id, itemImageMock())
+        .mockImplementation(() => true)
     })
 
     context('상품 id와 변경 된 상품이 주어지면', () => {
       it('true를 리턴해야 한다.', async () => {
-        const item = await itemUpdater.updateItem(userMock().email, itemMock().id, updatedItem)
+        const item = await itemUpdater.updateItem(userMock().email, itemMock().id, updatedItem, filesMock())
 
         expect(item).toBe(true)
       })
@@ -80,9 +99,16 @@ describe('ItemUpdater class', () => {
 
     context('찾을 수 없는 상품 id이 주어지고 변경 된 상품이 주어지면', () => {
       const not_found_id = (itemMock().id = 99999)
+      beforeEach(() => {
+        when(ItemRepositoryMock.findById)
+          .calledWith(not_found_id)
+          .mockImplementation(() => {
+            throw new ItemNotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`)
+          })
+      })
 
       it('NotFoundException을 던져야 한다', async () => {
-        expect(itemUpdater.updateItem(userMock().email, not_found_id, updatedItem)).rejects.toThrow(
+        expect(itemUpdater.updateItem(userMock().email, not_found_id, updatedItem, filesMock())).rejects.toThrow(
           new ItemNotFoundException(`${not_found_id}에 해당하는 상품을 찾을 수 없습니다.`),
         )
       })
@@ -95,7 +121,7 @@ describe('ItemUpdater class', () => {
           .mockImplementation(() => false)
       })
       it('ItemUpdatedFailException을 던져야 한다', async () => {
-        expect(itemUpdater.updateItem(userMock().email, itemMock().id, itemMock())).rejects.toThrow(
+        expect(itemUpdater.updateItem(userMock().email, itemMock().id, itemMock(), filesMock())).rejects.toThrow(
           new ItemUpdatedFailException(`해당 상품 변경에 실패했습니다`),
         )
       })

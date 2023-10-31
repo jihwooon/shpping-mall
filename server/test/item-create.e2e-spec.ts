@@ -27,6 +27,8 @@ import { JwtProvider } from '../src/jwt/jwt.provider'
 import { RolesGuard } from '../src/config/auth/guards/role-auth.guard'
 import { when } from 'jest-when'
 import { MemberNotFoundException } from '../src/members/application/error/member-not-found.exception'
+import { ItemImageUpdater } from '../src/item-images/application/item-image.updater'
+import { ItemImageRepository } from '../src/item-images/domain/item-image.repository'
 
 describe('ItemCreateController (e2e)', () => {
   let app: INestApplication
@@ -52,6 +54,8 @@ describe('ItemCreateController (e2e)', () => {
         ItemReader,
         ItemUpdater,
         MemberRepository,
+        ItemImageUpdater,
+        ItemImageRepository,
         JwtProvider,
         JwtAuthGuard,
         RolesGuard,

@@ -11,29 +11,10 @@ import { MemberRepository } from '../members/domain/member.repository'
 import { JwtProvider } from '../jwt/jwt.provider'
 import { ItemImageCreater } from '../item-images/application/item-image.creater'
 import { ItemImageRepository } from '../item-images/domain/item-image.repository'
-import { MulterModule } from '@nestjs/platform-express'
-import { diskStorage } from 'multer'
-import * as mime from 'mime-types'
-import { v4 as uuid } from 'uuid'
+import { ItemImageUpdater } from '../item-images/application/item-image.updater'
 
 @Module({
-  imports: [
-    DatabaseModule,
-    MulterModule.register({
-      storage: diskStorage({
-        destination(req, file, callback) {
-          callback(null, './uploads')
-        },
-        filename(req, file, callback) {
-          callback(null, `${uuid()}.${mime.extension(file.mimetype)}`)
-        },
-      }),
-      limits: {
-        fileSize: 1024 * 1024 * 5,
-        files: 5,
-      },
-    }),
-  ],
+  imports: [DatabaseModule],
   controllers: [ItemCreateController, ItemDetailController, ItemUpdateController],
   providers: [
     ItemCreater,
@@ -44,6 +25,7 @@ import { v4 as uuid } from 'uuid'
     JwtProvider,
     ItemImageCreater,
     ItemImageRepository,
+    ItemImageUpdater,
   ],
 })
 export class ItemModule {}
