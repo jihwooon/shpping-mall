@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { Module, HttpException, HttpStatus } from '@nestjs/common'
 import { ItemCreater } from './application/item.creater'
 import { ItemReader } from './application/item.reader'
 import { ItemCreateController } from './web/item-create.controller'
@@ -13,6 +13,7 @@ import { ItemImageCreater } from '../item-images/application/item-image.creater'
 import { ItemImageRepository } from '../item-images/domain/item-image.repository'
 import { MulterModule } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
+import { existsSync, mkdirSync } from 'fs'
 import * as mime from 'mime-types'
 import { v4 as uuid } from 'uuid'
 
@@ -22,7 +23,11 @@ import { v4 as uuid } from 'uuid'
     MulterModule.register({
       storage: diskStorage({
         destination(req, file, callback) {
-          callback(null, './uploads')
+          const uploadPath = 'uploads'
+          if (!existsSync(uploadPath)) {
+            mkdirSync(uploadPath)
+          }
+          callback(null, uploadPath)
         },
         filename(req, file, callback) {
           callback(null, `${uuid()}.${mime.extension(file.mimetype)}`)
@@ -31,6 +36,22 @@ import { v4 as uuid } from 'uuid'
       limits: {
         fileSize: 1024 * 1024 * 5,
         files: 5,
+      },
+      fileFilter: (request, file, callback) => {
+        if (file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+          callback(null, true)
+        } else {
+          callback(
+            new HttpException(
+              {
+                message: 'NOT_MATCHED_IMAGE_FILE_FORMAT',
+                error: '지원하지 않는 이미지 형식입니다.',
+              },
+              HttpStatus.BAD_REQUEST,
+            ),
+            false,
+          )
+        }
       },
     }),
   ],
