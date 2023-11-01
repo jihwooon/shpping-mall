@@ -7,13 +7,13 @@ import { ItemRepository } from './domain/item.repository'
 import { DatabaseModule } from '../config/database/database.module'
 import { ItemUpdateController } from './web/item-update.controller'
 import { ItemUpdater } from './application/item.updater'
-import { MemberRepository } from '../members/domain/member.repository'
-import { JwtProvider } from '../jwt/jwt.provider'
 import { ItemImageModule } from '../item-images/item-image.module'
+import { MemberModule } from '../members/member.module'
+import { JwtModule } from '../jwt/jwt.module'
 
 @Module({
-  imports: [DatabaseModule, ItemImageModule],
+  imports: [DatabaseModule, ItemImageModule, MemberModule, JwtModule],
   controllers: [ItemCreateController, ItemDetailController, ItemUpdateController],
-  providers: [ItemCreater, ItemRepository, ItemReader, ItemUpdater, MemberRepository, JwtProvider],
+  providers: [ItemCreater, ItemRepository, ItemReader, ItemUpdater],
 })
 export class ItemModule {}
