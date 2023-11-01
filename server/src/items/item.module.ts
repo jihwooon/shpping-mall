@@ -9,23 +9,11 @@ import { ItemUpdateController } from './web/item-update.controller'
 import { ItemUpdater } from './application/item.updater'
 import { MemberRepository } from '../members/domain/member.repository'
 import { JwtProvider } from '../jwt/jwt.provider'
-import { ItemImageCreater } from '../item-images/application/item-image.creater'
-import { ItemImageRepository } from '../item-images/domain/item-image.repository'
-import { ItemImageUpdater } from '../item-images/application/item-image.updater'
+import { ItemImageModule } from '../item-images/item-image.module'
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, ItemImageModule],
   controllers: [ItemCreateController, ItemDetailController, ItemUpdateController],
-  providers: [
-    ItemCreater,
-    ItemRepository,
-    ItemReader,
-    ItemUpdater,
-    MemberRepository,
-    JwtProvider,
-    ItemImageCreater,
-    ItemImageRepository,
-    ItemImageUpdater,
-  ],
+  providers: [ItemCreater, ItemRepository, ItemReader, ItemUpdater, MemberRepository, JwtProvider],
 })
 export class ItemModule {}
