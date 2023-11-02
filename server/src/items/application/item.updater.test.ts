@@ -11,7 +11,7 @@ import { userMock } from '../../fixture/memberFixture'
 import { ItemNotFoundException } from '../error/item-not-found.exception'
 import { ItemUpdatedFailException } from '../error/item-updated-fail.exception'
 import { MemberRepository } from '../../members/domain/member.repository'
-import { filesMock, itemImageListMock, itemImageMock } from '../../fixture/itemImageFixture'
+import { filesMock, itemImagesMock, itemImageMock } from '../../fixture/itemImageFixture'
 import { ItemImageUpdater } from '../../item-images/application/item-image.updater'
 import { ItemImageRepository } from '../../item-images/domain/item-image.repository'
 
@@ -83,7 +83,7 @@ describe('ItemUpdater class', () => {
         .mockImplementation(() => true)
       when(ItemImageRepositoryMock.findByItemOrderByItemImageIdAsc)
         .calledWith(itemMock().id)
-        .mockResolvedValue(itemImageListMock())
+        .mockResolvedValue(itemImagesMock())
       when(ItemImageRepositoryMock.update)
         .calledWith(itemImageMock().id, itemImageMock())
         .mockImplementation(() => true)
