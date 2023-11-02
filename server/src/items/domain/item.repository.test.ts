@@ -2,7 +2,7 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2/promise'
 import { Test, TestingModule } from '@nestjs/testing'
 import { dbItemMock, detailItemMock, itemMock } from '../../fixture/itemFixture'
 import { ItemRepository } from './item.repository'
-import { MYSQL_CONNECTION } from '../../config/database/constants'
+import { MYSQL_CONNECTION } from '../../database/constants'
 
 describe('ItemRepository class', () => {
   let itemRepository: ItemRepository

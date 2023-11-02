@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { Connection } from 'mysql2/promise'
-import { MYSQL_CONNECTION } from '../../config/database/constants'
+import { MYSQL_CONNECTION } from '../../database/constants'
 import { MemberRepository } from '../domain/member.repository'
 import { EmailChecker } from './email.checker'
 import { AlreadyExistedEmailException } from './error/already-existed-email.exception'

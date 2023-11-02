@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { DatabaseModule } from '../../config/database/database.module'
+import { DatabaseModule } from '../../database/database.module'
 import { TokenController } from './web/token.controller'
 import { TokenIssuer } from './application/token.issuer'
 import { MemberModule } from '../../members/member.module'
