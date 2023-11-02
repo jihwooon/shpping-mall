@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { itemMock } from '../../fixture/itemFixture'
-import { MYSQL_CONNECTION } from '../../config/database/constants'
+import { MYSQL_CONNECTION } from '../../database/constants'
 import { Connection } from 'mysql2/promise'
 import { when } from 'jest-when'
 import { fileMock, filesMock } from '../../fixture/itemImageFixture'

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { Connection } from 'mysql2/promise'
 import { MemberRepository } from '../../../members/domain/member.repository'
-import { MYSQL_CONNECTION } from '../../../config/database/constants'
+import { MYSQL_CONNECTION } from '../../../database/constants'
 import { JwtProvider } from '../../../jwt/jwt.provider'
 import { SigninService } from './signin.service'
 import { InternalServerErrorException, BadRequestException } from '@nestjs/common'

@@ -1,6 +1,6 @@
 import { Connection, ResultSetHeader, RowDataPacket } from 'mysql2/promise'
 import { Inject } from '@nestjs/common'
-import { MYSQL_CONNECTION } from '../../config/database/constants'
+import { MYSQL_CONNECTION } from '../../database/constants'
 import { Member } from './member.entity'
 
 export class MemberRepository {

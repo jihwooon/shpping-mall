@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { Connection } from 'mysql2/promise'
 import { MemberRepository } from '../../../members/domain/member.repository'
-import { MYSQL_CONNECTION } from '../../../config/database/constants'
+import { MYSQL_CONNECTION } from '../../../database/constants'
 import { JwtProvider } from '../../../jwt/jwt.provider'
 import { SignoutService } from './signout.service'
 import { TokenExpiredException } from '../../token/error/token_expired.exception'

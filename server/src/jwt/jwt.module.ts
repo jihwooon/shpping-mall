@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { DatabaseModule } from '../config/database/database.module'
+import { DatabaseModule } from '../database/database.module'
 import { JwtProvider } from '../jwt/jwt.provider'
 
 @Module({

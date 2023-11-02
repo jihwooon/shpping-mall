@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { DatabaseModule } from '../config/database/database.module'
+import { DatabaseModule } from '../database/database.module'
 import { ItemImageCreater } from '../item-images/application/item-image.creater'
 import { ItemImageRepository } from '../item-images/domain/item-image.repository'
 import { ItemImageUpdater } from '../item-images/application/item-image.updater'
