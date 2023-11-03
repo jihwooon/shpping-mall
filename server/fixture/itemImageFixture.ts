@@ -1,4 +1,4 @@
-import { ItemImage } from '../item-images/domain/item-image.entity'
+import { ItemImage } from '../src/item-images/domain/item-image.entity'
 import { itemMock } from './itemFixture'
 
 export const itemImageMock = (): ItemImage => {

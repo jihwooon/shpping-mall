@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { JwtProvider } from './jwt.provider'
 import { BadRequestException, UnauthorizedException } from '@nestjs/common'
 import { TokenType } from './token-type.enum'
-import { userMock } from '../fixture/memberFixture'
-import { jwtTokenFixture } from '../fixture/jwtTokenFixture'
+import { userMock } from '../../fixture/memberFixture'
+import { jwtTokenFixture } from '../../fixture/jwtTokenFixture'
 
 describe('JwtProvider class', () => {
   let jwtProvider: JwtProvider

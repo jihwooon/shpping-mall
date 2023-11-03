@@ -8,7 +8,7 @@ import { JwtProvider } from '../../../jwt/jwt.provider'
 import { Response } from 'express'
 import { TokenIssuer } from '../../token/application/token.issuer'
 import { MemberNotFoundException } from '../../../members/application/error/member-not-found.exception'
-import { jwtTokenFixture } from '../../../fixture/jwtTokenFixture'
+import { jwtTokenFixture } from '../../../../fixture/jwtTokenFixture'
 
 describe('SignoutController class', () => {
   let signoutController: SignoutController

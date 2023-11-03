@@ -1,6 +1,6 @@
-import { Role } from '../members/domain/member-role.enum'
-import { MemberType } from '../members/domain/member-type.enum'
-import { Member } from '../members/domain/member.entity'
+import { Role } from '../src/members/domain/member-role.enum'
+import { MemberType } from '../src/members/domain/member-type.enum'
+import { Member } from '../src/members/domain/member.entity'
 
 export const userMock = (): Member => {
   return {

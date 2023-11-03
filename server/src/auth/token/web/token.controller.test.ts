@@ -6,7 +6,7 @@ import { MYSQL_CONNECTION } from '../../../database/constants'
 import { JwtProvider } from '../../../jwt/jwt.provider'
 import { TokenController } from './token.controller'
 import { TokenIssuer } from '../application/token.issuer'
-import { jwtTokenFixture } from '../../../fixture/jwtTokenFixture'
+import { jwtTokenFixture } from '../../../../fixture/jwtTokenFixture'
 import { TokenExpiredException } from '../error/token_expired.exception'
 import { MemberNotFoundException } from '../../../members/application/error/member-not-found.exception'
 

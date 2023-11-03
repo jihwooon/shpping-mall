@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { Connection, ResultSetHeader, RowDataPacket } from 'mysql2/promise'
 import { MemberRepository } from './member.repository'
 import { MYSQL_CONNECTION } from '../../database/constants'
-import { dbMemberMock, userMock } from '../../fixture/memberFixture'
+import { dbMemberMock, userMock } from '../../../fixture/memberFixture'
 
 describe('MemberRepository class', () => {
   let connection: Connection

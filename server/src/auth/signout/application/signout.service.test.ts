@@ -10,8 +10,8 @@ import { MemberNotFoundException } from '../../../members/application/error/memb
 import { NotAccessTokenTypeException } from '../../token/error/not-access-token-type.exception'
 import { InternalServerErrorException } from '@nestjs/common'
 import { TokenIssuer } from '../../token/application/token.issuer'
-import { userMock } from '../../../fixture/memberFixture'
-import { jwtTokenFixture } from '../../../fixture/jwtTokenFixture'
+import { userMock } from '../../../../fixture/memberFixture'
+import { jwtTokenFixture } from '../../../../fixture/jwtTokenFixture'
 
 describe('Signout class', () => {
   let connect: Connection

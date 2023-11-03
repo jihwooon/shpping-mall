@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { MYSQL_CONNECTION } from '../../database/constants'
 import { Connection } from 'mysql2/promise'
-import { fileMock, filesMock, itemImageMock } from '../../fixture/itemImageFixture'
+import { fileMock, filesMock, itemImageMock } from '../../../fixture/itemImageFixture'
 import { ItemImageRepository } from '../../item-images/domain/item-image.repository'
 import { ItemImageUpdater } from './item-image.updater'
-import { itemMock } from '../../fixture/itemFixture'
+import { itemMock } from '../../../fixture/itemFixture'
 
 describe('ItemImageUpdater class', () => {
   let itemImageUpdater: ItemImageUpdater

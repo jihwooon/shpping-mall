@@ -1,5 +1,5 @@
-import { ItemStatusEnum } from '../items/domain/item-status.enum'
-import { Item } from '../items/domain/item.entity'
+import { ItemStatusEnum } from '../src/items/domain/item-status.enum'
+import { Item } from '../src/items/domain/item.entity'
 import { userMock } from './memberFixture'
 
 export const itemMock = (): Item => {

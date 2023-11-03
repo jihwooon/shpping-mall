@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { ItemRepository } from '../domain/item.repository'
-import { itemMock } from '../../fixture/itemFixture'
+import { itemMock } from '../../../fixture/itemFixture'
 import { ItemDetailController } from './item-detail.controller'
 import { ItemReader } from '../application/item.reader'
 import { MYSQL_CONNECTION } from '../../database/constants'

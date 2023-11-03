@@ -11,7 +11,7 @@ import { TokenIssuer } from '../src/auth/token/application/token.issuer'
 import { TokenExpiredException } from '../src/auth/token/error/token_expired.exception'
 import { NotAccessTokenTypeException } from '../src/auth/token/error/not-access-token-type.exception'
 import { MemberNotFoundException } from '../src/members/application/error/member-not-found.exception'
-import { jwtTokenFixture } from '../src/fixture/jwtTokenFixture'
+import { jwtTokenFixture } from '../fixture/jwtTokenFixture'
 
 describe('SignoutController (e2e)', () => {
   let app: INestApplication

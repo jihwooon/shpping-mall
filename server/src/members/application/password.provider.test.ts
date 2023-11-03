@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { PasswordProvider } from './password.provider'
 import { BadRequestException } from '@nestjs/common'
-import { userMock } from '../../fixture/memberFixture'
+import { userMock } from '../../../fixture/memberFixture'
 
 describe('PasswordProvider class', () => {
   let passwordProvider: PasswordProvider

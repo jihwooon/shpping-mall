@@ -2,8 +2,8 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2/promise'
 import { Test, TestingModule } from '@nestjs/testing'
 import { MYSQL_CONNECTION } from '../../database/constants'
 import { ItemImageRepository } from './item-image.repository'
-import { dbItemImagesMock, itemImageMock } from '../../fixture/itemImageFixture'
-import { itemMock } from '../../fixture/itemFixture'
+import { dbItemImagesMock, itemImageMock } from '../../../fixture/itemImageFixture'
+import { itemMock } from '../../../fixture/itemFixture'
 
 describe('ItemImageRepository class', () => {
   let itemImageRepository: ItemImageRepository
