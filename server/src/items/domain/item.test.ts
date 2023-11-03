@@ -1,5 +1,5 @@
 import { Item } from './item.entity'
-import { itemMock } from '../../fixture/itemFixture'
+import { itemMock } from '../../../fixture/itemFixture'
 
 describe('Item', () => {
   let items: Item

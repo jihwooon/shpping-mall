@@ -1,5 +1,5 @@
 import { Member } from './member.entity'
-import { userMock } from '../../fixture/memberFixture'
+import { userMock } from '../../../fixture/memberFixture'
 import { Role } from './member-role.enum'
 import { MemberType } from './member-type.enum'
 

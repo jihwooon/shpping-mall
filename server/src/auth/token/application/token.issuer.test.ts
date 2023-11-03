@@ -4,11 +4,11 @@ import { TokenIssuer } from './token.issuer'
 import { MemberRepository } from '../../../members/domain/member.repository'
 import { MYSQL_CONNECTION } from '../../../database/constants'
 import { MemberNotFoundException } from '../../../members/application/error/member-not-found.exception'
-import { userMock } from '../../../fixture/memberFixture'
+import { userMock } from '../../../../fixture/memberFixture'
 import { JwtProvider } from '../../../jwt/jwt.provider'
 import { TokenExpiredException } from '../error/token_expired.exception'
 import { InternalServerErrorException } from '@nestjs/common'
-import { jwtTokenFixture } from '../../../fixture/jwtTokenFixture'
+import { jwtTokenFixture } from '../../../../fixture/jwtTokenFixture'
 
 describe('TokenIssuer class', () => {
   let connect: Connection

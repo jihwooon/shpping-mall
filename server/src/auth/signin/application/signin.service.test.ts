@@ -8,8 +8,8 @@ import { InternalServerErrorException, BadRequestException } from '@nestjs/commo
 import { PasswordProvider } from '../../../members/application/password.provider'
 import { TokenIssuer } from '../../token/application/token.issuer'
 import { MemberNotFoundException } from '../../../members/application/error/member-not-found.exception'
-import { userMock } from '../../../fixture/memberFixture'
-import { jwtTokenFixture } from '../../../fixture/jwtTokenFixture'
+import { userMock } from '../../../../fixture/memberFixture'
+import { jwtTokenFixture } from '../../../../fixture/jwtTokenFixture'
 
 describe('Signup class', () => {
   let connect: Connection

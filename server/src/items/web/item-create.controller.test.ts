@@ -2,14 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { ItemCreateController } from './item-create.controller'
 import { ItemCreater } from '../application/item.creater'
 import { ItemRepository } from '../domain/item.repository'
-import { itemMock } from '../../fixture/itemFixture'
+import { itemMock } from '../../../fixture/itemFixture'
 import { MYSQL_CONNECTION } from '../../database/constants'
 import { Connection } from 'mysql2/promise'
 import { CreateItemRequest } from '../dto/save-item.dto'
 import { InternalServerErrorException } from '@nestjs/common'
 import { JwtProvider } from '../../jwt/jwt.provider'
 import { when } from 'jest-when'
-import { userMock } from '../../fixture/memberFixture'
+import { userMock } from '../../../fixture/memberFixture'
 
 describe('ItemController class', () => {
   let itemController: ItemCreateController

@@ -1,4 +1,4 @@
-import { TokenType } from '../jwt/token-type.enum'
+import { TokenType } from '../src/jwt/token-type.enum'
 
 export const jwtTokenFixture = () => {
   return {

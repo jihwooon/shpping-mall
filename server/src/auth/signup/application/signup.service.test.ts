@@ -6,7 +6,7 @@ import { MYSQL_CONNECTION } from '../../../database/constants'
 import { SignupService } from './signup.service'
 import { PasswordProvider } from '../../../members/application/password.provider'
 import { JwtProvider } from '../../../jwt/jwt.provider'
-import { userMock } from '../../../fixture/memberFixture'
+import { userMock } from '../../../../fixture/memberFixture'
 
 describe('Signup class', () => {
   let connect: Connection

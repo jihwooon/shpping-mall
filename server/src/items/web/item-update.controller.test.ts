@@ -4,12 +4,12 @@ import { ItemUpdater } from '../application/item.updater'
 import { ItemRepository } from '../domain/item.repository'
 import { MYSQL_CONNECTION } from '../../database/constants'
 import { Connection } from 'mysql2/promise'
-import { itemMock } from '../../fixture/itemFixture'
+import { itemMock } from '../../../fixture/itemFixture'
 import { UpdateItemRequest } from '../dto/update-item.dto'
 import { JwtProvider } from '../../jwt/jwt.provider'
 import { when } from 'jest-when'
-import { userMock } from '../../fixture/memberFixture'
-import { filesMock } from '../../fixture/itemImageFixture'
+import { userMock } from '../../../fixture/memberFixture'
+import { filesMock } from '../../../fixture/itemImageFixture'
 
 describe('ItemUpdateController class', () => {
   let itemController: ItemUpdateController

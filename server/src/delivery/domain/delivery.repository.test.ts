@@ -1,8 +1,8 @@
 import { RowDataPacket } from 'mysql2/promise'
 import { MYSQL_CONNECTION } from '../../database/constants'
 import { DeliveryRepository } from './delivery.repository'
-import { userMock } from '../../fixture/memberFixture'
-import { dbDeliveriesMock } from '../../fixture/deliveryFixture'
+import { userMock } from '../../../fixture/memberFixture'
+import { dbDeliveriesMock } from '../../../fixture/deliveryFixture'
 import { Test, TestingModule } from '@nestjs/testing'
 
 describe('DeliveryRepository class', () => {

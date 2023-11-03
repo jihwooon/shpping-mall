@@ -1,6 +1,6 @@
-import { userMock } from '../../fixture/memberFixture'
+import { userMock } from '../../../fixture/memberFixture'
 import { Delivery } from './delivery.entity'
-import { deliveryMock } from '../../fixture/deliveryFixture'
+import { deliveryMock } from '../../../fixture/deliveryFixture'
 
 describe('Delivery', () => {
   let delivery: Delivery

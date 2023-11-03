@@ -1,5 +1,5 @@
 import { userMock } from './memberFixture'
-import { Delivery } from '../delivery/domain/delivery.entity'
+import { Delivery } from '../src/delivery/domain/delivery.entity'
 
 export const deliveryMock = (): Delivery => {
   return {

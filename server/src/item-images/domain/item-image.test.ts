@@ -1,5 +1,5 @@
 import { ItemImage } from './item-image.entity'
-import { itemImageMock } from '../../fixture/itemImageFixture'
+import { itemImageMock } from '../../../fixture/itemImageFixture'
 
 describe('ItemImage', () => {
   let itemImage: ItemImage

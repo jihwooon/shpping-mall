@@ -7,7 +7,7 @@ import { Connection } from 'mysql2/promise'
 import { JwtProvider } from '../src/jwt/jwt.provider'
 import { TokenController } from '../src/auth/token/web/token.controller'
 import { TokenIssuer } from '../src/auth/token/application/token.issuer'
-import { jwtTokenFixture } from '../src/fixture/jwtTokenFixture'
+import { jwtTokenFixture } from '../fixture/jwtTokenFixture'
 import { MemberNotFoundException } from '../src/members/application/error/member-not-found.exception'
 import { TokenExpiredException } from '../src/auth/token/error/token_expired.exception'
 
