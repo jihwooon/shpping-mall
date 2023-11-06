@@ -3,6 +3,7 @@ import { ItemImageRepository } from '../domain/item-image.repository'
 import { ItemImage } from '../domain/item-image.entity'
 import { ItemRepository } from '../../items/domain/item.repository'
 import { ItemNotFoundException } from '../../items/error/item-not-found.exception'
+import { FileIsNotEmpty } from '../error/file-is-not-empty'
 
 @Injectable()
 export class ItemImageCreater {
@@ -12,6 +13,10 @@ export class ItemImageCreater {
   ) {}
 
   async saveItemImages(itemId: number, @UploadedFiles() files: Express.Multer.File[]) {
+    if (Array.isArray(files) && files.length === 0) {
+      throw new FileIsNotEmpty('파일은 필수 입력 값입니다')
+    }
+
     files.map((file, i) => {
       const isRepresentImage: boolean = i === 0
 
