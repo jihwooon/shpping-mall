@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus } from '@nestjs/common'
+import { BadRequestException } from '@nestjs/common'
 import { diskStorage } from 'multer'
 import { existsSync, mkdirSync } from 'fs'
 import * as mime from 'mime-types'
@@ -25,16 +25,7 @@ export const multerDiskOptions = {
     if (file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
       callback(null, true)
     } else {
-      callback(
-        new HttpException(
-          {
-            message: 'NOT_MATCHED_IMAGE_FILE_FORMAT',
-            error: '지원하지 않는 이미지 형식입니다.',
-          },
-          HttpStatus.BAD_REQUEST,
-        ),
-        false,
-      )
+      callback(new BadRequestException('지원하지 않는 이미지 형식입니다.'), false)
     }
   },
 }
