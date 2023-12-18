@@ -15,7 +15,7 @@ module.exports = {
   "rootDir": ".",
   "testRegex": ".*\\.(e2e-spec|test|spec)\\.ts$",
   "transform": {
-    '^.+\\.(t|j)sx?$': [
+    '^.+\\.(t|j)s?$': [
       '@swc/jest',
     ],
   },
