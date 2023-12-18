@@ -13,7 +13,7 @@ export class ItemImageUpdater {
     const { id } = items
 
     const itemImages = await this.itemImageRepository.findByItemOrderByItemImageIdAsc(id)
-    if (Array.isArray(itemImages) && itemImages.length === 0) {
+    if (!itemImages || itemImages.length === 0) {
       throw new ItemImageNotFoundException(`${id}에 해당하는 이미지를 찾을 수 없습니다.`)
     }
 

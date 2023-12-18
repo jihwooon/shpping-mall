@@ -13,15 +13,16 @@ export class ItemImageCreater {
   ) {}
 
   async saveItemImages(itemId: number, @UploadedFiles() files: Express.Multer.File[]) {
-    if (Array.isArray(files) && files.length === 0) {
+    if (!files || files.length === 0) {
       throw new FileIsNotEmpty('파일은 필수 입력 값입니다')
     }
 
-    files.map((file, i) => {
-      const isRepresentImage: boolean = i === 0
-
-      this.saveItemImage(itemId, { ...file }, isRepresentImage)
-    })
+    await Promise.all(
+      files.map((file, i) => {
+        const isRepresentImage: boolean = i === 0
+        this.saveItemImage(itemId, { ...file }, isRepresentImage)
+      }),
+    )
   }
 
   async saveItemImage(itemId: number, @UploadedFiles() file: Express.Multer.File, isRepresentImage) {
